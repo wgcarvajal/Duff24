@@ -4,7 +4,6 @@ package duff24.com.duff24.fragments;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -17,18 +16,13 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.parse.FindCallback;
 import com.parse.GetCallback;
-import com.parse.GetDataCallback;
 import com.parse.ParseException;
-import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import duff24.com.duff24.R;
 import duff24.com.duff24.adaptadores.AdaptadorProductoGrid;
 import duff24.com.duff24.basededatos.AdminSQliteOpenHelper;
@@ -40,22 +34,22 @@ import duff24.com.duff24.util.AppUtil;
  */
 public class ProductoGridFragment extends Fragment implements AdapterView.OnItemClickListener
 {
-
     private static final String LIST_STATE = "listState";
-    private Parcelable mListState = null;
 
+    private Parcelable mListState = null;
     private String subcategoria;
     private String subcategoriaesp;
     private TextView titulo;
-
     private GridView gridProductos;
     private List<Producto> data = new ArrayList<>();
     private AdaptadorProductoGrid adapter;
+    private String font_path = "font/2-4ef58.ttf";
+    private Typeface TF;
 
-    public ProductoGridFragment() {
+    public ProductoGridFragment()
+    {
         // Required empty public constructor
     }
-
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -69,21 +63,21 @@ public class ProductoGridFragment extends Fragment implements AdapterView.OnItem
         }
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+                             Bundle savedInstanceState)
+    {
         View v = inflater.inflate(R.layout.fragment_producto_grid, container, false);
+
         gridProductos= (GridView) v.findViewById(R.id.gridProductos);
-        String font_path = "font/2-4ef58.ttf";
-        Typeface TF = Typeface.createFromAsset(inflater.getContext().getAssets(), font_path);
         titulo = (TextView) v.findViewById(R.id.textsubcategoria);
-        titulo.setText(this.subcategoria + "s");
+
+        TF = Typeface.createFromAsset(inflater.getContext().getAssets(), font_path);
+        titulo.setText(this.subcategoria);
         titulo.setTypeface(TF);
         if(getResources().getString(R.string.idioma).equals("es"))
         {
-            titulo.setText(this.subcategoriaesp+"s");
+            titulo.setText(this.subcategoriaesp);
         }
 
         adapter= new AdaptadorProductoGrid(v.getContext(),data);
@@ -100,7 +94,6 @@ public class ProductoGridFragment extends Fragment implements AdapterView.OnItem
         }
         return v;
     }
-
 
     public void init(String subcategoria,String subcategoriaesp)
     {
@@ -160,18 +153,15 @@ public class ProductoGridFragment extends Fragment implements AdapterView.OnItem
                                         AppUtil.data.add(producto);
                                         data.add(producto);
                                     }
-
-
                                     adapter.notifyDataSetChanged();
                                     if (mListState != null)
                                     {
                                         gridProductos.onRestoreInstanceState(mListState);
                                     }
-
                                     mListState = null;
-
                                 }
-                            } else {
+                            } else
+                            {
                                 Log.i("entro ", "al error");
                             }
                         }
@@ -206,7 +196,6 @@ public class ProductoGridFragment extends Fragment implements AdapterView.OnItem
 
         if(fila.moveToFirst())
         {
-
             int cant= db.update("pedido",registroPedido,"prodid = '"+prodid+"'",null);
         }
         else
@@ -217,7 +206,5 @@ public class ProductoGridFragment extends Fragment implements AdapterView.OnItem
             db.insert("pedido",null,registroPedido);
         }
         db.close();
-
-
     }
 }

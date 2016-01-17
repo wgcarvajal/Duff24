@@ -25,6 +25,5 @@ public class AdminSQliteOpenHelper extends SQLiteOpenHelper
     {
         db.execSQL("drop table if exists pedido");
         db.execSQL("create table pedido(prodid text primary key, prodcantidad integer, prodprecio integer, prodnombre text)");
-
     }
 }

@@ -2,7 +2,6 @@ package duff24.com.duff24.fragments;
 
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
@@ -17,17 +16,13 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-
-
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import duff24.com.duff24.R;
 import duff24.com.duff24.adaptadores.AdaptadorProducto;
 import duff24.com.duff24.basededatos.AdminSQliteOpenHelper;
@@ -37,19 +32,19 @@ import duff24.com.duff24.util.AppUtil;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ProductoFragment extends Fragment implements AdapterView.OnItemClickListener {
-
+public class ProductoFragment extends Fragment implements AdapterView.OnItemClickListener
+{
     private static final String LIST_STATE = "listState";
+
     private Parcelable mListState = null;
-
-
     private String subcategoria;
     private String subcategoriaesp;
     private TextView titulo;
-
     private ListView listaProductos;
     private List<Producto> data= new ArrayList<>();
     private AdaptadorProducto adapter;
+    private String font_path = "font/2-4ef58.ttf";
+    private Typeface TF;
 
 
     public ProductoFragment() {
@@ -65,43 +60,40 @@ public class ProductoFragment extends Fragment implements AdapterView.OnItemClic
             subcategoria=savedInstanceState.getString("subcategoria");
             subcategoriaesp=savedInstanceState.getString("subcategoriaesp");
             mListState=savedInstanceState.getParcelable(LIST_STATE);
-
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+                             Bundle savedInstanceState)
+    {
         View v= inflater.inflate(R.layout.fragment_producto, container, false);
-        listaProductos= (ListView) v.findViewById(R.id.lstproductos);
 
-        String font_path = "font/2-4ef58.ttf";
-        Typeface TF = Typeface.createFromAsset(inflater.getContext().getAssets(), font_path);
+        listaProductos= (ListView) v.findViewById(R.id.lstproductos);
         titulo = (TextView) v.findViewById(R.id.textsubcategoria);
-        titulo.setText(this.subcategoria + "s");
+
+        TF = Typeface.createFromAsset(inflater.getContext().getAssets(), font_path);
+        titulo.setText(this.subcategoria);
         titulo.setTypeface(TF);
         if(getResources().getString(R.string.idioma).equals("es"))
         {
-            titulo.setText(this.subcategoriaesp+"s");
+            titulo.setText(this.subcategoriaesp);
         }
 
         adapter= new AdaptadorProducto(v.getContext(),data);
         listaProductos.setAdapter(adapter);
         listaProductos.setOnItemClickListener(this);
+
         if(data.size()>0)
         {
-
             adapter.notifyDataSetChanged();
         }
-        else {
+        else
+        {
             loadData();
         }
-
         return v;
     }
-
-
 
     public void init(String subcategoria,String subcategoriaesp)
     {
@@ -119,23 +111,24 @@ public class ProductoFragment extends Fragment implements AdapterView.OnItemClic
         super.onSaveInstanceState(outState);
     }
 
-    public void loadData()
+    private void loadData()
     {
         ParseQuery<ParseObject> querySubcategoria = new ParseQuery<ParseObject>(Producto.TABLASUBCATEGORIA);
         querySubcategoria.whereEqualTo(Producto.TBLSUBCATEGORIA_NOMBRE, this.subcategoria);
         querySubcategoria.getFirstInBackground(new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject subCategoria, ParseException e) {
-                if (e == null) {
-
+                if (e == null)
+                {
                     ParseQuery<ParseObject> queryProductos = new ParseQuery<ParseObject>(Producto.TABLA);
                     queryProductos.whereEqualTo(Producto.SUBCATEGORIA, subCategoria.getObjectId());
                     queryProductos.findInBackground(new FindCallback<ParseObject>() {
                         @Override
                         public void done(List<ParseObject> productos, ParseException e) {
-                            if (e == null) {
-                                for (final ParseObject prod : productos) {
-
+                            if (e == null)
+                            {
+                                for (ParseObject prod : productos)
+                                {
                                     int bandera=0;
                                     for(Producto p:AppUtil.data)
                                     {
@@ -146,7 +139,6 @@ public class ProductoFragment extends Fragment implements AdapterView.OnItemClic
                                             break;
                                         }
                                     }
-
                                     if(bandera==0)
                                     {
                                         Producto producto = new Producto();
@@ -162,16 +154,12 @@ public class ProductoFragment extends Fragment implements AdapterView.OnItemClic
                                         AppUtil.data.add(producto);
                                         data.add(producto);
                                     }
-
-
                                     adapter.notifyDataSetChanged();
                                     if (mListState != null)
                                     {
                                         listaProductos.onRestoreInstanceState(mListState);
                                     }
-
                                     mListState = null;
-
                                 }
                             } else {
                                 Log.i("entro ", "al error");
@@ -182,8 +170,6 @@ public class ProductoFragment extends Fragment implements AdapterView.OnItemClic
             }
         });
     }
-
-
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -199,7 +185,6 @@ public class ProductoFragment extends Fragment implements AdapterView.OnItemClic
 
         AdminSQliteOpenHelper admin = new AdminSQliteOpenHelper(getContext(),"admin",null,1);
         SQLiteDatabase db = admin.getWritableDatabase();
-
         String prodid = data.get(position).getId();
 
         Cursor fila = db.rawQuery("select prodcantidad from pedido where prodid = '" + prodid + "'", null);

@@ -17,17 +17,13 @@ import android.view.SubMenu;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
-
 import java.util.ArrayList;
 import java.util.List;
-
-
 import duff24.com.duff24.adaptadores.PagerAdapterGrid;
 import duff24.com.duff24.fragments.ProductoGridFragment;
 import duff24.com.duff24.modelo.Producto;
@@ -42,44 +38,70 @@ public class BebidasActivity extends AppCompatActivity implements View.OnClickLi
     private ViewPager pager;
     private PagerAdapterGrid adapter;
     private List<ProductoGridFragment> data;
-
     private NavigationView navView;
     private ImageView btnMenuPrincipal;
     private DrawerLayout drawer;
+    private TextView tituloMenuHeader;
+    private Typeface TF;
+    private String font_path = "font/2-4ef58.ttf";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        titulo = (TextView)findViewById(R.id.txttitulo);
+        tituloMenuHeader=(TextView)findViewById(R.id.titulo_header_menu);
+
         btnMenuPrincipal=(ImageView)findViewById(R.id.btn_menu_principal);
-        btnMenuPrincipal.setOnClickListener(this);
+        btnComidas = (ImageView) findViewById(R.id.btncomida);
+        btnMarket=(ImageView) findViewById(R.id.btnmarket);
+        btnBebidas= (ImageView) findViewById(R.id.btnbebida);
 
         drawer=(DrawerLayout)findViewById(R.id.drawer);
+        pager= (ViewPager)findViewById(R.id.pager);
+        navView = (NavigationView) findViewById(R.id.nav);
 
-        btnComidas = (ImageView) findViewById(R.id.btncomida);
-        btnComidas.setImageResource(R.mipmap.ic_foods_opaco);
+        btnMenuPrincipal.setOnClickListener(this);
         btnComidas.setOnClickListener(this);
-
-        btnMarket=(ImageView) findViewById(R.id.btnmarket);
         btnMarket.setOnClickListener(this);
 
-        btnBebidas= (ImageView) findViewById(R.id.btnbebida);
+        btnComidas.setImageResource(R.mipmap.ic_foods_opaco);
         btnBebidas.setImageResource(R.mipmap.ic_driks);
 
-        titulo = (TextView)findViewById(R.id.txttitulo);
-
-        String font_path = "font/2-4ef58.ttf";
-        Typeface TF = Typeface.createFromAsset(getAssets(), font_path);
+        TF = Typeface.createFromAsset(getAssets(), font_path);
         titulo.setTypeface(TF);
+        tituloMenuHeader.setTypeface(TF);
 
         data= new ArrayList<>();
-        pager= (ViewPager)findViewById(R.id.pager);
         adapter = new PagerAdapterGrid(getSupportFragmentManager(), data);
         pager.setAdapter(adapter);
 
+        Menu m = navView.getMenu();
+        aplicandoTipoLetraItemMenu(m,font_path);
 
+        loadData();
 
+    }
+
+    private void aplicandoTipoLetraItemMenu(Menu m,String tipoLetra)
+    {
+
+        for (int i=0;i<m.size();i++) {
+            MenuItem mi = m.getItem(i);
+            SubMenu subMenu = mi.getSubMenu();
+            if (subMenu!=null && subMenu.size() >0 ) {
+                for (int j=0; j <subMenu.size();j++) {
+                    MenuItem subMenuItem = subMenu.getItem(j);
+                    applyFontToMenuItem(subMenuItem,tipoLetra);
+                }
+            }
+            applyFontToMenuItem(mi,tipoLetra);
+        }
+    }
+
+    private void loadData()
+    {
         ParseQuery<ParseObject> queryCategoria = new ParseQuery<ParseObject>(Producto.TABLACATEGORIA);
         queryCategoria.whereEqualTo(Producto.CATEGORIANOMBRE, "Drink");
         queryCategoria.getFirstInBackground(new GetCallback<ParseObject>() {
@@ -95,9 +117,8 @@ public class BebidasActivity extends AppCompatActivity implements View.OnClickLi
                         public void done(List<ParseObject> subcategorias, ParseException e) {
                             if (e == null) {
                                 Log.i("entro", subcategorias.size() + "");
-                                for (ParseObject subcategoria : subcategorias) {
-
-
+                                for (ParseObject subcategoria : subcategorias)
+                                {
                                     ProductoGridFragment productoFragment = new ProductoGridFragment();
                                     productoFragment.init(subcategoria.getString(Producto.TBLSUBCATEGORIA_NOMBRE), subcategoria.getString(Producto.TBLSUBCATEGORIA_NOMBREESP));
 
@@ -111,24 +132,6 @@ public class BebidasActivity extends AppCompatActivity implements View.OnClickLi
                 }
             }
         });
-
-        navView = (NavigationView) findViewById(R.id.nav);
-        Menu m = navView.getMenu();
-        for (int i=0;i<m.size();i++) {
-            MenuItem mi = m.getItem(i);
-
-            //for aapplying a font to subMenu ...
-            SubMenu subMenu = mi.getSubMenu();
-            if (subMenu!=null && subMenu.size() >0 ) {
-                for (int j=0; j <subMenu.size();j++) {
-                    MenuItem subMenuItem = subMenu.getItem(j);
-                    applyFontToMenuItem(subMenuItem);
-                }
-            }
-
-            //the method we have create in activity
-            applyFontToMenuItem(mi);
-        }
     }
 
 
@@ -154,8 +157,9 @@ public class BebidasActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
-    private void applyFontToMenuItem(MenuItem mi) {
-        Typeface font = Typeface.createFromAsset(getAssets(), "font/2-4ef58.ttf");
+    private void applyFontToMenuItem(MenuItem mi,String rutaTipoLetra)
+    {
+        Typeface font = Typeface.createFromAsset(getAssets(), rutaTipoLetra);
         SpannableString mNewTitle = new SpannableString(mi.getTitle());
         mNewTitle.setSpan(new CustomTypefaceSpan("" , font), 0 , mNewTitle.length(),  Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         mi.setTitle(mNewTitle);

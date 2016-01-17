@@ -40,8 +40,11 @@ import duff24.com.duff24.modelo.Producto;
  */
 public class AdaptadorProductoGrid extends BaseAdapter implements View.OnClickListener
 {
-    Context context;
-    List<Producto> data;
+    private Context context;
+    private List<Producto> data;
+    private String font_path = "font/2-4ef58.ttf";
+    private String font_pathOds="font/odstemplik.otf";
+    private Typeface TF;
 
     public AdaptadorProductoGrid(Context context, List<Producto> data)
     {
@@ -50,17 +53,20 @@ public class AdaptadorProductoGrid extends BaseAdapter implements View.OnClickLi
     }
 
     @Override
-    public int getCount() {
+    public int getCount()
+    {
         return data.size();
     }
 
     @Override
-    public Object getItem(int position) {
+    public Object getItem(int position)
+    {
         return data.get(position);
     }
 
     @Override
-    public long getItemId(int position) {
+    public long getItemId(int position)
+    {
         return position;
     }
 
@@ -68,115 +74,107 @@ public class AdaptadorProductoGrid extends BaseAdapter implements View.OnClickLi
     public View getView(int position, View convertView, ViewGroup parent)
     {
         View v = null;
-
-        String font_path = "font/2-4ef58.ttf";
-        Typeface TF = Typeface.createFromAsset(context.getAssets(),font_path);
+        boolean entro=false;
+        final Producto p = (Producto) getItem(position);
 
         if(convertView == null)
         {
-
-            v = View.inflate(context, R.layout.template_producto_grid ,null);
-            ((TextView) v.findViewById(R.id.txtnombreproducto)).setTypeface(TF);
-
+            v = View.inflate(context,R.layout.template_producto_grid ,null);
+            entro=true;
         }else
         {
             v = convertView;
         }
 
-        final Producto p = (Producto) getItem(position);
-
-        TextView txt = (TextView) v.findViewById(R.id.txtnombreproducto);
+        TextView txtnombreProducto = (TextView) v.findViewById(R.id.txtnombreproducto);
         ImageView imagenProducto=(ImageView) v.findViewById(R.id.img_producto);
-        txt.setText(p.getNombre());
-
-        font_path = "font/odstemplik.otf";
-        TF = Typeface.createFromAsset(context.getAssets(),font_path);
         TextView txtconteo= (TextView) v.findViewById(R.id.txtconteo);
-        txtconteo.setTypeface(TF);
-        txtconteo.setText("0");
-        txtconteo.setVisibility(View.GONE);
-
         ImageView btnDisminuir= (ImageView) v.findViewById(R.id.btn_disminuir);
-        btnDisminuir.setVisibility(View.GONE);
-        btnDisminuir.setTag(position);
+        TextView txtPrecioProducto = (TextView) v.findViewById(R.id.txtprecioproducto);
+        TextView txtDescripcionProducto = (TextView) v.findViewById(R.id.txtdescripcionproducto);
 
+        if(entro)
+        {
+            TF = Typeface.createFromAsset(context.getAssets(), font_path);
+            txtnombreProducto.setTypeface(TF);
+            TF = Typeface.createFromAsset(context.getAssets(),font_pathOds);
+            txtconteo.setTypeface(TF);
+            txtnombreProducto.setText(p.getNombre());
+            txtDescripcionProducto.setText(p.getDescripcion());
+        }
+        txtconteo.setText("0");
+
+        txtconteo.setVisibility(View.GONE);
+        btnDisminuir.setVisibility(View.GONE);
+
+        btnDisminuir.setTag(position);
         btnDisminuir.setOnClickListener(this);
 
-        txt = (TextView) v.findViewById(R.id.txtprecioproducto);
         final View fv=v;
+
         if(p.getPrecio()!=0)
         {
-            Log.i("info:", "el precio ya no es null");
-            txt.setText("$" + p.getPrecio());
+            Log.i("info:","el precio ya no es null");
+            txtPrecioProducto.setText("$" + p.getPrecio());
         }
         else
         {
-
             ParseQuery<ParseObject> queryPrecio = new ParseQuery<>(Producto.TABLAPRECIO);
             queryPrecio.whereEqualTo(Producto.TBLPRECIO_PRODUCTO, p.getId());
             queryPrecio.orderByDescending(Producto.TBLPRECIO_FECHACREACION);
-            queryPrecio.getFirstInBackground(new GetCallback<ParseObject>() {
+            queryPrecio.getFirstInBackground(new GetCallback<ParseObject>()
+            {
                 @Override
-                public void done(ParseObject precio, ParseException e) {
-                    if (e == null) {
+                public void done(ParseObject precio, ParseException e)
+                {
+                    if (e == null)
+                    {
                         p.setPrecio(precio.getInt(Producto.TBLPRECIO_VALOR));
                         TextView pre= (TextView)fv.findViewById(R.id.txtprecioproducto);
                         pre.setText("$"+precio.getInt(Producto.TBLPRECIO_VALOR));
                     }
                 }
             });
-
         }
-        txt = (TextView) v.findViewById(R.id.txtdescripcionproducto);
-
-        txt.setText(p.getDescripcion());
 
         if(p.getImagen()!=null)
         {
-
             imagenProducto.setImageBitmap(p.getImagen());
         }
         else
         {
-
             ParseQuery<ParseObject> queryImagen = new ParseQuery<ParseObject>(Producto.TABLAIMAGEN);
             queryImagen.whereEqualTo(Producto.TBLIMAGEN_PRODUCTO, p.getId());
-            queryImagen.getFirstInBackground(new GetCallback<ParseObject>() {
+            queryImagen.getFirstInBackground(new GetCallback<ParseObject>()
+            {
                 @Override
-                public void done(ParseObject object, ParseException e) {
-                    if (e == null) {
+                public void done(ParseObject object, ParseException e)
+                {
+                    if (e == null)
+                    {
                         ParseFile fileObject = (ParseFile) object.get(Producto.TBLIMAGEN_IMGFILE);
                         final String nombreImagen=fileObject.getName();
                         fileObject.getDataInBackground(new GetDataCallback() {
                             @Override
                             public void done(byte[] data, ParseException e) {
-                                if (e == null) {
+                                if (e == null)
+                                {
                                     ImageView imagen = (ImageView) fv.findViewById(R.id.img_producto);
                                     Bitmap imagenmodificada = decodeSampledBitmapFromResource(data, 0, data.length, 80, 80);
                                     p.setImagen(imagenmodificada);
                                     imagen.setImageBitmap(imagenmodificada);
-
-                                    /*String[] extensiones=nombreImagen.split("\\.");
-                                    String extension= extensiones[1];
-                                    Log.i("nombre imagen",extension);
-                                    Log.i("nombre imagen",nombreImagen);
-                                    guardarImagen(context,p.getId()+"",imagenmodificada,extension);*/
-
                                 }
                             }
                         });
                     }
-
                 }
             });
-
         }
+
         AdminSQliteOpenHelper admin = new AdminSQliteOpenHelper(context,"admin",null,1);
         SQLiteDatabase db = admin.getReadableDatabase();
 
-        String prodid = data.get(position).getId();
-
-        Cursor fila = db.rawQuery("select prodcantidad from pedido where prodid = '"+prodid+"'",null);
+        Cursor fila = db.rawQuery("select prodcantidad from pedido where prodid = '"+p.getId()+"'",null);
 
         if(fila.moveToFirst())
         {
@@ -214,9 +212,7 @@ public class AdaptadorProductoGrid extends BaseAdapter implements View.OnClickLi
             }
             this.notifyDataSetChanged();
         }
-
         db.close();
-
     }
 
 

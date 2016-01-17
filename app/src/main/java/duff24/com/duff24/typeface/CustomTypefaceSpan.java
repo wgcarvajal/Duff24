@@ -41,7 +41,6 @@ public class CustomTypefaceSpan extends TypefaceSpan {
         if ((fake & Typeface.ITALIC) != 0) {
             paint.setTextSkewX(-0.25f);
         }
-
         paint.setTypeface(tf);
     }
 }

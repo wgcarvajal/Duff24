@@ -4,9 +4,7 @@ import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-
 import java.util.List;
-
 import duff24.com.duff24.fragments.ProductoFragment;
 
 /**
@@ -35,7 +33,8 @@ public class PagerAdapter extends FragmentStatePagerAdapter
     }
 
     @Override
-    public void restoreState(Parcelable state, ClassLoader loader) {
+    public void restoreState(Parcelable state, ClassLoader loader)
+    {
         super.restoreState(state, loader);
     }
 }
