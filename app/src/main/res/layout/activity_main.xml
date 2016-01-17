@@ -40,19 +40,16 @@
                     android:layout_margin="@dimen/margin_small"
                     />
                 <pl.droidsonroids.gif.GifImageView
-                    android:layout_width="@dimen/tamano_icono_carro_pedido"
+                    android:id="@+id/btn_mi_pedido"
+                    android:layout_width="@dimen/tam_ancho_icono_carro_pedido"
                     android:layout_height="@dimen/tamano_icono_carro_pedido"
                     android:layout_margin="@dimen/super_margin_small"
-                    android:src="@drawable/pedidos"
+                    android:src="@drawable/carro_pedido"
                     android:layout_alignRight="@id/txttitulo"
+                    android:scaleType="fitXY"
                     />
 
-                <ImageView
-                    android:layout_width="@dimen/tamano_icono_carro_pedido"
-                    android:layout_height="@dimen/tamano_icono_carro_pedido"
-                    android:layout_margin="@dimen/super_margin_small"
-                    android:src="@mipmap/ic_carro_pedido"
-                    android:layout_alignRight="@id/txttitulo"/>
+
 
             </RelativeLayout>
 

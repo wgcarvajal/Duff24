@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
+import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
@@ -99,10 +100,16 @@ public class AdaptadorProductoGrid extends BaseAdapter implements View.OnClickLi
             txtnombreProducto.setTypeface(TF);
             TF = Typeface.createFromAsset(context.getAssets(),font_pathOds);
             txtconteo.setTypeface(TF);
-            txtnombreProducto.setText(p.getNombre());
-            txtDescripcionProducto.setText(p.getDescripcion());
         }
         txtconteo.setText("0");
+        txtnombreProducto.setText(p.getNombreing());
+        txtDescripcionProducto.setText(p.getDescripcionIng());
+
+        if(context.getResources().getString(R.string.idioma).equals("es"))
+        {
+            txtnombreProducto.setText(p.getNombreesp());
+            txtDescripcionProducto.setText(p.getDescripcionesp());
+        }
 
         txtconteo.setVisibility(View.GONE);
         btnDisminuir.setVisibility(View.GONE);
@@ -190,6 +197,8 @@ public class AdaptadorProductoGrid extends BaseAdapter implements View.OnClickLi
     @Override
     public void onClick(View v)
     {
+        MediaPlayer m = MediaPlayer.create(context,R.raw.sounido_click);
+        m.start();
         AdminSQliteOpenHelper admin = new AdminSQliteOpenHelper(context,"admin",null,1);
         SQLiteDatabase db = admin.getWritableDatabase();
 

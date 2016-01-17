@@ -12,9 +12,9 @@ public class Producto
     public static String TABLAPRECIO="Precio";
     public static String TABLACATEGORIA="Categoria";
     public static String TABLASUBCATEGORIA="Subcategoria";
-    public static String NOMBRE="prodnombre";
+    public static String NOMBREING="prodnombre";
     public static String NOMBREESP="prodnombreesp";
-    public static String DESCRIPCION="proddescripcion";
+    public static String DESCRIPCIONING="proddescripcion";
     public static String DESCRIPCIONESP="proddescripcionesp";
     public static String CATEGORIANOMBRE="catnombre";
     public static String TBLSUBCATEGORIA_CATEGORIA="categoria";
@@ -30,17 +30,55 @@ public class Producto
 
 
     private String id;
-    private String nombre;
+    private String nombreesp;
+    private String nombreing;
     private int precio;
-    private String descripcion;
+    private String descripcionesp;
+    private String descripcionIng;
     private String categoria;
-    private String subcategoria;
+    private String subcategoriaing;
+    private String subcategoriaesp;
     private Bitmap imagen;
 
+    public String getNombreesp()
+    {
+        return nombreesp;
+    }
 
+    public void setNombreesp(String nombreesp)
+    {
+        this.nombreesp = nombreesp;
+    }
 
-    private String urlImagen;
+    public String getNombreing()
+    {
+        return nombreing;
+    }
 
+    public void setNombreing(String nombreing)
+    {
+        this.nombreing = nombreing;
+    }
+
+    public String getDescripcionesp()
+    {
+        return descripcionesp;
+    }
+
+    public void setDescripcionesp(String descripcionesp)
+    {
+        this.descripcionesp = descripcionesp;
+    }
+
+    public String getDescripcionIng()
+    {
+        return descripcionIng;
+    }
+
+    public void setDescripcionIng(String descripcionIng)
+    {
+        this.descripcionIng = descripcionIng;
+    }
 
     public String getId()
     {
@@ -52,32 +90,12 @@ public class Producto
         this.id = id;
     }
 
-    public String getNombre()
-    {
-        return nombre;
-    }
-
-    public void setNombre(String nombre)
-    {
-        this.nombre = nombre;
-    }
-
     public int getPrecio() {
         return precio;
     }
 
     public void setPrecio(int precio) {
         this.precio = precio;
-    }
-
-    public String getDescripcion()
-    {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion)
-    {
-        this.descripcion = descripcion;
     }
 
     public String getCategoria()
@@ -90,16 +108,6 @@ public class Producto
         this.categoria = categoria;
     }
 
-    public String getSubcategoria()
-    {
-        return subcategoria;
-    }
-
-    public void setSubcategoria(String subcategoria)
-    {
-        this.subcategoria = subcategoria;
-    }
-
     public Bitmap getImagen() {
         return imagen;
     }
@@ -109,12 +117,24 @@ public class Producto
         this.imagen = imagen;
     }
 
-    public String getUrlImagen() {
-        return urlImagen;
+    public String getSubcategoriaing()
+    {
+        return subcategoriaing;
     }
 
-    public void setUrlImagen(String urlImagen) {
-        this.urlImagen = urlImagen;
+    public void setSubcategoriaing(String subcategoriaing)
+    {
+        this.subcategoriaing = subcategoriaing;
+    }
+
+    public String getSubcategoriaesp()
+    {
+        return subcategoriaesp;
+    }
+
+    public void setSubcategoriaesp(String subcategoriaesp)
+    {
+        this.subcategoriaesp = subcategoriaesp;
     }
 
 

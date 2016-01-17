@@ -5,11 +5,14 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.SoundEffectConstants;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -37,7 +40,7 @@ public class ProductoFragment extends Fragment implements AdapterView.OnItemClic
     private static final String LIST_STATE = "listState";
 
     private Parcelable mListState = null;
-    private String subcategoria;
+    private String subcategoriaing;
     private String subcategoriaesp;
     private TextView titulo;
     private ListView listaProductos;
@@ -57,7 +60,7 @@ public class ProductoFragment extends Fragment implements AdapterView.OnItemClic
         super.onCreate(savedInstanceState);
         if(savedInstanceState!=null)
         {
-            subcategoria=savedInstanceState.getString("subcategoria");
+            subcategoriaing=savedInstanceState.getString("subcategoriaing");
             subcategoriaesp=savedInstanceState.getString("subcategoriaesp");
             mListState=savedInstanceState.getParcelable(LIST_STATE);
         }
@@ -68,12 +71,11 @@ public class ProductoFragment extends Fragment implements AdapterView.OnItemClic
                              Bundle savedInstanceState)
     {
         View v= inflater.inflate(R.layout.fragment_producto, container, false);
-
         listaProductos= (ListView) v.findViewById(R.id.lstproductos);
         titulo = (TextView) v.findViewById(R.id.textsubcategoria);
 
         TF = Typeface.createFromAsset(inflater.getContext().getAssets(), font_path);
-        titulo.setText(this.subcategoria);
+        titulo.setText(this.subcategoriaing);
         titulo.setTypeface(TF);
         if(getResources().getString(R.string.idioma).equals("es"))
         {
@@ -83,6 +85,7 @@ public class ProductoFragment extends Fragment implements AdapterView.OnItemClic
         adapter= new AdaptadorProducto(v.getContext(),data);
         listaProductos.setAdapter(adapter);
         listaProductos.setOnItemClickListener(this);
+
 
         if(data.size()>0)
         {
@@ -95,9 +98,9 @@ public class ProductoFragment extends Fragment implements AdapterView.OnItemClic
         return v;
     }
 
-    public void init(String subcategoria,String subcategoriaesp)
+    public void init(String subcategoriaing,String subcategoriaesp)
     {
-        this.subcategoria=subcategoria;
+        this.subcategoriaing=subcategoriaing;
         this.subcategoriaesp=subcategoriaesp;
     }
 
@@ -105,7 +108,7 @@ public class ProductoFragment extends Fragment implements AdapterView.OnItemClic
     public void onSaveInstanceState(Bundle outState)
     {
         mListState = listaProductos.onSaveInstanceState();
-        outState.putString("subcategoria", subcategoria);
+        outState.putString("subcategoriaing", subcategoriaing);
         outState.putString("subcategoriaesp", subcategoriaesp);
         outState.putParcelable(LIST_STATE, mListState);
         super.onSaveInstanceState(outState);
@@ -114,7 +117,7 @@ public class ProductoFragment extends Fragment implements AdapterView.OnItemClic
     private void loadData()
     {
         ParseQuery<ParseObject> querySubcategoria = new ParseQuery<ParseObject>(Producto.TABLASUBCATEGORIA);
-        querySubcategoria.whereEqualTo(Producto.TBLSUBCATEGORIA_NOMBRE, this.subcategoria);
+        querySubcategoria.whereEqualTo(Producto.TBLSUBCATEGORIA_NOMBRE, this.subcategoriaing);
         querySubcategoria.getFirstInBackground(new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject subCategoria, ParseException e) {
@@ -143,14 +146,12 @@ public class ProductoFragment extends Fragment implements AdapterView.OnItemClic
                                     {
                                         Producto producto = new Producto();
                                         producto.setId(prod.getObjectId());
-                                        producto.setNombre(prod.getString(Producto.NOMBRE));
-                                        producto.setDescripcion(prod.getString(Producto.DESCRIPCION));
+                                        producto.setNombreesp(prod.getString(Producto.NOMBREESP));
+                                        producto.setNombreing(prod.getString(Producto.NOMBREING));
+                                        producto.setDescripcionesp(prod.getString(Producto.DESCRIPCIONESP));
+                                        producto.setDescripcionIng(prod.getString(Producto.DESCRIPCIONING));
                                         producto.setPrecio(0);
                                         producto.setImagen(null);
-                                        if (isAdded() && getResources().getString(R.string.idioma).equals("es")) {
-                                            producto.setNombre(prod.getString(Producto.NOMBREESP));
-                                            producto.setDescripcion(prod.getString(Producto.DESCRIPCIONESP));
-                                        }
                                         AppUtil.data.add(producto);
                                         data.add(producto);
                                     }
@@ -172,7 +173,10 @@ public class ProductoFragment extends Fragment implements AdapterView.OnItemClic
     }
 
     @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+    {
+        MediaPlayer m = MediaPlayer.create(getContext(),R.raw.sounido_click);
+        m.start();
         TextView textconteo= (TextView) view.findViewById(R.id.txtconteo);
         textconteo.setVisibility(View.VISIBLE);
 
@@ -200,7 +204,11 @@ public class ProductoFragment extends Fragment implements AdapterView.OnItemClic
         {
             registroPedido.put("prodid",prodid);
             registroPedido.put("prodprecio",data.get(position).getPrecio());
-            registroPedido.put("prodnombre",data.get(position).getNombre());
+            registroPedido.put("prodnombreesp",data.get(position).getNombreesp());
+            registroPedido.put("prodnombreing",data.get(position).getNombreing());
+            registroPedido.put("proddescripcioning",data.get(position).getDescripcionIng());
+            registroPedido.put("proddescripcionesp",data.get(position).getDescripcionesp());
+
             db.insert("pedido",null,registroPedido);
         }
         db.close();

@@ -28,10 +28,10 @@ import duff24.com.duff24.adaptadores.PagerAdapter;
 import duff24.com.duff24.fragments.ProductoFragment;
 import duff24.com.duff24.modelo.Producto;
 import duff24.com.duff24.typeface.CustomTypefaceSpan;
+import pl.droidsonroids.gif.GifImageView;
 
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener
-{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
 
     private TextView titulo;
     private ViewPager pager;
@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ImageView btnMarket;
     private NavigationView navView;
     private ImageView btnMenuPrincipal;
+    private GifImageView btnMipedido;
     private DrawerLayout drawer;
     private TextView tituloMenuHeader;
     private Typeface TF;
@@ -57,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tituloMenuHeader=(TextView)findViewById(R.id.titulo_header_menu);
 
         btnMenuPrincipal=(ImageView)findViewById(R.id.btn_menu_principal);
+        btnMipedido = (GifImageView)findViewById(R.id.btn_mi_pedido);
         btnBebidas = (ImageView) findViewById(R.id.btnbebida);
         btnMarket = (ImageView) findViewById(R.id.btnmarket);
 
@@ -67,8 +69,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnMenuPrincipal.setOnClickListener(this);
         btnBebidas.setOnClickListener(this);
         btnMarket.setOnClickListener(this);
+        btnMipedido.setOnClickListener(this);
+        navView.setNavigationItemSelectedListener(this);
 
         TF = Typeface.createFromAsset(getAssets(), font_path);
+        titulo.setTypeface(TF);
+        tituloMenuHeader.setTypeface(TF);
 
         data= new ArrayList<>();
         adapter = new PagerAdapter(getSupportFragmentManager(), data);
@@ -146,6 +152,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btn_menu_principal:
                     drawer.openDrawer(GravityCompat.START);
             break;
+            case R.id.btn_mi_pedido:
+                intent = new Intent(this,PedidoActivity.class);
+                startActivity(intent);
+            break;
 
         }
     }
@@ -156,5 +166,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         SpannableString mNewTitle = new SpannableString(mi.getTitle());
         mNewTitle.setSpan(new CustomTypefaceSpan("" , font), 0 , mNewTitle.length(),  Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         mi.setTitle(mNewTitle);
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem menuItem)
+    {
+        Intent intent;
+        switch (menuItem.getItemId())
+        {
+            case R.id.nav_mi_pedido:
+                intent = new Intent(this,PedidoActivity.class);
+                startActivity(intent);
+            break;
+        }
+        drawer.closeDrawers();
+        return false;
     }
 }

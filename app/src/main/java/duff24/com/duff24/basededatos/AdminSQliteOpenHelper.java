@@ -17,7 +17,7 @@ public class AdminSQliteOpenHelper extends SQLiteOpenHelper
     @Override
     public void onCreate(SQLiteDatabase db)
     {
-        db.execSQL("create table pedido(prodid text primary key, prodcantidad integer, prodprecio integer, prodnombre text)");
+        db.execSQL("create table pedido(prodid text primary key, prodcantidad integer, prodprecio integer, prodnombreesp text, prodnombreing text, proddescripcioning text, proddescripcionesp text )");
     }
 
     @Override

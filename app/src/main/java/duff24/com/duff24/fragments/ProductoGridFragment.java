@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
@@ -142,14 +143,12 @@ public class ProductoGridFragment extends Fragment implements AdapterView.OnItem
                                     if(bandera==0) {
                                         Producto producto = new Producto();
                                         producto.setId(prod.getObjectId());
-                                        producto.setNombre(prod.getString(Producto.NOMBRE));
-                                        producto.setDescripcion(prod.getString(Producto.DESCRIPCION));
+                                        producto.setNombreing(prod.getString(Producto.NOMBREING));
+                                        producto.setDescripcionIng(prod.getString(Producto.DESCRIPCIONING));
+                                        producto.setNombreesp(prod.getString(Producto.NOMBREESP));
+                                        producto.setDescripcionesp(prod.getString(Producto.DESCRIPCIONESP));
                                         producto.setPrecio(0);
                                         producto.setImagen(null);
-                                        if (isAdded() && getResources().getString(R.string.idioma).equals("es")) {
-                                            producto.setNombre(prod.getString(Producto.NOMBREESP));
-                                            producto.setDescripcion(prod.getString(Producto.DESCRIPCIONESP));
-                                        }
                                         AppUtil.data.add(producto);
                                         data.add(producto);
                                     }
@@ -175,6 +174,8 @@ public class ProductoGridFragment extends Fragment implements AdapterView.OnItem
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
     {
+        MediaPlayer m = MediaPlayer.create(getContext(),R.raw.sounido_click);
+        m.start();
         Log.i("entro producto:",position+"");
         TextView textconteo= (TextView) view.findViewById(R.id.txtconteo);
         textconteo.setVisibility(View.VISIBLE);
@@ -202,7 +203,11 @@ public class ProductoGridFragment extends Fragment implements AdapterView.OnItem
         {
             registroPedido.put("prodid",prodid);
             registroPedido.put("prodprecio",data.get(position).getPrecio());
-            registroPedido.put("prodnombre",data.get(position).getNombre());
+            registroPedido.put("prodnombreesp",data.get(position).getNombreesp());
+            registroPedido.put("prodnombreing",data.get(position).getNombreing());
+            registroPedido.put("proddescripcioning",data.get(position).getDescripcionIng());
+            registroPedido.put("proddescripcionesp",data.get(position).getDescripcionesp());
+
             db.insert("pedido",null,registroPedido);
         }
         db.close();

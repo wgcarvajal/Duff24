@@ -9,5 +9,7 @@
     <string name="hamburguesas">Hamburguesas</string>
     <string name="idioma">es</string>
     <string name="texto_menu_mi_pedido">Mi pedido</string>
+    <string name="vaciar_pedido">Vaciar pedido</string>
+    <string name="regresar_a_carta">Regresar a la carta</string>
 
 </resources>

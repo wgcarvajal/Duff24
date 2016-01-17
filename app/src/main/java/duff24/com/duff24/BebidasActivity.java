@@ -28,8 +28,9 @@ import duff24.com.duff24.adaptadores.PagerAdapterGrid;
 import duff24.com.duff24.fragments.ProductoGridFragment;
 import duff24.com.duff24.modelo.Producto;
 import duff24.com.duff24.typeface.CustomTypefaceSpan;
+import pl.droidsonroids.gif.GifImageView;
 
-public class BebidasActivity extends AppCompatActivity implements View.OnClickListener {
+public class BebidasActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
 
     private ImageView btnComidas;
     private ImageView btnBebidas;
@@ -40,6 +41,7 @@ public class BebidasActivity extends AppCompatActivity implements View.OnClickLi
     private List<ProductoGridFragment> data;
     private NavigationView navView;
     private ImageView btnMenuPrincipal;
+    private GifImageView btnMipedido;
     private DrawerLayout drawer;
     private TextView tituloMenuHeader;
     private Typeface TF;
@@ -54,6 +56,7 @@ public class BebidasActivity extends AppCompatActivity implements View.OnClickLi
         tituloMenuHeader=(TextView)findViewById(R.id.titulo_header_menu);
 
         btnMenuPrincipal=(ImageView)findViewById(R.id.btn_menu_principal);
+        btnMipedido = (GifImageView)findViewById(R.id.btn_mi_pedido);
         btnComidas = (ImageView) findViewById(R.id.btncomida);
         btnMarket=(ImageView) findViewById(R.id.btnmarket);
         btnBebidas= (ImageView) findViewById(R.id.btnbebida);
@@ -65,6 +68,8 @@ public class BebidasActivity extends AppCompatActivity implements View.OnClickLi
         btnMenuPrincipal.setOnClickListener(this);
         btnComidas.setOnClickListener(this);
         btnMarket.setOnClickListener(this);
+        btnMipedido.setOnClickListener(this);
+        navView.setNavigationItemSelectedListener(this);
 
         btnComidas.setImageResource(R.mipmap.ic_foods_opaco);
         btnBebidas.setImageResource(R.mipmap.ic_driks);
@@ -154,6 +159,10 @@ public class BebidasActivity extends AppCompatActivity implements View.OnClickLi
             case R.id.btn_menu_principal:
                 drawer.openDrawer(GravityCompat.START);
             break;
+            case R.id.btn_mi_pedido:
+                intent = new Intent(this,PedidoActivity.class);
+                startActivity(intent);
+            break;
         }
     }
 
@@ -163,5 +172,20 @@ public class BebidasActivity extends AppCompatActivity implements View.OnClickLi
         SpannableString mNewTitle = new SpannableString(mi.getTitle());
         mNewTitle.setSpan(new CustomTypefaceSpan("" , font), 0 , mNewTitle.length(),  Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         mi.setTitle(mNewTitle);
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem menuItem)
+    {
+        Intent intent;
+        switch (menuItem.getItemId())
+        {
+            case R.id.nav_mi_pedido:
+                intent = new Intent(this,PedidoActivity.class);
+                startActivity(intent);
+                break;
+        }
+        drawer.closeDrawers();
+        return false;
     }
 }

@@ -1,0 +1,57 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="duff24.com.duff24.PedidoActivity"
+    android:background="#000000">
+
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/drawer"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        >
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
+            <ImageView
+                android:id="@+id/btn_menu_principal"
+                android:layout_width="@dimen/tamano_icono_menu_principal"
+                android:layout_height="@dimen/tamano_icono_menu_principal"
+                android:src="@mipmap/ic_menu_principal"
+                android:layout_margin="@dimen/margin_small"
+                />
+
+            <TextView
+                android:id="@+id/txttitulo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/super_margin_small"
+                android:text="@string/texto_menu_mi_pedido"
+                android:textSize="@dimen/tam_titulo_vista"
+                android:textColor="#ffffff"
+                android:gravity="center"
+                />
+
+        </RelativeLayout>
+
+        <android.support.design.widget.NavigationView
+
+            android:id="@+id/nav"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:layout_gravity="start"
+            app:menu="@menu/pedido_nav"
+            android:background="#BF000000"
+            app:itemTextColor="#ffffff"
+            app:itemIconTint="#ffffff"
+            app:headerLayout="@layout/navigation_header"
+            app:itemTextAppearance="@style/NavDrawerTextStyle"
+            />
+
+
+    </android.support.v4.widget.DrawerLayout>
+
+
+</RelativeLayout>
