@@ -1,0 +1,131 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    tools:context=".MainActivity"
+    android:background="#000000">
+
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/drawer"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/txttitulo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/super_margin_small"
+                    android:text="@string/la_carta"
+                    android:textSize="@dimen/tam_titulo_vista"
+                    android:textColor="#ffffff"
+                    android:gravity="center"
+                    />
+
+                <ImageView
+                    android:id="@+id/btn_menu_principal"
+                    android:layout_width="@dimen/tamano_icono_menu_principal"
+                    android:layout_height="@dimen/tamano_icono_menu_principal"
+                    android:src="@mipmap/ic_menu_principal"
+                    android:layout_margin="@dimen/margin_small"
+                    />
+                <pl.droidsonroids.gif.GifImageView
+                    android:layout_width="@dimen/tamano_icono_carro_pedido"
+                    android:layout_height="@dimen/tamano_icono_carro_pedido"
+                    android:layout_margin="@dimen/super_margin_small"
+                    android:src="@drawable/pedidos"
+                    android:layout_alignRight="@id/txttitulo"
+                    />
+
+                <ImageView
+                    android:layout_width="@dimen/tamano_icono_carro_pedido"
+                    android:layout_height="@dimen/tamano_icono_carro_pedido"
+                    android:layout_margin="@dimen/super_margin_small"
+                    android:src="@mipmap/ic_carro_pedido"
+                    android:layout_alignRight="@id/txttitulo"/>
+
+            </RelativeLayout>
+
+            <LinearLayout
+                android:id="@+id/menucarta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="@dimen/margin_small"
+                android:layout_marginBottom="@dimen/margin_small">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:id="@+id/btncomida"
+                        android:layout_width="@dimen/ancho_btn_menu_principal"
+                        android:layout_height="@dimen/alto_btn_menu_principal"
+                        android:src="@mipmap/ic_foods"
+                        />
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center">
+                    <ImageView
+                        android:id="@+id/btnbebida"
+                        android:layout_width="@dimen/ancho_btn_menu_principal"
+                        android:layout_height="@dimen/alto_btn_menu_principal"
+                        android:src="@mipmap/ic_drinks_opaco"
+                        />
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:id="@+id/btnmarket"
+                        android:layout_width="@dimen/ancho_btn_menu_principal"
+                        android:layout_height="@dimen/alto_btn_menu_principal"
+                        android:src="@mipmap/ic_market_opaco"
+                        />
+                </LinearLayout>
+            </LinearLayout>
+            <android.support.v4.view.ViewPager
+                android:id="@+id/pager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/menucarta">
+            </android.support.v4.view.ViewPager>
+        </LinearLayout>
+        <android.support.design.widget.NavigationView
+
+            android:id="@+id/nav"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:layout_gravity="start"
+            app:menu="@menu/main_nav"
+            android:background="#BF000000"
+            app:itemTextColor="#ffffff"
+            app:itemIconTint="#ffffff"
+            app:headerLayout="@layout/navigation_header"
+            app:itemTextAppearance="@style/NavDrawerTextStyle"
+
+
+            />
+    </android.support.v4.widget.DrawerLayout>
+</LinearLayout>

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:cardview="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+
+    >
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/cardview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/super_margin_small"
+        android:layout_marginRight="@dimen/super_margin_small"
+        android:layout_marginTop="@dimen/super_margin_small"
+        cardview:cardBackgroundColor="#00000000"
+        >
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+
+                >
+                <TextView
+                    android:id="@+id/txtnombreproducto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Hawaiana"
+                    android:textColor="#ffffff"
+                    android:textSize="@dimen/tam_nombre_producto"
+
+
+                    />
+
+                <TextView
+                    android:id="@+id/txtprecioproducto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#ffffff"
+                    android:text="$7500"
+                    android:textSize="@dimen/tam_precio_producto"
+                    android:layout_below="@id/txtnombreproducto"
+
+                    />
+
+                <TextView
+                    android:id="@+id/txtdescripcionproducto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#ffffff"
+                    android:text="Carne de res, piña, doble queso, cebolla, tomate, lechuga, salsas"
+                    android:textSize="@dimen/tam_descripcion_producto"
+                    android:layout_below="@id/txtprecioproducto"/>
+
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3">
+
+                <ImageView
+                    android:id="@+id/img_producto"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/alto_template_producto"
+                    android:scaleType="fitXY"
+                    />
+
+                <TextView
+                    android:id="@+id/txtconteo"
+                    android:layout_width="@dimen/tam_btn_cantidad_producto"
+                    android:layout_height="@dimen/tam_btn_cantidad_producto"
+                    android:text="0"
+                    android:textSize="@dimen/tam_text_cantidad_producto"
+                    android:textColor="#ffffff"
+                    android:layout_alignRight="@id/img_producto"
+                    android:layout_alignBottom="@id/img_producto"
+                    android:background="@drawable/text_view_redondo"
+                    android:gravity="center"
+
+                    />
+                <ImageView
+                    android:id="@+id/btn_disminuir"
+                    android:layout_width="@dimen/tam_btn_cantidad_producto"
+                    android:layout_height="@dimen/tam_btn_cantidad_producto"
+                    android:layout_marginRight="@dimen/super_margin_small"
+                    android:layout_alignBottom="@id/img_producto"
+                    android:layout_toLeftOf="@id/txtconteo"
+                    android:src="@mipmap/ic_disminuir"
+                    android:background="@drawable/img_view_redondo"
+                    />
+            </RelativeLayout>
+
+
+        </LinearLayout>
+
+
+
+</android.support.v7.widget.CardView>
+
+
+</RelativeLayout>

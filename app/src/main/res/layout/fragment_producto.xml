@@ -1,0 +1,27 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="duff24.com.duff24.fragments.MascotaFragment">
+
+    <TextView
+        android:id="@+id/textsubcategoria"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/hamburguesas"
+        android:textColor="#ffffff"
+        android:gravity="center"
+        android:textSize="@dimen/tam_titulo_subcategoria"
+        android:layout_marginBottom="@dimen/margin_small"/>
+    <ListView
+        android:id="@+id/lstproductos"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="#00000000"
+        android:dividerHeight="@dimen/margin_small"
+        android:scrollbars="none"
+        >
+    </ListView>
+
+</LinearLayout>

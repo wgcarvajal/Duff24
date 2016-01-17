@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+    <string name="la_carta">La Carta</string>
+
+    <string name="comida">Comidas</string>
+    <string name="bebida">Bebidas</string>
+    <string name="hamburguesas">Hamburguesas</string>
+    <string name="idioma">es</string>
+    <string name="texto_menu_mi_pedido">Mi pedido</string>
+
+</resources>

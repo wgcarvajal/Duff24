@@ -1,0 +1,30 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <dimen name="tam_titulo_vista">30sp</dimen>
+    <dimen name="margin_small">10dp</dimen>
+    <dimen name="ancho_btn_menu_principal">30dp</dimen>
+    <dimen name="alto_btn_menu_principal">30dp</dimen>
+    <dimen name="tam_titulo_subcategoria">25sp</dimen>
+    <dimen name="super_margin_small">5dp</dimen>
+    <dimen name="alto_template_producto">160dp</dimen>
+    <dimen name="tam_nombre_producto">22sp</dimen>
+    <dimen name="tam_precio_producto">19sp</dimen>
+    <dimen name="tam_descripcion_producto">14sp</dimen>
+    <dimen name="alto_campo_nombre_producto">60dp</dimen>
+    <dimen name="tam_imagen_producto_grid">100dp</dimen>
+    <dimen name="alto_campo_descripcion_producto">45dp</dimen>
+    <dimen name="tamano_icono_menu_principal">40dp</dimen>
+    <dimen name="tamano_icono_carro_pedido">50dp</dimen>
+    <dimen name="tam_logo_menu_header">70dp</dimen>
+    <dimen name="tam_titulo_menu_header">70dp</dimen>
+    <dimen name="tam_letra_titulo_menu_header">25sp</dimen>
+    <dimen name="tam_letra_item_menu">20sp</dimen>
+    <dimen name="tam_btn_cantidad_producto">48dp</dimen>
+    <dimen name="tam_text_cantidad_producto">40sp</dimen>
+    <dimen name="tam_btn_cantidad_prod_grid">35dp</dimen>
+    <dimen name="tam_text_cantidad_producto_grid">25sp</dimen>
+
+</resources>

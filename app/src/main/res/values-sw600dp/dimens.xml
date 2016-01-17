@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <dimen name="tam_titulo_vista">50sp</dimen>
+    <dimen name="margin_small">20dp</dimen>
+    <dimen name="ancho_btn_menu_principal">50dp</dimen>
+    <dimen name="alto_btn_menu_principal">50dp</dimen>
+    <dimen name="tam_titulo_subcategoria">45sp</dimen>
+    <dimen name="super_margin_small">10dp</dimen>
+    <dimen name="alto_template_producto">250dp</dimen>
+    <dimen name="tam_nombre_producto">38sp</dimen>
+    <dimen name="tam_precio_producto">35sp</dimen>
+    <dimen name="tam_descripcion_producto">20sp</dimen>
+    <dimen name="alto_campo_nombre_producto">120dp</dimen>
+    <dimen name="tam_imagen_producto_grid">200dp</dimen>
+    <dimen name="alto_campo_descripcion_producto">90dp</dimen>
+    <dimen name="tamano_icono_menu_principal">60dp</dimen>
+    <dimen name="tamano_icono_carro_pedido">90dp</dimen>
+    <dimen name="tam_logo_menu_header">100dp</dimen>
+    <dimen name="tam_titulo_menu_header">100dp</dimen>
+    <dimen name="tam_letra_titulo_menu_header">50sp</dimen>
+    <dimen name="tam_letra_item_menu">35sp</dimen>
+    <dimen name="tam_btn_cantidad_producto">68dp</dimen>
+    <dimen name="tam_text_cantidad_producto">60sp</dimen>
+    <dimen name="tam_btn_cantidad_prod_grid">55dp</dimen>
+    <dimen name="tam_text_cantidad_producto_grid">35sp</dimen>
+
+</resources>
