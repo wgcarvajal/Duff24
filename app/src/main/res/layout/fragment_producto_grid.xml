@@ -21,6 +21,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:numColumns="3"
+        android:layout_marginLeft="@dimen/margin_small"
+        android:layout_marginRight="@dimen/margin_small"
+        android:layout_marginBottom="@dimen/margin_small"
         android:horizontalSpacing="@dimen/super_margin_small"
         android:verticalSpacing="@dimen/super_margin_small"
         android:scrollbars="none">

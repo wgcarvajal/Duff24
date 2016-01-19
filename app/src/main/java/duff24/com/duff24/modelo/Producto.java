@@ -27,6 +27,8 @@ public class Producto
     public static String ID="objectId";
     public static String TBLIMAGEN_PRODUCTO="producto";
     public static String TBLIMAGEN_IMGFILE="imgFile";
+    public static String TBLPRECIO_PREFECHAFIN="prefechafin";
+    public static String TBLSUBCATEGORIA_FECHACREACION="createdAt";
 
 
     private String id;

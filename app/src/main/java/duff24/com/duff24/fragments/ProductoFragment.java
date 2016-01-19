@@ -116,66 +116,25 @@ public class ProductoFragment extends Fragment implements AdapterView.OnItemClic
 
     private void loadData()
     {
-        ParseQuery<ParseObject> querySubcategoria = new ParseQuery<ParseObject>(Producto.TABLASUBCATEGORIA);
-        querySubcategoria.whereEqualTo(Producto.TBLSUBCATEGORIA_NOMBRE, this.subcategoriaing);
-        querySubcategoria.getFirstInBackground(new GetCallback<ParseObject>() {
-            @Override
-            public void done(ParseObject subCategoria, ParseException e) {
-                if (e == null)
+        for(Producto prod: AppUtil.data)
+        {
+            if(prod.getSubcategoriaing().equals(subcategoriaing))
+            {
+                data.add(prod);
+                adapter.notifyDataSetChanged();
+                if (mListState != null)
                 {
-                    ParseQuery<ParseObject> queryProductos = new ParseQuery<ParseObject>(Producto.TABLA);
-                    queryProductos.whereEqualTo(Producto.SUBCATEGORIA, subCategoria.getObjectId());
-                    queryProductos.findInBackground(new FindCallback<ParseObject>() {
-                        @Override
-                        public void done(List<ParseObject> productos, ParseException e) {
-                            if (e == null)
-                            {
-                                for (ParseObject prod : productos)
-                                {
-                                    int bandera=0;
-                                    for(Producto p:AppUtil.data)
-                                    {
-                                        if(p.getId().equals(prod.getObjectId()))
-                                        {
-                                            data.add(p);
-                                            bandera=1;
-                                            break;
-                                        }
-                                    }
-                                    if(bandera==0)
-                                    {
-                                        Producto producto = new Producto();
-                                        producto.setId(prod.getObjectId());
-                                        producto.setNombreesp(prod.getString(Producto.NOMBREESP));
-                                        producto.setNombreing(prod.getString(Producto.NOMBREING));
-                                        producto.setDescripcionesp(prod.getString(Producto.DESCRIPCIONESP));
-                                        producto.setDescripcionIng(prod.getString(Producto.DESCRIPCIONING));
-                                        producto.setPrecio(0);
-                                        producto.setImagen(null);
-                                        AppUtil.data.add(producto);
-                                        data.add(producto);
-                                    }
-                                    adapter.notifyDataSetChanged();
-                                    if (mListState != null)
-                                    {
-                                        listaProductos.onRestoreInstanceState(mListState);
-                                    }
-                                    mListState = null;
-                                }
-                            } else {
-                                Log.i("entro ", "al error");
-                            }
-                        }
-                    });
+                    listaProductos.onRestoreInstanceState(mListState);
                 }
+                mListState = null;
             }
-        });
+        }
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
     {
-        MediaPlayer m = MediaPlayer.create(getContext(),R.raw.sounido_click);
+        MediaPlayer m = MediaPlayer.create(getContext(),R.raw.sonido_click);
         m.start();
         TextView textconteo= (TextView) view.findViewById(R.id.txtconteo);
         textconteo.setVisibility(View.VISIBLE);
@@ -212,6 +171,11 @@ public class ProductoFragment extends Fragment implements AdapterView.OnItemClic
             db.insert("pedido",null,registroPedido);
         }
         db.close();
+    }
+
+    public void actualizarData()
+    {
+        adapter.notifyDataSetChanged();
     }
 
 

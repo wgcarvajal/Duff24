@@ -6,82 +6,75 @@
     android:background="#000000"
     >
 
-    <LinearLayout
-        android:orientation="vertical"
+
+
+    <TextView
+        android:id="@+id/txtnombreproducto"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:id="@+id/txtnombreproducto"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/alto_campo_nombre_producto"
-            android:text="Hawaiana"
-            android:textColor="#ffffff"
-            android:textSize="@dimen/tam_nombre_producto"
-            android:gravity="center"
+        android:layout_height="@dimen/alto_campo_nombre_producto"
+        android:text="Hawaiana"
+        android:textColor="#ffffff"
+        android:textSize="@dimen/tam_nombre_producto"
+        android:gravity="center"
 
 
-            />
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/tam_imagen_producto_grid">
-
-            <ImageView
-                android:id="@+id/img_producto"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="fitXY"
-
-                />
-
-            <TextView
-                android:id="@+id/txtconteo"
-                android:layout_width="@dimen/tam_btn_cantidad_prod_grid"
-                android:layout_height="@dimen/tam_btn_cantidad_prod_grid"
-                android:text="0"
-                android:textSize="@dimen/tam_text_cantidad_producto_grid"
-                android:textColor="#ffffff"
-                android:layout_alignRight="@id/img_producto"
-                android:layout_alignBottom="@id/img_producto"
-                android:background="@drawable/text_view_redondo"
-                android:gravity="center"
-                />
-            <ImageView
-                android:id="@+id/btn_disminuir"
-                android:layout_width="@dimen/tam_btn_cantidad_prod_grid"
-                android:layout_height="@dimen/tam_btn_cantidad_prod_grid"
-                android:layout_marginRight="@dimen/super_margin_small"
-                android:layout_alignBottom="@id/img_producto"
-                android:layout_toLeftOf="@id/txtconteo"
-                android:src="@mipmap/ic_disminuir"
-                android:background="@drawable/img_view_redondo"
-                />
+        />
 
 
-        </RelativeLayout>
-        <TextView
-            android:id="@+id/txtprecioproducto"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="#ffffff"
-            android:text="$7500"
-            android:textSize="@dimen/tam_precio_producto"
-            android:gravity="center"
+    <ImageView
+        android:id="@+id/img_producto"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/tam_imagen_producto_grid"
+        android:scaleType="fitXY"
+        android:layout_below="@id/txtnombreproducto"
 
-            />
-        <TextView
-            android:id="@+id/txtdescripcionproducto"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/alto_campo_descripcion_producto"
-            android:textColor="#ffffff"
-            android:text="350 ml"
-            android:gravity="center_horizontal"
-            android:textSize="@dimen/tam_descripcion_producto"
-            />
+        />
+
+    <TextView
+        android:id="@+id/txtprecioproducto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#ffffff"
+        android:text="$7500"
+        android:textSize="@dimen/tam_precio_producto"
+        android:gravity="center"
+        android:layout_below="@id/img_producto"
+
+        />
+    <TextView
+        android:id="@+id/txtdescripcionproducto"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/alto_campo_descripcion_producto"
+        android:textColor="#ffffff"
+        android:text="350 ml"
+        android:gravity="center_horizontal"
+        android:textSize="@dimen/tam_descripcion_producto"
+        android:layout_below="@id/txtprecioproducto"
+        />
 
 
-
-    </LinearLayout>
+    <TextView
+        android:id="@+id/txtconteo"
+        android:layout_width="@dimen/tam_btn_cantidad_prod_grid"
+        android:layout_height="@dimen/tam_btn_cantidad_prod_grid"
+        android:text="0"
+        android:textSize="@dimen/tam_text_cantidad_producto_grid"
+        android:textColor="#ffffff"
+        android:layout_alignRight="@id/img_producto"
+        android:layout_alignBottom="@id/img_producto"
+        android:background="@drawable/text_view_redondo"
+        android:gravity="center"
+        />
+    <ImageView
+        android:id="@+id/btn_disminuir"
+        android:layout_width="@dimen/tam_btn_cantidad_prod_grid"
+        android:layout_height="@dimen/tam_btn_cantidad_prod_grid"
+        android:layout_marginRight="@dimen/super_margin_small"
+        android:layout_alignBottom="@id/img_producto"
+        android:layout_toLeftOf="@id/txtconteo"
+        android:src="@mipmap/ic_disminuir"
+        android:background="@drawable/img_view_redondo"
+        />
 
 
 

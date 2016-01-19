@@ -12,6 +12,8 @@
     <string name="texto_menu_mi_pedido">My order</string>
     <string name="vaciar_pedido">empty order</string>
     <string name="regresar_a_carta">Back to the menu</string>
+    <string name="text_total_pedido">Total: </string>
+    <string name="text_btn_finalizar_pedido">Checkout</string>
 
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
@@ -22,6 +24,8 @@
     <string name="title_activity_bitmap">Bitmap</string>
     <string name="title_activity_bitmap_decodificacion">BitmapDecodificacion</string>
     <string name="title_activity_pedido">PedidoActivity</string>
+    <string name="title_activity_prueba">PruebaActivity</string>
+    <string name="domicilio_incluido">(Delivery included $2000)</string>
 
 
 </resources>

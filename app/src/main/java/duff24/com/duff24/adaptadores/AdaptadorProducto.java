@@ -102,6 +102,7 @@ public class AdaptadorProducto extends BaseAdapter implements View.OnClickListen
         txtconteo.setText("0");
         txtnombreProducto.setText(p.getNombreing());
         txtDescripcionProducto.setText(p.getDescripcionIng());
+        txtPrecioProducto.setText("$" + p.getPrecio());
 
         if(context.getResources().getString(R.string.idioma).equals("es"))
         {
@@ -116,31 +117,6 @@ public class AdaptadorProducto extends BaseAdapter implements View.OnClickListen
         btnDisminuir.setOnClickListener(this);
 
         final View fv=v;
-
-        if(p.getPrecio()!=0)
-        {
-            Log.i("info:","el precio ya no es null");
-            txtPrecioProducto.setText("$" + p.getPrecio());
-        }
-        else
-        {
-            ParseQuery<ParseObject> queryPrecio = new ParseQuery<>(Producto.TABLAPRECIO);
-            queryPrecio.whereEqualTo(Producto.TBLPRECIO_PRODUCTO, p.getId());
-            queryPrecio.orderByDescending(Producto.TBLPRECIO_FECHACREACION);
-            queryPrecio.getFirstInBackground(new GetCallback<ParseObject>()
-            {
-                @Override
-                public void done(ParseObject precio, ParseException e)
-                {
-                    if (e == null)
-                    {
-                        p.setPrecio(precio.getInt(Producto.TBLPRECIO_VALOR));
-                        TextView pre= (TextView)fv.findViewById(R.id.txtprecioproducto);
-                        pre.setText("$"+precio.getInt(Producto.TBLPRECIO_VALOR));
-                    }
-                }
-            });
-        }
 
         if(p.getImagen()!=null)
         {
@@ -158,7 +134,6 @@ public class AdaptadorProducto extends BaseAdapter implements View.OnClickListen
                     if (e == null)
                     {
                         ParseFile fileObject = (ParseFile) object.get(Producto.TBLIMAGEN_IMGFILE);
-                        final String nombreImagen=fileObject.getName();
                         fileObject.getDataInBackground(new GetDataCallback() {
                             @Override
                             public void done(byte[] data, ParseException e) {
@@ -195,7 +170,7 @@ public class AdaptadorProducto extends BaseAdapter implements View.OnClickListen
     @Override
     public void onClick(View v)
     {
-        MediaPlayer m = MediaPlayer.create(context,R.raw.sounido_click);
+        MediaPlayer m = MediaPlayer.create(context,R.raw.sonido_click);
         m.start();
 
         AdminSQliteOpenHelper admin = new AdminSQliteOpenHelper(context,"admin",null,1);

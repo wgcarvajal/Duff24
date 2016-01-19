@@ -27,10 +27,15 @@ import java.util.List;
 import duff24.com.duff24.adaptadores.PagerAdapterGrid;
 import duff24.com.duff24.fragments.ProductoGridFragment;
 import duff24.com.duff24.modelo.Producto;
+import duff24.com.duff24.modelo.Subcategoria;
 import duff24.com.duff24.typeface.CustomTypefaceSpan;
+import duff24.com.duff24.util.AppUtil;
 import pl.droidsonroids.gif.GifImageView;
 
 public class MarketActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
+
+    public final static int MI_REQUEST_CODE = 1;
+
     private ImageView btnComidas;
     private ImageView btnBebidas;
     private ImageView btnMarket;
@@ -108,37 +113,16 @@ public class MarketActivity extends AppCompatActivity implements View.OnClickLis
 
     private void loadData()
     {
-        ParseQuery<ParseObject> queryCategoria = new ParseQuery<ParseObject>(Producto.TABLACATEGORIA);
-        queryCategoria.whereEqualTo(Producto.CATEGORIANOMBRE, "Market");
-        queryCategoria.getFirstInBackground(new GetCallback<ParseObject>() {
-            @Override
-            public void done(ParseObject categoria, ParseException e) {
-                if (e == null) {
-                    Log.i("entro", "entro");
-                    ParseQuery<ParseObject> querySubcategoria = new ParseQuery<ParseObject>(Producto.TABLASUBCATEGORIA);
-                    querySubcategoria.whereEqualTo(Producto.TBLSUBCATEGORIA_CATEGORIA, categoria.getObjectId());
-                    querySubcategoria.orderByAscending(Producto.TBLSUBCATEGORIA_NOMBRE);
-                    querySubcategoria.findInBackground(new FindCallback<ParseObject>() {
-                        @Override
-                        public void done(List<ParseObject> subcategorias, ParseException e) {
-                            if (e == null) {
-                                Log.i("entro", subcategorias.size() + "");
-                                for (ParseObject subcategoria : subcategorias)
-                                {
-
-                                    ProductoGridFragment productoFragment = new ProductoGridFragment();
-                                    productoFragment.init(subcategoria.getString(Producto.TBLSUBCATEGORIA_NOMBRE), subcategoria.getString(Producto.TBLSUBCATEGORIA_NOMBREESP));
-
-                                    data.add(productoFragment);
-                                    adapter.notifyDataSetChanged();
-
-                                }
-                            }
-                        }
-                    });
-                }
+        for(Subcategoria sub: AppUtil.listaSubcategorias)
+        {
+            if(sub.getNombreCategoria().equals("Market"))
+            {
+                ProductoGridFragment productoFragment = new ProductoGridFragment();
+                productoFragment.init(sub.getNombreIngles(), sub.getNombreEspanol());
+                data.add(productoFragment);
+                adapter.notifyDataSetChanged();
             }
-        });
+        }
     }
 
     @Override
@@ -162,7 +146,7 @@ public class MarketActivity extends AppCompatActivity implements View.OnClickLis
             break;
             case R.id.btn_mi_pedido:
                 intent = new Intent(this,PedidoActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, MI_REQUEST_CODE);
             break;
         }
     }
@@ -183,10 +167,37 @@ public class MarketActivity extends AppCompatActivity implements View.OnClickLis
         {
             case R.id.nav_mi_pedido:
                 intent = new Intent(this,PedidoActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, MI_REQUEST_CODE);
                 break;
         }
         drawer.closeDrawers();
         return false;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == MI_REQUEST_CODE) {
+
+            if (requestCode == MI_REQUEST_CODE)
+            {
+                int posicionactual=pager.getCurrentItem();
+                int tamano=adapter.getCount();
+                ProductoGridFragment prodFrag=(ProductoGridFragment)adapter.getItem(posicionactual);
+                prodFrag.actualizarData();
+                if((posicionactual+1)<tamano)
+                {
+                    prodFrag=(ProductoGridFragment)adapter.getItem(posicionactual+1);
+                    prodFrag.actualizarData();
+                }
+                if((posicionactual-1)>=0)
+                {
+                    prodFrag=(ProductoGridFragment)adapter.getItem(posicionactual-1);
+                    prodFrag.actualizarData();
+                }
+            }
+
+        }
     }
 }

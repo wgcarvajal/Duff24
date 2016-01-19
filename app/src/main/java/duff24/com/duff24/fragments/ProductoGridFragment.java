@@ -114,67 +114,26 @@ public class ProductoGridFragment extends Fragment implements AdapterView.OnItem
 
     public void loadData()
     {
-        ParseQuery<ParseObject> querySubcategoria = new ParseQuery<ParseObject>(Producto.TABLASUBCATEGORIA);
-        querySubcategoria.whereEqualTo(Producto.TBLSUBCATEGORIA_NOMBRE, this.subcategoria);
-        querySubcategoria.getFirstInBackground(new GetCallback<ParseObject>() {
-            @Override
-            public void done(ParseObject subCategoria, ParseException e) {
-                if (e == null) {
-
-                    ParseQuery<ParseObject> queryProductos = new ParseQuery<ParseObject>(Producto.TABLA);
-                    queryProductos.whereEqualTo(Producto.SUBCATEGORIA, subCategoria.getObjectId());
-                    queryProductos.findInBackground(new FindCallback<ParseObject>() {
-                        @Override
-                        public void done(List<ParseObject> productos, ParseException e) {
-                            if (e == null) {
-                                for (final ParseObject prod : productos) {
-
-                                    int bandera=0;
-                                    for(Producto p: AppUtil.data)
-                                    {
-                                        if(p.getId().equals(prod.getObjectId()))
-                                        {
-                                            data.add(p);
-                                            bandera=1;
-                                            break;
-                                        }
-                                    }
-
-                                    if(bandera==0) {
-                                        Producto producto = new Producto();
-                                        producto.setId(prod.getObjectId());
-                                        producto.setNombreing(prod.getString(Producto.NOMBREING));
-                                        producto.setDescripcionIng(prod.getString(Producto.DESCRIPCIONING));
-                                        producto.setNombreesp(prod.getString(Producto.NOMBREESP));
-                                        producto.setDescripcionesp(prod.getString(Producto.DESCRIPCIONESP));
-                                        producto.setPrecio(0);
-                                        producto.setImagen(null);
-                                        AppUtil.data.add(producto);
-                                        data.add(producto);
-                                    }
-                                    adapter.notifyDataSetChanged();
-                                    if (mListState != null)
-                                    {
-                                        gridProductos.onRestoreInstanceState(mListState);
-                                    }
-                                    mListState = null;
-                                }
-                            } else
-                            {
-                                Log.i("entro ", "al error");
-                            }
-                        }
-                    });
+        for(Producto prod: AppUtil.data)
+        {
+            if(prod.getSubcategoriaing().equals(subcategoria))
+            {
+                data.add(prod);
+                adapter.notifyDataSetChanged();
+                if (mListState != null)
+                {
+                    gridProductos.onRestoreInstanceState(mListState);
                 }
+                mListState = null;
             }
-        });
+        }
     }
 
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
     {
-        MediaPlayer m = MediaPlayer.create(getContext(),R.raw.sounido_click);
+        MediaPlayer m = MediaPlayer.create(getContext(),R.raw.sonido_click);
         m.start();
         Log.i("entro producto:",position+"");
         TextView textconteo= (TextView) view.findViewById(R.id.txtconteo);
@@ -211,5 +170,10 @@ public class ProductoGridFragment extends Fragment implements AdapterView.OnItem
             db.insert("pedido",null,registroPedido);
         }
         db.close();
+    }
+
+    public void actualizarData()
+    {
+        adapter.notifyDataSetChanged();
     }
 }

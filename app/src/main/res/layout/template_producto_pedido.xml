@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/negro"
+    >
+
+    <TextView
+        android:id="@+id/txtnombreproducto"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/tam_text_nombre_producto_pedido"
+        android:textColor="@color/blanco"
+        android:text="prueba"
+        android:textSize="@dimen/size_text_nombre_producto_pedido"
+        android:gravity="center"
+        />
+
+        <ImageView
+            android:id="@+id/img_producto"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/tam_imagen_producto_pedido"
+            android:scaleType="fitXY"
+            android:layout_below="@+id/txtnombreproducto"
+            />
+
+    <TextView
+        android:id="@+id/txtprecioproducto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="$0"
+        android:textColor="@color/blanco"
+        android:gravity="center"
+        android:textSize="@dimen/size_text_precio_producto_pedido"
+        android:layout_below="@id/img_producto"
+        />
+
+
+    <ImageView
+        android:id="@+id/btn_disminuir"
+        android:layout_width="@dimen/tam_btn_producto_pedido"
+        android:layout_height="@dimen/tam_btn_producto_pedido"
+        android:layout_alignBottom="@id/img_producto"
+        android:layout_marginRight="@dimen/margin_small"
+        android:layout_toLeftOf="@+id/txtconteo"
+        android:src="@mipmap/ic_disminuir"
+        android:background="@drawable/img_view_redondo"
+        />
+
+    <TextView
+        android:id="@+id/txtconteo"
+        android:layout_width="@dimen/tam_btn_producto_pedido"
+        android:layout_height="@dimen/tam_btn_producto_pedido"
+        android:text="0"
+        android:textSize="@dimen/size_text_btn_producto_pedido"
+        android:textColor="#ffffff"
+        android:layout_alignBottom="@id/img_producto"
+        android:layout_alignRight="@id/img_producto"
+        android:layout_marginRight="@dimen/super_margin_small"
+        android:background="@drawable/text_view_redondo"
+        android:gravity="center"
+
+        />
+
+
+
+</RelativeLayout>

@@ -36,8 +36,7 @@
             android:name=".PedidoActivity"
             android:label="@string/title_activity_pedido"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme"
-            >
+            android:theme="@style/AppTheme" >
         </activity>
     </application>
 

@@ -23,9 +23,20 @@
     <dimen name="tam_letra_titulo_menu_header">25sp</dimen>
     <dimen name="tam_letra_item_menu">20sp</dimen>
     <dimen name="tam_btn_cantidad_producto">48dp</dimen>
-    <dimen name="tam_text_cantidad_producto">40sp</dimen>
+    <dimen name="tam_text_cantidad_producto">30sp</dimen>
     <dimen name="tam_btn_cantidad_prod_grid">35dp</dimen>
     <dimen name="tam_text_cantidad_producto_grid">25sp</dimen>
     <dimen name="tam_ancho_icono_carro_pedido">80dp</dimen>
+    <dimen name="margin_veinte_dp">20dp</dimen>
+    <dimen name="tam_text_total_pedido">25sp</dimen>
+    <dimen name="tam_text_btn_finalizar_pedido">20sp</dimen>
+    <dimen name="navigation_icon_size">48dp</dimen>
+    <dimen name="tam_text_nombre_producto_pedido">50dp</dimen>
+    <dimen name="size_text_nombre_producto_pedido">20sp</dimen>
+    <dimen name="tam_imagen_producto_pedido">100dp</dimen>
+    <dimen name="size_text_precio_producto_pedido">15sp</dimen>
+    <dimen name="tam_btn_producto_pedido">40dp</dimen>
+    <dimen name="size_text_btn_producto_pedido">27sp</dimen>
+    <dimen name="size_tex_domicilio_incluido">15sp</dimen>
 
 </resources>

@@ -11,5 +11,9 @@
     <string name="texto_menu_mi_pedido">Mi pedido</string>
     <string name="vaciar_pedido">Vaciar pedido</string>
     <string name="regresar_a_carta">Regresar a la carta</string>
+    <string name="text_total_pedido">Total: </string>
+    <string name="text_btn_finalizar_pedido">Finalizar pedido</string>
+    <string name="domicilio_incluido">(Domicilio incluido $2000)</string>
+
 
 </resources>
