@@ -200,14 +200,7 @@ public class RegistrarseActivity extends AppCompatActivity implements View.OnCli
             email=params[1];
             password=params[2];
             telefono=params[3];
-            if(hayConexionInternet())
-            {
-                return hayInternet();
-            }
-            else
-            {
-                return false;
-            }
+            return hayConexionInternet();
         }
 
         @Override
@@ -226,31 +219,6 @@ public class RegistrarseActivity extends AppCompatActivity implements View.OnCli
                 }
             }
         }
-    }
-
-    private boolean hayInternet()
-    {
-        ParseQuery<ParseObject> conexion = new ParseQuery<>("Conexion");
-        Task<ParseObject> objeto=conexion.getFirstInBackground();
-
-        try
-        {
-            int contador =1;
-            while (objeto.getResult()==null && contador<200)
-            {
-                Thread.sleep(50);
-                contador++;
-            }
-            if(contador==200)
-            {
-                return false;
-            }
-            return true;
-        } catch (InterruptedException e)
-        {
-            e.printStackTrace();
-        }
-        return false;
     }
 
     private boolean hayConexionInternet()

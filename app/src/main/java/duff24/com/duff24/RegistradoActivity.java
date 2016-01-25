@@ -1,8 +1,11 @@
 package duff24.com.duff24;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -12,8 +15,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -36,6 +37,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import duff24.com.duff24.adaptadores.AdaptadorSpinnerFormaPago;
+import duff24.com.duff24.basededatos.AdminSQliteOpenHelper;
+import duff24.com.duff24.modelo.Pedido;
 import duff24.com.duff24.modelo.Usuario;
 
 public class RegistradoActivity extends AppCompatActivity implements View.OnClickListener {
@@ -98,6 +101,7 @@ public class RegistradoActivity extends AppCompatActivity implements View.OnClic
         btnFlechaAtras.setOnClickListener(this);
         btnAgregarDireccion.setOnClickListener(this);
         btnAgregarTelefono.setOnClickListener(this);
+        btnEnviarPedido.setOnClickListener(this);
 
 
         String [] objetos= getResources().getStringArray(R.array.forma_pago);
@@ -143,8 +147,130 @@ public class RegistradoActivity extends AppCompatActivity implements View.OnClic
             case R.id.btn_agregar_telefono:
                 agregarTelefono();
             break;
+
+            case R.id.btn_enviar_pedido:
+                enviarPedido();
+            break;
         }
     }
+
+    private void enviarPedido()
+    {
+        String nombre=ParseUser.getCurrentUser().getString(Usuario.NOMBRE);
+        int indiceDireccion=spDireccion.getSelectedItemPosition();
+        int indiceTelefono=spTelefono.getSelectedItemPosition();
+        int indiceFormaPago=spFormaPago.getSelectedItemPosition();
+        String observaciones=txtObservaciones.getText().toString();
+        if(indiceDireccion==0 || indiceTelefono==0 || indiceFormaPago==0)
+        {
+            mostrarMensaje(R.string.campos_obligatorios);
+        }
+        else
+        {
+            String formaPago;
+            if(indiceFormaPago==1)
+            {
+                formaPago="tc";
+            }
+            else
+            {
+                formaPago="ef";
+            }
+            String direccion= spDireccion.getSelectedItem().toString();
+            String telefono=spTelefono.getSelectedItem().toString();
+            pd = ProgressDialog.show(this, getResources().getString(R.string.enviando_pedido), getResources().getString(R.string.por_favor_espere), true, false);
+            EnviarPedidoTask evptask= new EnviarPedidoTask();
+            evptask.execute(nombre,direccion,telefono,observaciones,formaPago);
+        }
+
+    }
+
+    class EnviarPedidoTask extends AsyncTask<String, Void, Boolean>
+    {
+
+        private String nombre;
+        private String direccion;
+        private String telefono;
+        private String observaciones;
+        private String formaPago;
+
+        @Override
+        protected Boolean doInBackground(String... params)
+        {
+            nombre=params[0];
+            direccion=params[1];
+            telefono=params[2];
+            observaciones=params[3];
+            formaPago=params[4];
+            return hayConexionInternet();
+        }
+
+        @Override
+        protected void onPostExecute(Boolean resultado)
+        {
+            super.onPostExecute(resultado);
+            if(resultado)
+            {
+                enviarParse(nombre,direccion,telefono,observaciones,formaPago);
+            }
+            else
+            {
+                if(pd!=null)
+                {
+                    pd.dismiss();
+                    mostrarMensaje(R.string.compruebe_conexion);
+                }
+            }
+
+        }
+    }
+
+    private void enviarParse(String nombre,String direccion,String telefono,String observaciones,String formaPago)
+    {
+        final ParseObject pedido = new ParseObject(Pedido.TABLA);
+        pedido.put(Pedido.PERSONANOMBRE, nombre);
+        pedido.put(Pedido.DIRECCION, direccion);
+        pedido.put(Pedido.TELEFONO, telefono);
+        pedido.put(Pedido.FORMAPAGO, formaPago);
+        pedido.put(Pedido.OBSERVACIONES, observaciones);
+        pedido.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null) {
+
+                    AdminSQliteOpenHelper admin = new AdminSQliteOpenHelper(getApplicationContext(), "admin", null, 1);
+                    SQLiteDatabase db = admin.getReadableDatabase();
+
+                    Cursor fila = db.rawQuery("select prodid,prodcantidad from pedido", null);
+                    if (fila != null) {
+
+                        if (fila.moveToFirst()) {
+                            do {
+                                ParseObject itempedido = new ParseObject(Pedido.TABLAITEMPEDIDO);
+                                itempedido.put(Pedido.TBLITEMPEDIDO_PEDIDO, pedido.getObjectId());
+                                itempedido.put(Pedido.TBLITEMPEDIDO_PRODUCTO, fila.getString(fila.getColumnIndex("prodid")));
+                                itempedido.put(Pedido.TBLITEMPEDIDO_CANTIDAD, fila.getInt(fila.getColumnIndex("prodcantidad")));
+                                itempedido.saveInBackground();
+
+
+                            } while (fila.moveToNext());
+                            setResult(Activity.RESULT_OK);
+                            if (pd != null) {
+                                pd.dismiss();
+                            }
+                            finish();
+                        }
+                    }
+                } else {
+                    if (pd != null) {
+                        pd.dismiss();
+                    }
+                    mostrarMensaje(R.string.compruebe_conexion);
+                }
+            }
+        });
+    }
+
     private void agregarTelefono()
     {
         dialog= new Dialog(this);

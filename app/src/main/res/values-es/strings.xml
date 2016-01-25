@@ -18,8 +18,8 @@
     <string name="mensaje_pedido_vacio">Se ha vaciado el pedido.</string>
     <string name="mensaje_pedido_minimo">Valor minimo del pedido $10.000</string>
     <string name="txt_hint_correo_electronico">Correo electrónico</string>
-    <string name="text_autenticarse">Autenticarse</string>
-    <string name="text_recuperar_clave">Recuperar clave</string>
+    <string name="text_autenticarse">Iniciar sesión</string>
+    <string name="text_recuperar_clave">¿Olvidaste tu clave?</string>
     <string name="text_registrarse">Registrarse</string>
     <string name="text_clave">Clave</string>
     <string name="text_continuar_no_registrado">Continuar como no registrado</string>
@@ -58,6 +58,7 @@
     <string name="txt_seleccione_direccion">Seleccione dirección</string>
     <string name="txt_enviando">Enviando...</string>
     <string name="txt_registro_exitoso">Registro exitoso</string>
+    <string name="btn_facebook">Iniciar sesión con facebook</string>
 
 
     <string-array name="forma_pago">
@@ -65,6 +66,9 @@
         <item>Tarjeta</item>
         <item>Efectivo</item>
     </string-array>
+
+
+
 
 
 

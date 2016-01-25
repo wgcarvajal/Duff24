@@ -5,6 +5,9 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,9 +23,11 @@ import android.widget.Toast;
 
 import com.parse.LogInCallback;
 import com.parse.ParseException;
+import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
-import com.parse.RequestPasswordResetCallback;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,10 +48,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private TextView txtpassword;
     private TextView tituloVista;
     private ProgressDialog pd = null;
+    private Button btnFacebook;
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
@@ -58,13 +65,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         btnRegistrarse=(Button)findViewById(R.id.btnRegistrarse);
         btnIniciarSesion=(Button)findViewById(R.id.btninciarsesion);
         btnContNoRegistrado=(Button)findViewById(R.id.btn_continuar_no_registrado);
+        btnFacebook=(Button)findViewById(R.id.btn_facebook);
         btnAtras.setOnClickListener(this);
         btnRegistrarse.setOnClickListener(this);
         btnIniciarSesion.setOnClickListener(this);
         btnContNoRegistrado.setOnClickListener(this);
         txtrecuperarClave.setOnClickListener(this);
-
-
+        btnFacebook.setOnClickListener(this);
 
         TF = Typeface.createFromAsset(getAssets(), font_path);
         btnIniciarSesion.setTypeface(TF);
@@ -73,6 +80,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         txtrecuperarClave.setTypeface(TF);
         txtemail.setTypeface(TF);
         txtpassword.setTypeface(TF);
+        btnFacebook.setTypeface(TF);
     }
 
 
@@ -102,6 +110,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             case R.id.btninciarsesion:
                 iniciarSession();
             break;
+
+            case R.id.btn_facebook:
+                iniciarSessionFacebook();
+            break;
         }
 
     }
@@ -112,28 +124,93 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         String password=txtpassword.getText().toString();
         if(verificarCampos(email,password))
         {
+            IniciarSesionTask isTask=new IniciarSesionTask();
+            isTask.execute(email,password);
 
-            pd = ProgressDialog.show(this, getResources().getString(R.string.txt_iniciando), getResources().getString(R.string.por_favor_espere), true, false);
-            ParseUser.logInInBackground(email, password, new LogInCallback() {
-                public void done(ParseUser user, ParseException e) {
-                    if (user != null) {
-                        pd.dismiss();
-                        setResult(MI_REQUEST_SE_LOGUIO_USUARIO);
-                        finish();
-                    } else
+        }
+    }
+
+    private void iniciarSessionFacebook()
+    {
+        List<String> permissions = Arrays.asList("public_profile", "user_about_me",
+                "user_birthday", "user_location", "email");
+        ParseFacebookUtils.logInWithReadPermissionsInBackground(this, permissions, new LogInCallback()
+        {
+            @Override
+            public void done(ParseUser user, ParseException err)
+            {
+                if (user == null)
+                {
+                    if(err!=null)
                     {
-                         pd.dismiss();
-                         if(e.getCode()==101)
-                         {
-                             mostrarMensaje(R.string.txt_email_clave_incorrectos);
-                         }
-                         else
-                         {
-                             mostrarMensaje(R.string.compruebe_conexion);
-                         }
+                        Log.i("mensaje:",err.getMessage()+"codigo: "+err.getCode());
+                    }
+                    else
+                    {
+                        Log.d("MyApp", "El usuario cancelo el Loggin");
+                    }
+
+
+                } else if (user.isNew())
+                {
+                    Log.d("MyApp", "Primer loggin del Usuario");
+
+                } else
+                {
+                    Log.d("MyApp", "El usuario ya estaba logueado");
+                }
+            }
+        });
+    }
+
+    private void enviarParse(String email, String password)
+    {
+        pd = ProgressDialog.show(this, getResources().getString(R.string.txt_iniciando), getResources().getString(R.string.por_favor_espere), true, false);
+        ParseUser.logInInBackground(email, password, new LogInCallback() {
+            public void done(ParseUser user, ParseException e) {
+                if (user != null) {
+                    pd.dismiss();
+                    setResult(MI_REQUEST_SE_LOGUIO_USUARIO);
+                    finish();
+                } else
+                {
+                    pd.dismiss();
+                    if(e.getCode()==101)
+                    {
+                        mostrarMensaje(R.string.txt_email_clave_incorrectos);
+                    }
+                    else
+                    {
+                        mostrarMensaje(R.string.compruebe_conexion);
                     }
                 }
-            });
+            }
+        });
+    }
+
+    public class IniciarSesionTask extends AsyncTask<String,Void,Boolean>
+    {
+        String email;
+        String password;
+        @Override
+        protected Boolean doInBackground(String... params)
+        {
+            email=params[0];
+            password=params[1];
+            return hayConexionInternet();
+        }
+        @Override
+        protected void onPostExecute(Boolean resultado)
+        {
+            super.onPostExecute(resultado);
+            if(resultado)
+            {
+                enviarParse(email,password);
+            }
+            else
+            {
+                mostrarMensaje(R.string.compruebe_conexion);
+            }
         }
     }
 
@@ -141,7 +218,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
-
+        ParseFacebookUtils.onActivityResult(requestCode, resultCode, data);
         switch (requestCode)
         {
             case MI_REQUEST_CODE_REGISTRARSE:
@@ -159,7 +236,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }
             break;
         }
-
     }
 
     private void mostrarDialogConfirmarPedido()
@@ -227,7 +303,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }
             }
         }
-
         return true;
     }
 
@@ -255,5 +330,19 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         // Match the given input against this pattern
         Matcher matcher = pattern.matcher(email);
         return matcher.matches();
+    }
+
+    private boolean hayConexionInternet()
+    {
+        ConnectivityManager cm =
+                (ConnectivityManager)this.getSystemService(this.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        if(activeNetwork!=null)
+        {
+
+            return activeNetwork.isConnectedOrConnecting();
+        }
+        return false;
     }
 }

@@ -222,7 +222,7 @@ public class NoregistradoActivity extends AppCompatActivity implements View.OnCl
         toast.show();
     }
 
-    class EnviarPedidoTask extends AsyncTask<String, Void, Boolean>
+    public class EnviarPedidoTask extends AsyncTask<String, Void, Boolean>
     {
 
         private String nombre;
@@ -241,14 +241,7 @@ public class NoregistradoActivity extends AppCompatActivity implements View.OnCl
             telefono=params[3];
             observaciones=params[4];
             formaPago=params[5];
-            if(hayConexionInternet())
-            {
-                return hayInternet();
-            }
-            else
-            {
-                return false;
-            }
+            return hayConexionInternet();
         }
 
         @Override
@@ -269,31 +262,6 @@ public class NoregistradoActivity extends AppCompatActivity implements View.OnCl
             }
 
         }
-    }
-
-    private boolean hayInternet()
-    {
-        ParseQuery<ParseObject> conexion = new ParseQuery<>("Conexion");
-        Task<ParseObject> objeto=conexion.getFirstInBackground();
-
-        try
-        {
-            int contador =1;
-            while (objeto.getResult()==null && contador<200)
-            {
-                Thread.sleep(50);
-                contador++;
-            }
-            if(contador==200)
-            {
-                return false;
-            }
-            return true;
-        } catch (InterruptedException e)
-        {
-            e.printStackTrace();
-        }
-        return false;
     }
 
     private boolean hayConexionInternet()

@@ -2,6 +2,9 @@ package duff24.com.duff24;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -14,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -33,7 +37,10 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import bolts.Task;
@@ -122,8 +129,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ocultandoMenu(m);
         loadData();
 
-    }
 
+    }
     private void ocultandoMenu(Menu m)
     {
         for (int i=0;i<m.size();i++) {
@@ -216,13 +223,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void cargarDatosParse()
     {
         ParseQuery<ParseObject> queryCategorias= new ParseQuery<>(Producto.TABLACATEGORIA);
+        queryCategorias.selectKeys(Arrays.asList(Producto.ID,Producto.CATEGORIANOMBRE));
         queryCategorias.findInBackground(new FindCallback<ParseObject>() {
+
             @Override
             public void done(final List<ParseObject> categorias, ParseException e) {
                 if(e==null)
                 {
                     ParseQuery<ParseObject> querySubcategoria= new ParseQuery<>(Producto.TABLASUBCATEGORIA);
                     querySubcategoria.orderByAscending(Producto.TBLPRECIO_FECHACREACION);
+                    querySubcategoria.selectKeys(Arrays.asList(Producto.ID,Producto.TBLSUBCATEGORIA_NOMBRE,Producto.TBLSUBCATEGORIA_NOMBREESP,Producto.TBLSUBCATEGORIA_CATEGORIA));
                     querySubcategoria.findInBackground(new FindCallback<ParseObject>() {
                         @Override
                         public void done(final List<ParseObject> subcategorias, ParseException e) {
@@ -230,12 +240,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             {
                                 ParseQuery<ParseObject> queryPrecios= new ParseQuery<>(Producto.TABLAPRECIO);
                                 queryPrecios.whereEqualTo(Producto.TBLPRECIO_PREFECHAFIN,null);
+                                queryPrecios.selectKeys(Arrays.asList(Producto.TBLPRECIO_PRODUCTO,Producto.TBLPRECIO_VALOR));
                                 queryPrecios.findInBackground(new FindCallback<ParseObject>() {
                                     @Override
                                     public void done(final List<ParseObject> precios, ParseException e) {
                                         if(e==null)
                                         {
                                             ParseQuery<ParseObject> queryProductos= new ParseQuery<>(Producto.TABLA);
+                                            queryProductos.selectKeys(Arrays.asList(Producto.ID,Producto.NOMBREESP,Producto.NOMBREING,Producto.DESCRIPCIONING,Producto.DESCRIPCIONESP,Producto.SUBCATEGORIA));
                                             queryProductos.findInBackground(new FindCallback<ParseObject>() {
                                                 @Override
                                                 public void done(List<ParseObject> productos, ParseException e)
@@ -322,15 +334,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                                             men.getItem(0).setVisible(false);
                                                         }
                                                     }
+                                                    else
+                                                    {
+                                                        mostrarMensajeComprobarConexion();
+                                                    }
 
                                                 }
                                             });
                                         }
+                                        else
+                                        {
+                                            mostrarMensajeComprobarConexion();
+                                        }
                                     }
                                 });
                             }
+                            else
+                            {
+                                mostrarMensajeComprobarConexion();
+                            }
                         }
                     });
+                }
+                else
+                {
+                    mostrarMensajeComprobarConexion();
                 }
             }
         });
@@ -451,14 +479,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         protected Boolean doInBackground(Void... params)
         {
-            if(hayConexionInternet())
-            {
-                return hayInternet();
-            }
-            else
-            {
-                return false;
-            }
+            return hayConexionInternet();
         }
 
         @Override
@@ -483,31 +504,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnRecargarVista.setVisibility(View.VISIBLE);
     }
 
-    private boolean hayInternet()
-    {
-        ParseQuery<ParseObject> conexion = new ParseQuery<>("Conexion");
-        Task<ParseObject> objeto=conexion.getFirstInBackground();
-
-        try
-        {
-            int contador =1;
-            while (objeto.getResult()==null && contador<200)
-            {
-                Thread.sleep(50);
-                contador++;
-            }
-            if(contador==200)
-            {
-                return false;
-            }
-            return true;
-        } catch (InterruptedException e)
-        {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
     private boolean hayConexionInternet()
     {
         ConnectivityManager cm =
@@ -524,7 +520,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
     private void cerrarSesion()
     {
-        pd = ProgressDialog.show(this,"fdfd", getResources().getString(R.string.por_favor_espere), true, false);
+        pd = ProgressDialog.show(this,"", getResources().getString(R.string.por_favor_espere), true, false);
 
         CerrarSesionTask cst= new CerrarSesionTask();
         cst.execute();
@@ -553,7 +549,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         protected Void doInBackground(Void... params) {
             ParseUser.logOut();
-
             return null;
         }
 

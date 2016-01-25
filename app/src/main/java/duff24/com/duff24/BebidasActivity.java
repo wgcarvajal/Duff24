@@ -1,7 +1,9 @@
 package duff24.com.duff24;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
@@ -10,25 +12,25 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
-import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import com.parse.FindCallback;
-import com.parse.GetCallback;
-import com.parse.ParseException;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
+import android.widget.Toast;
+
+
+import com.parse.ParseUser;
+
 import java.util.ArrayList;
 import java.util.List;
 import duff24.com.duff24.adaptadores.PagerAdapterGrid;
-import duff24.com.duff24.fragments.ProductoFragment;
 import duff24.com.duff24.fragments.ProductoGridFragment;
-import duff24.com.duff24.modelo.Producto;
 import duff24.com.duff24.modelo.Subcategoria;
 import duff24.com.duff24.typeface.CustomTypefaceSpan;
 import duff24.com.duff24.util.AppUtil;
@@ -56,6 +58,7 @@ public class BebidasActivity extends AppCompatActivity implements View.OnClickLi
     private Typeface TF;
     private String font_path = "font/2-4ef58.ttf";
     private String font_path_ASimple="font/A_Simple_Life.ttf";
+    private ProgressDialog pd = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,6 +136,21 @@ public class BebidasActivity extends AppCompatActivity implements View.OnClickLi
                 adapter.notifyDataSetChanged();
             }
         }
+
+        Menu m=navView.getMenu();
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        if (currentUser != null) {
+            m.getItem(1).setTitle(currentUser.getUsername());
+            m.getItem(1).setVisible(true);
+            Menu men=m.getItem(1).getSubMenu();
+            men.getItem(0).setVisible(true);
+        }
+        else
+        {
+            m.getItem(1).setVisible(false);
+            Menu men=m.getItem(1).getSubMenu();
+            men.getItem(0).setVisible(false);
+        }
     }
 
 
@@ -180,9 +198,63 @@ public class BebidasActivity extends AppCompatActivity implements View.OnClickLi
                 intent = new Intent(this,PedidoActivity.class);
                 startActivityForResult(intent, MI_REQUEST_CODE);
                 break;
+
+            case R.id.nav_cerrar_sesion:
+                cerrarSesion();
+                break;
         }
         drawer.closeDrawers();
         return false;
+    }
+
+    private void cerrarSesion()
+    {
+        pd = ProgressDialog.show(this, "", getResources().getString(R.string.por_favor_espere), true, false);
+
+        CerrarSesionTask cst= new CerrarSesionTask();
+        cst.execute();
+
+    }
+
+    public class CerrarSesionTask extends AsyncTask<Void,Void,Void>
+    {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            ParseUser.logOut();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid)
+        {
+            super.onPostExecute(aVoid);
+            Menu m=navView.getMenu();
+            m.getItem(1).setVisible(false);
+            Menu men=m.getItem(1).getSubMenu();
+            men.getItem(0).setVisible(false);
+            mostrarMensaje(R.string.txt_sesion_cerrada);
+            if(pd!=null)
+            {
+                pd.dismiss();
+            }
+        }
+    }
+
+    private void mostrarMensaje(int idmensaje)
+    {
+        LayoutInflater inflater = getLayoutInflater();
+        View layout = inflater.inflate(R.layout.template_mensaje_toast,
+                (ViewGroup) findViewById(R.id.toast_layout));
+
+        TextView text = (TextView) layout.findViewById(R.id.txt_mensaje_toast);
+        text.setText(getResources().getString(idmensaje));
+
+        Toast toast = new Toast(this);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.setDuration(Toast.LENGTH_SHORT);
+        toast.setView(layout);
+        toast.show();
     }
 
     @Override
@@ -205,6 +277,33 @@ public class BebidasActivity extends AppCompatActivity implements View.OnClickLi
                     prodFrag=(ProductoGridFragment)getSupportFragmentManager().getFragments().get(posicionactual-1);
                     prodFrag.actualizarData();
                 }
+            Menu m=navView.getMenu();
+            mostrandoMenu(m);
+            ParseUser currentUser = ParseUser.getCurrentUser();
+            if (currentUser != null) {
+                m.getItem(1).setTitle(currentUser.getUsername());
+            }
+            else
+            {
+                m.getItem(1).setVisible(false);
+                Menu men=m.getItem(1).getSubMenu();
+                men.getItem(0).setVisible(false);
+            }
+        }
+    }
+    private void mostrandoMenu(Menu m)
+    {
+        for (int i=0;i<m.size();i++) {
+            MenuItem mi = m.getItem(i);
+            SubMenu subMenu = mi.getSubMenu();
+            if (subMenu!=null && subMenu.size() >0 ) {
+                for (int j=0; j <subMenu.size();j++) {
+                    MenuItem subMenuItem = subMenu.getItem(j);
+                    subMenuItem.setVisible(true);
+                }
+            }
+            mi.setVisible(true);
+
         }
     }
 }
