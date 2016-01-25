@@ -22,6 +22,13 @@
                 android:src="@mipmap/ic_menu_principal"
                 android:layout_margin="@dimen/margin_small"
                 />
+            <ImageView
+                android:id="@+id/flecha_atras"
+                android:layout_width="@dimen/tam_ancho_flecha_atras"
+                android:layout_height="@dimen/tam_flecha_atras"
+                android:scaleType="fitXY"
+                android:src="@mipmap/ic_atras"
+                />
 
             <TextView
                 android:id="@+id/txttitulo"
@@ -48,7 +55,7 @@
                 />
             <TextView
                 android:id="@+id/txt_domicilio"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/domicilio_incluido"
                 android:layout_marginLeft="@dimen/margin_small"
@@ -77,7 +84,7 @@
                 android:text="@string/text_btn_finalizar_pedido"
                 android:textSize="@dimen/tam_text_btn_finalizar_pedido"
                 android:textColor="@color/blanco"
-                android:background="@color/rojoTransparente"
+                android:background="@drawable/bordes_redondos_pequno_fondo_rojo"
                 android:layout_marginLeft="@dimen/margin_small"
                 android:layout_marginRight="@dimen/margin_small"
                 android:layout_marginBottom="@dimen/margin_small"

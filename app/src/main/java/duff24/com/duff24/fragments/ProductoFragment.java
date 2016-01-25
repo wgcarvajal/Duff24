@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
@@ -134,8 +135,16 @@ public class ProductoFragment extends Fragment implements AdapterView.OnItemClic
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
     {
-        MediaPlayer m = MediaPlayer.create(getContext(),R.raw.sonido_click);
-        m.start();
+        final MediaPlayer m = MediaPlayer.create(getContext(),R.raw.sonido_click);
+        m.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                if (mp == m) {
+                    m.start();
+                }
+            }
+        });
+
         TextView textconteo= (TextView) view.findViewById(R.id.txtconteo);
         textconteo.setVisibility(View.VISIBLE);
 

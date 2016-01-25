@@ -1,7 +1,11 @@
 package duff24.com.duff24;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
@@ -11,18 +15,29 @@ import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import bolts.Task;
+import duff24.com.duff24.adaptadores.AdaptadorProducto;
 import duff24.com.duff24.adaptadores.PagerAdapter;
 import duff24.com.duff24.fragments.ProductoFragment;
 import duff24.com.duff24.fragments.ProductoGridFragment;
@@ -40,16 +55,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView titulo;
     private ViewPager pager;
     private PagerAdapter adapter;
-    private List<ProductoFragment> data;
+    private List<ProductoFragment> data= new ArrayList<>();
     private ImageView btnBebidas;
     private ImageView btnMarket;
+    private ImageView btnComidas;
     private NavigationView navView;
     private ImageView btnMenuPrincipal;
     private GifImageView btnMipedido;
     private DrawerLayout drawer;
     private TextView tituloMenuHeader;
+    private TextView text_compruebe_conexion;
+    private Button btnRecargarVista;
     private Typeface TF;
     private String font_path = "font/2-4ef58.ttf";
+    private String font_path_ASimple="font/A_Simple_Life.ttf";
+    private ProgressDialog pd = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -60,11 +80,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         titulo = (TextView)findViewById(R.id.txttitulo);
         tituloMenuHeader=(TextView)findViewById(R.id.titulo_header_menu);
+        text_compruebe_conexion=(TextView)findViewById(R.id.txt_sin_conexion);
 
         btnMenuPrincipal=(ImageView)findViewById(R.id.btn_menu_principal);
         btnMipedido = (GifImageView)findViewById(R.id.btn_mi_pedido);
         btnBebidas = (ImageView) findViewById(R.id.btnbebida);
         btnMarket = (ImageView) findViewById(R.id.btnmarket);
+        btnComidas=(ImageView) findViewById(R.id.btncomida);
+        btnRecargarVista=(Button)findViewById(R.id.volver_cargar);
 
         drawer=(DrawerLayout)findViewById(R.id.drawer);
         pager= (ViewPager)findViewById(R.id.pager);
@@ -75,25 +98,64 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnMarket.setOnClickListener(this);
         btnMipedido.setOnClickListener(this);
         navView.setNavigationItemSelectedListener(this);
+        btnRecargarVista.setOnClickListener(this);
 
         btnMenuPrincipal.setVisibility(View.GONE);
         btnMipedido.setVisibility(View.GONE);
         btnBebidas.setVisibility(View.GONE);
         btnMarket.setVisibility(View.GONE);
+        btnComidas.setVisibility(View.GONE);
+        text_compruebe_conexion.setVisibility(View.GONE);
+        btnRecargarVista.setVisibility(View.GONE);
 
         TF = Typeface.createFromAsset(getAssets(), font_path);
         titulo.setTypeface(TF);
         tituloMenuHeader.setTypeface(TF);
+        TF = Typeface.createFromAsset(getAssets(), font_path_ASimple);
+        text_compruebe_conexion.setTypeface(TF);
+        btnRecargarVista.setTypeface(TF);
 
-        data= new ArrayList<>();
         adapter = new PagerAdapter(getSupportFragmentManager(), data);
         pager.setAdapter(adapter);
-
         Menu m = navView.getMenu();
-        aplicandoTipoLetraItemMenu(m,font_path);
-
+        aplicandoTipoLetraItemMenu(m, font_path_ASimple);
+        ocultandoMenu(m);
         loadData();
+
     }
+
+    private void ocultandoMenu(Menu m)
+    {
+        for (int i=0;i<m.size();i++) {
+            MenuItem mi = m.getItem(i);
+            SubMenu subMenu = mi.getSubMenu();
+            if (subMenu!=null && subMenu.size() >0 ) {
+                for (int j=0; j <subMenu.size();j++) {
+                    MenuItem subMenuItem = subMenu.getItem(j);
+                    subMenuItem.setVisible(false);
+                }
+            }
+            mi.setVisible(false);
+
+        }
+    }
+
+    private void mostrandoMenu(Menu m)
+    {
+        for (int i=0;i<m.size();i++) {
+            MenuItem mi = m.getItem(i);
+            SubMenu subMenu = mi.getSubMenu();
+            if (subMenu!=null && subMenu.size() >0 ) {
+                for (int j=0; j <subMenu.size();j++) {
+                    MenuItem subMenuItem = subMenu.getItem(j);
+                    subMenuItem.setVisible(true);
+                }
+            }
+            mi.setVisible(true);
+
+        }
+    }
+
     private void aplicandoTipoLetraItemMenu(Menu m,String tipoLetra)
     {
 
@@ -103,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (subMenu!=null && subMenu.size() >0 ) {
                 for (int j=0; j <subMenu.size();j++) {
                     MenuItem subMenuItem = subMenu.getItem(j);
-                    applyFontToMenuItem(subMenuItem,tipoLetra);
+                    applyFontToMenuItem(subMenuItem, tipoLetra);
                 }
             }
             applyFontToMenuItem(mi, tipoLetra);
@@ -128,11 +190,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             btnMipedido.setVisibility(View.VISIBLE);
             btnBebidas.setVisibility(View.VISIBLE);
             btnMarket.setVisibility(View.VISIBLE);
+            btnComidas.setVisibility(View.VISIBLE);
+            Menu m=navView.getMenu();
+            mostrandoMenu(m);
+
+            ParseUser currentUser = ParseUser.getCurrentUser();
+            if (currentUser != null) {
+                m.getItem(1).setTitle(currentUser.getUsername());
+            } else
+            {
+                m.getItem(1).setVisible(false);
+                Menu men=m.getItem(1).getSubMenu();
+                men.getItem(0).setVisible(false);
+            }
+
 
         }
         else
         {
-            cargarDatosParse();
+            CargarDatosRemotosTask cargarDatosRemotosTask=new CargarDatosRemotosTask();
+            cargarDatosRemotosTask.execute();
         }
     }
 
@@ -232,6 +309,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                                         btnMipedido.setVisibility(View.VISIBLE);
                                                         btnBebidas.setVisibility(View.VISIBLE);
                                                         btnMarket.setVisibility(View.VISIBLE);
+                                                        btnComidas.setVisibility(View.VISIBLE);
+                                                        Menu m= navView.getMenu();
+                                                        mostrandoMenu(m);
+                                                        ParseUser currentUser = ParseUser.getCurrentUser();
+                                                        if (currentUser != null) {
+                                                            m.getItem(1).setTitle(currentUser.getUsername());
+                                                        } else
+                                                        {
+                                                            m.getItem(1).setVisible(false);
+                                                            Menu men=m.getItem(1).getSubMenu();
+                                                            men.getItem(0).setVisible(false);
+                                                        }
                                                     }
 
                                                 }
@@ -272,7 +361,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivityForResult(intent,MI_REQUEST_CODE);
             break;
 
+            case R.id.volver_cargar:
+
+                volverAcargar();
+
+            break;
+
         }
+    }
+
+    private void volverAcargar()
+    {
+        text_compruebe_conexion.setVisibility(View.GONE);
+        btnRecargarVista.setVisibility(View.GONE);
+        CargarDatosRemotosTask cargarDatosRemotosTask=new CargarDatosRemotosTask();
+        cargarDatosRemotosTask.execute();
     }
 
     private void applyFontToMenuItem(MenuItem mi,String rutaTipoLetra)
@@ -293,6 +396,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 intent = new Intent(this,PedidoActivity.class);
                 startActivityForResult(intent, MI_REQUEST_CODE);
             break;
+            case R.id.nav_cerrar_sesion:
+                cerrarSesion();
+            break;
         }
         drawer.closeDrawers();
         return false;
@@ -307,21 +413,165 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (requestCode == MI_REQUEST_CODE) {
 
                 int posicionactual=pager.getCurrentItem();
-                Log.i("posicion actual:",posicionactual+"");
-                int tamano=adapter.getCount();
-                ProductoFragment prodFrag=(ProductoFragment)adapter.getItem(posicionactual);
+
+                int tamano=pager.getAdapter().getCount();
+
+                ProductoFragment prodFrag=(ProductoFragment)getSupportFragmentManager().getFragments().get(posicionactual);
                 prodFrag.actualizarData();
                 if((posicionactual+1)<tamano)
                 {
-                    prodFrag=(ProductoFragment)adapter.getItem(posicionactual+1);
+                    prodFrag=(ProductoFragment)getSupportFragmentManager().getFragments().get(posicionactual+1);
                     prodFrag.actualizarData();
                 }
 
                 if((posicionactual-1)>=0)
                 {
-                    prodFrag=(ProductoFragment)adapter.getItem(posicionactual-1);
+                    prodFrag=(ProductoFragment)getSupportFragmentManager().getFragments().get(posicionactual-1);
                     prodFrag.actualizarData();
                 }
+
+            Menu m=navView.getMenu();
+            mostrandoMenu(m);
+            ParseUser currentUser = ParseUser.getCurrentUser();
+            if (currentUser != null) {
+                m.getItem(1).setTitle(currentUser.getUsername());
+            } else
+            {
+                m.getItem(1).setVisible(false);
+                Menu men=m.getItem(1).getSubMenu();
+                men.getItem(0).setVisible(false);
+            }
         }
     }
+
+    class CargarDatosRemotosTask extends AsyncTask<Void, Void, Boolean>
+    {
+
+
+        @Override
+        protected Boolean doInBackground(Void... params)
+        {
+            if(hayConexionInternet())
+            {
+                return hayInternet();
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Boolean resultado) {
+            super.onPostExecute(resultado);
+
+            if(resultado)
+            {
+                cargarDatosParse();
+            }
+            else
+            {
+                mostrarMensajeComprobarConexion();
+            }
+
+        }
+    }
+
+    private void  mostrarMensajeComprobarConexion()
+    {
+        text_compruebe_conexion.setVisibility(View.VISIBLE);
+        btnRecargarVista.setVisibility(View.VISIBLE);
+    }
+
+    private boolean hayInternet()
+    {
+        ParseQuery<ParseObject> conexion = new ParseQuery<>("Conexion");
+        Task<ParseObject> objeto=conexion.getFirstInBackground();
+
+        try
+        {
+            int contador =1;
+            while (objeto.getResult()==null && contador<200)
+            {
+                Thread.sleep(50);
+                contador++;
+            }
+            if(contador==200)
+            {
+                return false;
+            }
+            return true;
+        } catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private boolean hayConexionInternet()
+    {
+        ConnectivityManager cm =
+                (ConnectivityManager)this.getSystemService(this.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        if(activeNetwork!=null)
+        {
+
+            return activeNetwork.isConnectedOrConnecting();
+        }
+        return false;
+
+    }
+    private void cerrarSesion()
+    {
+        pd = ProgressDialog.show(this,"fdfd", getResources().getString(R.string.por_favor_espere), true, false);
+
+        CerrarSesionTask cst= new CerrarSesionTask();
+        cst.execute();
+
+    }
+
+    private void mostrarMensaje(int idmensaje)
+    {
+        LayoutInflater inflater = getLayoutInflater();
+        View layout = inflater.inflate(R.layout.template_mensaje_toast,
+                (ViewGroup) findViewById(R.id.toast_layout));
+
+        TextView text = (TextView) layout.findViewById(R.id.txt_mensaje_toast);
+        text.setText(getResources().getString(idmensaje));
+
+        Toast toast = new Toast(this);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.setDuration(Toast.LENGTH_SHORT);
+        toast.setView(layout);
+        toast.show();
+    }
+
+    public class CerrarSesionTask extends  AsyncTask<Void,Void,Void>
+    {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            ParseUser.logOut();
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid)
+        {
+            super.onPostExecute(aVoid);
+            Menu m=navView.getMenu();
+            m.getItem(1).setVisible(false);
+            Menu men=m.getItem(1).getSubMenu();
+            men.getItem(0).setVisible(false);
+            mostrarMensaje(R.string.txt_sesion_cerrada);
+            if(pd!=null)
+            {
+                pd.dismiss();
+            }
+        }
+    }
+
+
 }

@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.parse.FindCallback;
@@ -48,8 +49,11 @@ public class MarketActivity extends AppCompatActivity implements View.OnClickLis
     private GifImageView btnMipedido;
     private DrawerLayout drawer;
     private TextView tituloMenuHeader;
+    private TextView text_compruebe_conexion;
+    private Button btnRecargarVista;
     private Typeface TF;
     private String font_path = "font/2-4ef58.ttf";
+    private String font_path_ASimple="font/A_Simple_Life.ttf";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -60,17 +64,21 @@ public class MarketActivity extends AppCompatActivity implements View.OnClickLis
 
         titulo = (TextView)findViewById(R.id.txttitulo);
         tituloMenuHeader=(TextView)findViewById(R.id.titulo_header_menu);
+        text_compruebe_conexion=(TextView)findViewById(R.id.txt_sin_conexion);
 
         btnMenuPrincipal=(ImageView)findViewById(R.id.btn_menu_principal);
         btnMipedido = (GifImageView)findViewById(R.id.btn_mi_pedido);
         btnComidas = (ImageView) findViewById(R.id.btncomida);
         btnMarket=(ImageView) findViewById(R.id.btnmarket);
         btnBebidas= (ImageView) findViewById(R.id.btnbebida);
+        btnRecargarVista=(Button)findViewById(R.id.volver_cargar);
 
         drawer=(DrawerLayout)findViewById(R.id.drawer);
         pager= (ViewPager)findViewById(R.id.pager);
         navView = (NavigationView) findViewById(R.id.nav);
 
+        text_compruebe_conexion.setVisibility(View.GONE);
+        btnRecargarVista.setVisibility(View.GONE);
         btnMenuPrincipal.setOnClickListener(this);
         btnComidas.setOnClickListener(this);
         btnBebidas.setOnClickListener(this);
@@ -90,7 +98,7 @@ public class MarketActivity extends AppCompatActivity implements View.OnClickLis
         pager.setAdapter(adapter);
 
         Menu m = navView.getMenu();
-        aplicandoTipoLetraItemMenu(m,font_path);
+        aplicandoTipoLetraItemMenu(m,font_path_ASimple);
 
         loadData();
     }
@@ -184,16 +192,16 @@ public class MarketActivity extends AppCompatActivity implements View.OnClickLis
             {
                 int posicionactual=pager.getCurrentItem();
                 int tamano=adapter.getCount();
-                ProductoGridFragment prodFrag=(ProductoGridFragment)adapter.getItem(posicionactual);
+                ProductoGridFragment prodFrag=(ProductoGridFragment)getSupportFragmentManager().getFragments().get(posicionactual);
                 prodFrag.actualizarData();
                 if((posicionactual+1)<tamano)
                 {
-                    prodFrag=(ProductoGridFragment)adapter.getItem(posicionactual+1);
+                    prodFrag=(ProductoGridFragment)getSupportFragmentManager().getFragments().get(posicionactual + 1);
                     prodFrag.actualizarData();
                 }
                 if((posicionactual-1)>=0)
                 {
-                    prodFrag=(ProductoGridFragment)adapter.getItem(posicionactual-1);
+                    prodFrag=(ProductoGridFragment)getSupportFragmentManager().getFragments().get(posicionactual-1);
                     prodFrag.actualizarData();
                 }
             }

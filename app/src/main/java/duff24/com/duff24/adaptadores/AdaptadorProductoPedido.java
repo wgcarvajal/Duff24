@@ -21,6 +21,7 @@ import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 import duff24.com.duff24.R;
@@ -102,7 +103,11 @@ public class AdaptadorProductoPedido extends BaseAdapter implements View.OnClick
 
         }
         txtnombreProducto.setText(producto.getNombreing());
-        txtprecioProducto.setText("$"+producto.getPrecio()+"");
+
+        DecimalFormat format= new DecimalFormat("###,###.##");
+        String valorTotal=format.format(producto.getPrecio());
+        valorTotal=valorTotal.replace(",",".");
+        txtprecioProducto.setText("$"+valorTotal);
 
 
         if(context.getResources().getString(R.string.idioma).equals("es"))

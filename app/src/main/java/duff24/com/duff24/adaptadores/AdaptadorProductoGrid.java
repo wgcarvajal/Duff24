@@ -30,6 +30,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.text.DecimalFormat;
 import java.util.List;
 
 import duff24.com.duff24.R;
@@ -45,6 +46,7 @@ public class AdaptadorProductoGrid extends BaseAdapter implements View.OnClickLi
     private List<Producto> data;
     private String font_path = "font/2-4ef58.ttf";
     private String font_pathOds="font/odstemplik.otf";
+    private String font_path_ASimple="font/A_Simple_Life.ttf";
     private Typeface TF;
 
     public AdaptadorProductoGrid(Context context, List<Producto> data)
@@ -100,11 +102,16 @@ public class AdaptadorProductoGrid extends BaseAdapter implements View.OnClickLi
             txtnombreProducto.setTypeface(TF);
             TF = Typeface.createFromAsset(context.getAssets(),font_pathOds);
             txtconteo.setTypeface(TF);
+            TF = Typeface.createFromAsset(context.getAssets(),font_path_ASimple);
+            txtDescripcionProducto.setTypeface(TF);
         }
         txtconteo.setText("0");
         txtnombreProducto.setText(p.getNombreing());
         txtDescripcionProducto.setText(p.getDescripcionIng());
-        txtPrecioProducto.setText("$" + p.getPrecio());
+        DecimalFormat format =new DecimalFormat("###,###.##");
+        String valorProducto=format.format(p.getPrecio());
+        valorProducto=valorProducto.replace(",",".");
+        txtPrecioProducto.setText("$" + valorProducto);
 
         if(context.getResources().getString(R.string.idioma).equals("es"))
         {
