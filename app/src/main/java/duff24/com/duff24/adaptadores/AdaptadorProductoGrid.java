@@ -2,15 +2,18 @@ package duff24.com.duff24.adaptadores;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.ContextWrapper;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -23,12 +26,6 @@ import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.text.DecimalFormat;
 import java.util.List;
@@ -44,13 +41,28 @@ public class AdaptadorProductoGrid extends BaseAdapter implements View.OnClickLi
 {
     private Context context;
     private List<Producto> data;
+    private LayoutInflater mInflater;
+
+
     private String font_path = "font/2-4ef58.ttf";
     private String font_pathOds="font/odstemplik.otf";
     private String font_path_ASimple="font/A_Simple_Life.ttf";
     private Typeface TF;
 
+    public class ViewHolder
+    {
+        public TextView txtnombreProducto;
+        public ImageView imagenProducto;
+        public TextView txtconteo;
+        public ImageView btnDisminuir;
+        public TextView txtPrecioProducto;
+        public TextView txtDescripcionProducto;
+    }
+
+
     public AdaptadorProductoGrid(Context context, List<Producto> data)
     {
+        mInflater=(LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.context = context;
         this.data = data;
     }
@@ -58,13 +70,21 @@ public class AdaptadorProductoGrid extends BaseAdapter implements View.OnClickLi
     @Override
     public int getCount()
     {
-        return data.size();
+        if(data!=null)
+        {
+            return data.size();
+        }
+        return 0;
     }
 
     @Override
     public Object getItem(int position)
     {
-        return data.get(position);
+        if(data != null && position >= 0 && position < getCount() )
+        {
+            return data.get(position);
+        }
+        return null;
     }
 
     @Override
@@ -76,84 +96,64 @@ public class AdaptadorProductoGrid extends BaseAdapter implements View.OnClickLi
     @Override
     public View getView(int position, View convertView, ViewGroup parent)
     {
-        View v = null;
-        boolean entro=false;
-        final Producto p = (Producto) getItem(position);
+        View v = convertView;
+        ViewHolder viewHolder;
 
         if(convertView == null)
         {
-            v = View.inflate(context,R.layout.template_producto_grid ,null);
-            entro=true;
+            v = mInflater.inflate(R.layout.template_producto_grid,parent,false);
+            viewHolder=new ViewHolder();
+            viewHolder.txtnombreProducto=(TextView) v.findViewById(R.id.txtnombreproducto);
+            viewHolder.imagenProducto=(ImageView) v.findViewById(R.id.img_producto);
+            viewHolder.txtconteo=(TextView) v.findViewById(R.id.txtconteo);
+            viewHolder.btnDisminuir=(ImageView) v.findViewById(R.id.btn_disminuir);
+            viewHolder.txtPrecioProducto=(TextView) v.findViewById(R.id.txtprecioproducto);
+            viewHolder.txtDescripcionProducto=(TextView) v.findViewById(R.id.txtdescripcionproducto);
+            TF = Typeface.createFromAsset(context.getAssets(), font_path);
+            viewHolder.txtnombreProducto.setTypeface(TF);
+            TF = Typeface.createFromAsset(context.getAssets(),font_pathOds);
+            viewHolder.txtconteo.setTypeface(TF);
+            viewHolder.txtconteo.setText("0");
+            TF = Typeface.createFromAsset(context.getAssets(),font_path_ASimple);
+            viewHolder.txtDescripcionProducto.setTypeface(TF);
+            viewHolder.btnDisminuir.setTag(R.id.txtconteo,viewHolder.txtconteo);
+            v.setTag(viewHolder);
+
         }else
         {
-            v = convertView;
+            viewHolder=(ViewHolder)v.getTag();
+            viewHolder.txtconteo.setText("0");
         }
 
-        TextView txtnombreProducto = (TextView) v.findViewById(R.id.txtnombreproducto);
-        ImageView imagenProducto=(ImageView) v.findViewById(R.id.img_producto);
-        TextView txtconteo= (TextView) v.findViewById(R.id.txtconteo);
-        ImageView btnDisminuir= (ImageView) v.findViewById(R.id.btn_disminuir);
-        TextView txtPrecioProducto = (TextView) v.findViewById(R.id.txtprecioproducto);
-        TextView txtDescripcionProducto = (TextView) v.findViewById(R.id.txtdescripcionproducto);
+        final Producto p = (Producto) getItem(position);
 
-        if(entro)
-        {
-            TF = Typeface.createFromAsset(context.getAssets(), font_path);
-            txtnombreProducto.setTypeface(TF);
-            TF = Typeface.createFromAsset(context.getAssets(),font_pathOds);
-            txtconteo.setTypeface(TF);
-            TF = Typeface.createFromAsset(context.getAssets(),font_path_ASimple);
-            txtDescripcionProducto.setTypeface(TF);
-        }
-        txtconteo.setText("0");
-        txtnombreProducto.setText(p.getNombreing());
-        txtDescripcionProducto.setText(p.getDescripcionIng());
-        DecimalFormat format =new DecimalFormat("###,###.##");
-        String valorProducto=format.format(p.getPrecio());
-        valorProducto=valorProducto.replace(",",".");
-        txtPrecioProducto.setText("$" + valorProducto);
+        fijarDatos(p, viewHolder, context.getResources().getString(R.string.idioma), position);
 
-        if(context.getResources().getString(R.string.idioma).equals("es"))
-        {
-            txtnombreProducto.setText(p.getNombreesp());
-            txtDescripcionProducto.setText(p.getDescripcionesp());
-        }
-
-        txtconteo.setVisibility(View.GONE);
-        btnDisminuir.setVisibility(View.GONE);
-
-        btnDisminuir.setTag(position);
-        btnDisminuir.setOnClickListener(this);
-
+        viewHolder.imagenProducto.setImageBitmap(null);
         final View fv=v;
-
 
         if(p.getImagen()!=null)
         {
-            imagenProducto.setImageBitmap(p.getImagen());
+            loadBitmap(p.getImagen(), viewHolder.imagenProducto,p.getId(),context);
         }
         else
         {
+            Log.i("la imagen","es null");
             ParseQuery<ParseObject> queryImagen = new ParseQuery<ParseObject>(Producto.TABLAIMAGEN);
             queryImagen.whereEqualTo(Producto.TBLIMAGEN_PRODUCTO, p.getId());
-            queryImagen.getFirstInBackground(new GetCallback<ParseObject>()
-            {
+            queryImagen.getFirstInBackground(new GetCallback<ParseObject>() {
                 @Override
-                public void done(ParseObject object, ParseException e)
-                {
-                    if (e == null)
-                    {
+                public void done(ParseObject object, ParseException e) {
+                    if (e == null) {
                         ParseFile fileObject = (ParseFile) object.get(Producto.TBLIMAGEN_IMGFILE);
-                        final String nombreImagen=fileObject.getName();
                         fileObject.getDataInBackground(new GetDataCallback() {
                             @Override
                             public void done(byte[] data, ParseException e) {
-                                if (e == null)
-                                {
+                                if (e == null) {
+
+                                    p.setImagen(data);
                                     ImageView imagen = (ImageView) fv.findViewById(R.id.img_producto);
-                                    Bitmap imagenmodificada = decodeSampledBitmapFromResource(data, 0, data.length, 80, 80);
-                                    p.setImagen(imagenmodificada);
-                                    imagen.setImageBitmap(imagenmodificada);
+                                    loadBitmap(data, imagen,p.getId(),context);
                                 }
                             }
                         });
@@ -162,55 +162,137 @@ public class AdaptadorProductoGrid extends BaseAdapter implements View.OnClickLi
             });
         }
 
-        AdminSQliteOpenHelper admin = new AdminSQliteOpenHelper(context,"admin",null,1);
-        SQLiteDatabase db = admin.getReadableDatabase();
-
-        Cursor fila = db.rawQuery("select prodcantidad from pedido where prodid = '"+p.getId()+"'",null);
-
-        if(fila.moveToFirst())
-        {
-            txtconteo.setVisibility(View.VISIBLE);
-            btnDisminuir.setVisibility(View.VISIBLE);
-            txtconteo.setText(fila.getInt(0)+"");
-        }
-        db.close();
-
         return v;
+    }
+
+    private void fijarDatos(Producto producto,ViewHolder viewHolder,String idioma,int position)
+    {
+        DecimalFormat format =new DecimalFormat("###,###.##");
+        String valorProducto=format.format(producto.getPrecio());
+        valorProducto=valorProducto.replace(",",".");
+        viewHolder.txtPrecioProducto.setText("$" + valorProducto);
+        if(idioma.equals("es"))
+        {
+            viewHolder.txtnombreProducto.setText(producto.getNombreesp());
+            viewHolder.txtDescripcionProducto.setText(producto.getDescripcionesp());
+        }
+        else
+        {
+            viewHolder.txtnombreProducto.setText(producto.getNombreing());
+            viewHolder.txtDescripcionProducto.setText(producto.getDescripcionIng());
+        }
+        viewHolder.txtconteo.setVisibility(View.GONE);
+        viewHolder.btnDisminuir.setVisibility(View.GONE);
+        viewHolder.btnDisminuir.setTag(position);
+        viewHolder.btnDisminuir.setOnClickListener(this);
+        FijarCantidadTask fijarCantidadTask=new FijarCantidadTask(context,viewHolder);
+        fijarCantidadTask.execute(producto.getId());
+
+    }
+
+    public class FijarCantidadTask extends AsyncTask<String,Void,Void>
+    {
+        ViewHolder viewHolder;
+        Context context;
+        int cantidad=0;
+
+        public FijarCantidadTask(Context context,ViewHolder viewHolder)
+        {
+            this.viewHolder=viewHolder;
+            this.context=context;
+        }
+
+        @Override
+        protected Void doInBackground(String... params)
+        {
+            AdminSQliteOpenHelper admin = new AdminSQliteOpenHelper(context,"admin",null,1);
+
+            SQLiteDatabase db = admin.getReadableDatabase();
+            Cursor fila = db.rawQuery("select prodcantidad from pedido where prodid = '"+params[0]+"'",null);
+            if(fila.moveToFirst())
+            {
+                cantidad=fila.getInt(0);
+            }
+            db.close();
+            return  null;
+        }
+
+        @Override
+        protected void onPostExecute(Void avoid) {
+            super.onPostExecute(avoid);
+            if(cantidad!=0)
+            {
+                viewHolder.txtconteo.setVisibility(View.VISIBLE);
+                viewHolder.btnDisminuir.setVisibility(View.VISIBLE);
+                viewHolder.txtconteo.setText(cantidad+"");
+            }
+        }
     }
 
     @Override
     public void onClick(View v)
     {
-        MediaPlayer m = MediaPlayer.create(context,R.raw.sonido_click);
-        m.start();
-        AdminSQliteOpenHelper admin = new AdminSQliteOpenHelper(context,"admin",null,1);
-        SQLiteDatabase db = admin.getWritableDatabase();
-
+        TextView txtconteo=(TextView)v.getTag(R.id.txtconteo);
         String prodid = data.get(Integer.parseInt(v.getTag().toString())).getId();
+        DisminuirCantidadTask disminuirCantidadTask= new DisminuirCantidadTask(txtconteo,(ImageView)v,context);
+        disminuirCantidadTask.execute(data.get(Integer.parseInt(v.getTag().toString())).getId());
 
-        Cursor fila = db.rawQuery("select prodcantidad from pedido where prodid = '"+prodid+"'",null);
+    }
 
-        if(fila.moveToFirst())
+    public class DisminuirCantidadTask extends AsyncTask<String,Void,Void>
+    {
+        private WeakReference<TextView> textViewWeakReference;
+        private WeakReference<ImageView> imageViewWeakReference;
+        private Context context;
+        private int cantidad=0;
+
+        public DisminuirCantidadTask(TextView textView,ImageView btn,Context context)
         {
-            int contador=fila.getInt(0);
-            if(contador==1)
+            this.textViewWeakReference= new WeakReference<TextView>(textView);
+            this.imageViewWeakReference= new WeakReference<ImageView>(btn);
+            this.context=context;
+        }
+        @Override
+        protected Void doInBackground(String... params)
+        {
+            MediaPlayer m = MediaPlayer.create(context, R.raw.sonido_click);
+            m.start();
+            AdminSQliteOpenHelper admin = new AdminSQliteOpenHelper(context,"admin",null,1);
+            SQLiteDatabase db = admin.getWritableDatabase();
+            Cursor fila = db.rawQuery("select prodcantidad from pedido where prodid = '" + params[0] + "'", null);
+            if(fila.moveToFirst())
             {
-                db.delete("pedido","prodid ='"+prodid+"'",null);
+                this.cantidad=fila.getInt(0)-1;
+                if(cantidad==0)
+                {
+                    db.delete("pedido", "prodid ='" + params[0] + "'", null);
+                }
+                else
+                {
+                    ContentValues registroPedido= new ContentValues();
+                    registroPedido.put("prodcantidad",cantidad);
+                    db.update("pedido", registroPedido, "prodid = '" + params[0] + "'", null);
+                }
+            }
+            db.close();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if(cantidad==0)
+            {
+                imageViewWeakReference.get().setVisibility(View.GONE);
+                textViewWeakReference.get().setText(0+"");
+                textViewWeakReference.get().setVisibility(View.GONE);
             }
             else
             {
-                ContentValues registroPedido= new ContentValues();
-                registroPedido.put("prodcantidad",contador-1);
-                int cant= db.update("pedido",registroPedido,"prodid = '"+prodid+"'",null);
+                textViewWeakReference.get().setText(cantidad + "");
             }
-            this.notifyDataSetChanged();
         }
-        db.close();
     }
-
-
-
-    //--------------------------------------------------------------------
 
     public static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
@@ -256,68 +338,93 @@ public class AdaptadorProductoGrid extends BaseAdapter implements View.OnClickLi
         private byte [] data = null;
         private String prodid="";
 
-        public BitmapWorkerTask(ImageView imageView,byte [] data,String prodid) {
-            // Use a WeakReference to ensure the ImageView can be garbage collected
+        public BitmapWorkerTask(ImageView imageView,byte [] data,String prodid)
+        {
             imageViewReference = new WeakReference<ImageView>(imageView);
             this.data=data;
             this.prodid=prodid;
         }
 
-        // Decode image in background.
         @Override
         protected Bitmap doInBackground(Integer... params) {
-            Bitmap bitmap= decodeSampledBitmapFromResource(data, 0,data.length,10,10);
+            Bitmap bitmap= decodeSampledBitmapFromResource(data, 0,data.length,80,80);
             return bitmap;
         }
 
-        // Once complete, see if ImageView is still around and set bitmap.
         @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            if (imageViewReference != null && bitmap != null) {
+        protected void onPostExecute(Bitmap bitmap)
+        {
+            if (isCancelled())
+            {
+                bitmap = null;
+            }
+            if (imageViewReference != null && bitmap != null)
+            {
                 final ImageView imageView = imageViewReference.get();
-                if (imageView != null) {
+                final BitmapWorkerTask bitmapWorkerTask =
+                        getBitmapWorkerTask(imageView);
+                if (this == bitmapWorkerTask && imageView != null)
+                {
                     imageView.setImageBitmap(bitmap);
                 }
             }
         }
-
     }
-
-    public void loadBitmap(byte[] data , ImageView imageView,String prodid)
+    public void loadBitmap(byte[] data , ImageView imageView,String prodid,Context context)
     {
-        BitmapWorkerTask task = new BitmapWorkerTask(imageView,data,prodid);
-        task.execute();
+
+        if (cancelPotentialWork(prodid, imageView)) {
+            final BitmapWorkerTask task = new BitmapWorkerTask(imageView,data,prodid);
+            final AsyncDrawable asyncDrawable =
+                    new AsyncDrawable(context.getResources(), null, task);
+
+            imageView.setImageDrawable(asyncDrawable);
+            task.execute();
+        }
     }
 
+    static class AsyncDrawable extends BitmapDrawable {
+        private final WeakReference<BitmapWorkerTask> bitmapWorkerTaskReference;
 
-    private String guardarImagen (Context context, String nombre, Bitmap imagen,String extension){
-        ContextWrapper cw = new ContextWrapper(context);
-        File dirImages = cw.getDir("Imagenes", Context.MODE_PRIVATE);
-        File myPath = new File(dirImages, nombre +"."+ extension);
-
-
-        FileOutputStream fos = null;
-        try{
-            fos = new FileOutputStream(myPath);
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            if(extension.equals("jpg"))
-            {
-                imagen.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-            }
-            else
-            {
-                imagen.compress(Bitmap.CompressFormat.PNG, 100, stream);
-            }
-
-            byte [] bytearray= stream.toByteArray();
-            fos.write(bytearray);
-            fos.close();
-        }catch (FileNotFoundException ex){
-            ex.printStackTrace();
-        }catch (IOException ex){
-            ex.printStackTrace();
+        public AsyncDrawable(Resources res, Bitmap bitmap,
+                             BitmapWorkerTask bitmapWorkerTask) {
+            super(res, bitmap);
+            bitmapWorkerTaskReference =
+                    new WeakReference<BitmapWorkerTask>(bitmapWorkerTask);
         }
-        return myPath.getAbsolutePath();
+
+        public BitmapWorkerTask getBitmapWorkerTask() {
+            return bitmapWorkerTaskReference.get();
+        }
+    }
+
+    public static boolean cancelPotentialWork(String prodid, ImageView imageView) {
+        final BitmapWorkerTask bitmapWorkerTask = getBitmapWorkerTask(imageView);
+
+        if (bitmapWorkerTask != null) {
+            final String bitmapProdid = bitmapWorkerTask.prodid;
+            // If bitmapData is not yet set or it differs from the new data
+            if (bitmapProdid.equals("") || !bitmapProdid.equals(prodid)) {
+                // Cancel previous task
+                bitmapWorkerTask.cancel(true);
+            } else {
+                // The same work is already in progress
+                return false;
+            }
+        }
+        // No task associated with the ImageView, or an existing task was cancelled
+        return true;
+    }
+
+    private static BitmapWorkerTask getBitmapWorkerTask(ImageView imageView) {
+        if (imageView != null) {
+            final Drawable drawable = imageView.getDrawable();
+            if (drawable instanceof AsyncDrawable) {
+                final AsyncDrawable asyncDrawable = (AsyncDrawable) drawable;
+                return asyncDrawable.getBitmapWorkerTask();
+            }
+        }
+        return null;
     }
 
 }

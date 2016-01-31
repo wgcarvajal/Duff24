@@ -3,6 +3,7 @@ package duff24.com.duff24;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
@@ -17,19 +18,29 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.AccessToken;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
+import com.parse.RequestPasswordResetCallback;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import duff24.com.duff24.modelo.Usuario;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener
 {
@@ -49,6 +60,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private TextView tituloVista;
     private ProgressDialog pd = null;
     private Button btnFacebook;
+    private Dialog dialog;
 
 
     @Override
@@ -104,7 +116,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             break;
 
             case R.id.recuperarClave:
-
+                recuperarClave();
             break;
 
             case R.id.btninciarsesion:
@@ -116,6 +128,116 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             break;
         }
 
+    }
+
+    private void recuperarClave()
+    {
+        dialog= new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.template_dialog_olvidaste_password);
+        dialog.getWindow().setBackgroundDrawableResource(R.drawable.bordes_redondeados_pequenos);
+
+
+        TF = Typeface.createFromAsset(getAssets(), font_path);
+        Button btnEnviar=(Button)dialog.findViewById(R.id.btn_enviar);
+        Button btnCancelar=(Button)dialog.findViewById(R.id.btn_cancelar);
+        final EditText txtemail =(EditText)dialog.findViewById(R.id.txt_email);
+
+        txtemail.setTypeface(TF);
+
+        btnEnviar.setTypeface(TF);
+        btnCancelar.setTypeface(TF);
+        final Context context=this;
+
+        btnEnviar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                String email=txtemail.getText().toString();
+
+                enviarEmail(email);
+            }
+        });
+
+        btnCancelar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
+    private void enviarEmail(String email)
+    {
+        if(email.equals(""))
+        {
+            mostrarMensaje(R.string.txt_ingrese_correo);
+        }
+        else
+        {
+            if(!validarCorreo(email))
+            {
+                mostrarMensaje(R.string.campo_correo);
+            }
+            else
+            {
+                pd=ProgressDialog.show(this,getResources().getString(R.string.txt_enviando), getResources().getString(R.string.por_favor_espere));
+                EnviarEmailTaks evet= new EnviarEmailTaks();
+                evet.execute(email);
+            }
+
+        }
+    }
+
+    public class EnviarEmailTaks extends  AsyncTask <String, Void, Boolean>
+    {
+        private String email;
+
+        @Override
+        protected Boolean doInBackground(String... params) {
+
+            email=params[0];
+            return hayConexionInternet();
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            super.onPostExecute(aBoolean);
+            if(aBoolean)
+            {
+                enviarEmailParse(email);
+            }
+            else
+            {
+                pd.dismiss();
+                mostrarMensaje(R.string.compruebe_conexion);
+            }
+        }
+    }
+
+    private void enviarEmailParse(String email)
+    {
+        ParseUser.requestPasswordResetInBackground(email, new RequestPasswordResetCallback() {
+            public void done(ParseException e) {
+                pd.dismiss();
+                if (e == null) {
+                    dialog.dismiss();
+                    mostrarMensaje(R.string.confirmacion_envio_email);
+                } else {
+
+                    if(e.getCode()==205)
+                    {
+                        mostrarMensaje(R.string.correo_no_se_encuentra);
+                    }
+                    else
+                    {
+                        mostrarMensaje(R.string.compruebe_conexion);
+                    }
+                }
+            }
+        });
     }
 
     private void iniciarSession()
@@ -132,6 +254,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private void iniciarSessionFacebook()
     {
+        pd=ProgressDialog.show(this,getResources().getString(R.string.txt_iniciando_con_facebook), getResources().getString(R.string.por_favor_espere), true);
         List<String> permissions = Arrays.asList("public_profile", "user_about_me",
                 "user_birthday", "user_location", "email");
         ParseFacebookUtils.logInWithReadPermissionsInBackground(this, permissions, new LogInCallback()
@@ -139,26 +262,31 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             @Override
             public void done(ParseUser user, ParseException err)
             {
+                pd.dismiss();
                 if (user == null)
                 {
                     if(err!=null)
                     {
-                        Log.i("mensaje:",err.getMessage()+"codigo: "+err.getCode());
+                        mostrarMensaje(R.string.compruebe_conexion);
+                    }
+                }
+                else
+                {
+                    if (user.isNew())
+                    {
+                        makeMeRequest();
                     }
                     else
                     {
-                        Log.d("MyApp", "El usuario cancelo el Loggin");
+                        if(user.getString(Usuario.NOMBRE)==null)
+                        {
+                            makeMeRequest();
+                        }
                     }
-
-
-                } else if (user.isNew())
-                {
-                    Log.d("MyApp", "Primer loggin del Usuario");
-
-                } else
-                {
-                    Log.d("MyApp", "El usuario ya estaba logueado");
+                    LoginActivity.this.setResult(MI_REQUEST_SE_LOGUIO_USUARIO);
+                    LoginActivity.this.finish();
                 }
+
             }
         });
     }
@@ -172,21 +300,58 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     pd.dismiss();
                     setResult(MI_REQUEST_SE_LOGUIO_USUARIO);
                     finish();
-                } else
-                {
+                } else {
                     pd.dismiss();
-                    if(e.getCode()==101)
-                    {
+                    if (e.getCode() == 101) {
                         mostrarMensaje(R.string.txt_email_clave_incorrectos);
-                    }
-                    else
-                    {
+                    } else {
                         mostrarMensaje(R.string.compruebe_conexion);
                     }
                 }
             }
         });
     }
+
+    private void makeMeRequest() {
+        GraphRequest request = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(),
+                new GraphRequest.GraphJSONObjectCallback() {
+                    @Override
+                    public void onCompleted(JSONObject jsonObject, GraphResponse graphResponse) {
+                        if (jsonObject != null) {
+                            JSONObject userProfile = new JSONObject();
+
+                            try {
+
+                                ParseUser currentUser = ParseUser.getCurrentUser();
+                                userProfile.put("facebookId", jsonObject.getLong("id"));
+                                userProfile.put("name", jsonObject.getString("name"));
+                                currentUser.put(Usuario.NOMBRE,jsonObject.getString("name"));
+
+                                if (jsonObject.getString("gender") != null)
+                                    userProfile.put("gender", jsonObject.getString("gender"));
+
+                                if (jsonObject.getString("email") != null)
+                                    userProfile.put("email", jsonObject.getString("email"));
+                                currentUser.put(Usuario.EMAILFACEBOOK, jsonObject.getString("email"));
+
+                                currentUser.put("profile", userProfile);
+                                currentUser.saveInBackground();
+
+                            } catch (JSONException e) {
+                                Log.d("Myapp",
+                                        "Error parsing returned user data. " + e);
+                            }
+                        } else if (graphResponse.getError() != null) {
+
+                        }
+                    }
+                });
+        Bundle parameters = new Bundle();
+        parameters.putString("fields", "id,email,gender,name");
+        request.setParameters(parameters);
+        request.executeAsync();
+    }
+
 
     public class IniciarSesionTask extends AsyncTask<String,Void,Boolean>
     {

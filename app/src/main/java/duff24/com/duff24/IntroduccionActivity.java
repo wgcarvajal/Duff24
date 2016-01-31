@@ -2,6 +2,7 @@ package duff24.com.duff24;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -20,15 +21,22 @@ public class IntroduccionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_introduccion);
 
         VideoView videoView = (VideoView) findViewById(R.id.video);
+        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                mp.setLooping(true);
+            }
+        });
 
-        Uri path = Uri.parse("android.resource://"+getPackageName()+"/"+R.raw.video_baja_calidad);
 
 
-        videoView.setVideoURI(path);
-        context=this;
-        videoView.start();
-        IrActiviyPrincipal ir= new IrActiviyPrincipal();
-        ir.execute();
+        //Uri path = Uri.parse("android.resource://"+getPackageName()+"/"+R.raw.video_prueba_final);
+
+
+        //videoView.setVideoURI(path);
+        //videoView.start();
+        //IrActiviyPrincipal ir= new IrActiviyPrincipal();
+        //ir.execute();
 
 
     }

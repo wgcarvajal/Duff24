@@ -13,7 +13,7 @@
     <dimen name="alto_template_producto">250dp</dimen>
     <dimen name="tam_nombre_producto">38sp</dimen>
     <dimen name="tam_precio_producto">35sp</dimen>
-    <dimen name="tam_descripcion_producto">18sp</dimen>
+    <dimen name="tam_descripcion_producto">23sp</dimen>
     <dimen name="alto_campo_nombre_producto">120dp</dimen>
     <dimen name="tam_imagen_producto_grid">180dp</dimen>
     <dimen name="alto_campo_descripcion_producto">90dp</dimen>
@@ -61,6 +61,6 @@
     <dimen name="size_text_btn_continuar_no_registrado">15sp</dimen>
     <dimen name="margin_muy_poca">3dp</dimen>
     <dimen name="tam_scrollview_observaciones">120dp</dimen>
-    <dimen name="size_text_compruebe_conexion">45sp</dimen>
+    <dimen name="size_text_compruebe_conexion">25sp</dimen>
     <dimen name="margin_input_registrase">26dp</dimen>
 </resources>

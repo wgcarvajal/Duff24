@@ -11,4 +11,11 @@
         android:title="@string/vaciar_pedido"
         android:icon="@android:drawable/ic_menu_delete"
         />
+
+    <item android:title="@string/txt_cuenta">
+        <menu>
+            <item android:title="@string/txt_cerrar_sesion"
+                android:id="@+id/nav_cerrar_sesion"/>
+        </menu>
+    </item>
 </menu>

@@ -40,7 +40,7 @@ public class Producto
     private String categoria;
     private String subcategoriaing;
     private String subcategoriaesp;
-    private Bitmap imagen;
+    private byte[] imagen;
 
     public String getNombreesp()
     {
@@ -110,11 +110,11 @@ public class Producto
         this.categoria = categoria;
     }
 
-    public Bitmap getImagen() {
+    public byte[] getImagen() {
         return imagen;
     }
 
-    public void setImagen(Bitmap imagen)
+    public void setImagen(byte[] imagen)
     {
         this.imagen = imagen;
     }

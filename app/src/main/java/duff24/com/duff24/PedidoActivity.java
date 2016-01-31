@@ -1,6 +1,7 @@
 package duff24.com.duff24;
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +9,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
 import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -40,6 +42,7 @@ import java.util.List;
 import duff24.com.duff24.adaptadores.AdaptadorProductoPedido;
 import duff24.com.duff24.basededatos.AdminSQliteOpenHelper;
 import duff24.com.duff24.modelo.Producto;
+import duff24.com.duff24.modelo.Usuario;
 import duff24.com.duff24.typeface.CustomTypefaceSpan;
 import duff24.com.duff24.util.AppUtil;
 
@@ -65,6 +68,7 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
     private ImageView flechaAtras;
     private AdaptadorProductoPedido adapter;
     private List<Producto> data= new ArrayList<>();
+    private ProgressDialog pd = null;
 
 
     @Override
@@ -94,15 +98,36 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
         flechaAtras.setOnClickListener(this);
         Menu m = navView.getMenu();
 
+        ParseUser currentUser = ParseUser.getCurrentUser();
+
         if(!hayProductos())
         {
             m.getItem(1).setVisible(false);
             btnFinalizarPedido.setVisibility(View.GONE);
-            btnMenuPrincipal.setVisibility(View.GONE);
+            if(currentUser !=null)
+            {
+                flechaAtras.setVisibility(View.GONE);
+            }
+            else
+            {
+                btnMenuPrincipal.setVisibility(View.GONE);
+                m.getItem(2).setVisible(false);
+                MenuItem mI= m.getItem(2);
+                Menu submenu= mI.getSubMenu();
+                submenu.getItem(0).setVisible(false);
+            }
+
         }
         else
         {
             flechaAtras.setVisibility(View.GONE);
+            if(currentUser==null)
+            {
+                m.getItem(2).setVisible(false);
+                MenuItem mI= m.getItem(2);
+                Menu submenu= mI.getSubMenu();
+                submenu.getItem(0).setVisible(false);
+            }
         }
 
         aplicandoTipoLetraItemMenu(m, font_path_ASimple);
@@ -130,7 +155,8 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
         Cursor fila = db.rawQuery("select prodid, prodcantidad from pedido", null);
         if (fila != null) {
 
-            if (fila.moveToFirst()) {
+            if (fila.moveToFirst())
+            {
 
                 int contador=2000;
                 do {
@@ -147,16 +173,12 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
                     }
 
                 } while (fila.moveToNext());
-
                 DecimalFormat format= new DecimalFormat("###,###.##");
                 String valorTotal=format.format(contador);
                 valorTotal=valorTotal.replace(",",".");
                 textValorTotalPedido.setText("$"+valorTotal);
             }
-
         }
-
-
         db.close();
     }
 
@@ -199,7 +221,6 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
 
     private void finalizarPedido()
     {
-        Log.i("entro", "+++++++");
         String substring=textValorTotalPedido.getText().toString().substring(1);
         substring =substring.replace(".","");
         int total= Integer.parseInt(substring);
@@ -258,10 +279,70 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
             case R.id.nav_vaciar_pedido:
                 vaciarPedido();
             break;
+            case R.id.nav_cerrar_sesion:
+                cerrarSesion();
+            break;
+
         }
         drawer.closeDrawers();
         return false;
 
+    }
+
+    private void cerrarSesion()
+    {
+        pd = ProgressDialog.show(this, "", getResources().getString(R.string.por_favor_espere), true, false);
+
+        CerrarSesionTask cst= new CerrarSesionTask();
+        cst.execute();
+
+    }
+
+    public class CerrarSesionTask extends AsyncTask<Void,Void,Void>
+    {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            ParseUser.logOut();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid)
+        {
+            super.onPostExecute(aVoid);
+            Menu m=navView.getMenu();
+            m.getItem(2).setVisible(false);
+            Menu men=m.getItem(2).getSubMenu();
+            men.getItem(0).setVisible(false);
+            mostrarMensaje(R.string.txt_sesion_cerrada);
+            if(!m.getItem(1).isVisible())
+            {
+                btnMenuPrincipal.setVisibility(View.GONE);
+                flechaAtras.setVisibility(View.VISIBLE);
+            }
+
+            if(pd!=null)
+            {
+                pd.dismiss();
+            }
+        }
+    }
+
+    private void mostrarMensaje(int idmensaje)
+    {
+        LayoutInflater inflater = getLayoutInflater();
+        View layout = inflater.inflate(R.layout.template_mensaje_toast,
+                (ViewGroup) findViewById(R.id.toast_layout));
+
+        TextView text = (TextView) layout.findViewById(R.id.txt_mensaje_toast);
+        text.setText(getResources().getString(idmensaje));
+
+        Toast toast = new Toast(this);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.setDuration(Toast.LENGTH_SHORT);
+        toast.setView(layout);
+        toast.show();
     }
 
 
@@ -318,7 +399,7 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
         DecimalFormat format= new DecimalFormat("###,###.##");
         String valorTotal=format.format(contador);
         valorTotal=valorTotal.replace(",",".");
-        textValorTotalPedido.setText("$"+valorTotal);
+        textValorTotalPedido.setText("$" + valorTotal);
     }
 
     private void vaciarPedido()
@@ -363,10 +444,19 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
                 toast.setView(layout);
                 toast.show();
                 Menu m = navView.getMenu();
+                mostrandoMenu(m);
                 m.getItem(1).setVisible(false);
                 btnFinalizarPedido.setVisibility(View.GONE);
-                flechaAtras.setVisibility(View.VISIBLE);
-                btnMenuPrincipal.setVisibility(View.GONE);
+                ParseUser currentUser = ParseUser.getCurrentUser();
+                if(currentUser==null)
+                {
+                    flechaAtras.setVisibility(View.VISIBLE);
+                    btnMenuPrincipal.setVisibility(View.GONE);
+                    m.getItem(2).setVisible(false);
+                    MenuItem mI=m.getItem(2);
+                    Menu submenu=mI.getSubMenu();
+                    submenu.getItem(0).setVisible(false);
+                }
             }
         });
 
@@ -395,11 +485,27 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
         return false;
     }
 
+    private void mostrandoMenu(Menu m)
+    {
+        for (int i=0;i<m.size();i++) {
+            MenuItem mi = m.getItem(i);
+            SubMenu subMenu = mi.getSubMenu();
+            if (subMenu!=null && subMenu.size() >0 ) {
+                for (int j=0; j <subMenu.size();j++) {
+                    MenuItem subMenuItem = subMenu.getItem(j);
+                    subMenuItem.setVisible(true);
+                }
+            }
+            mi.setVisible(true);
+
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
-
+        Log.i("requestcode:", " " + requestCode);
         if (requestCode == MI_REQUEST_CODE) {
 
             if (resultCode == RESULT_OK)
@@ -411,6 +517,8 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
             {
                 if(resultCode==MI_REQUEST_SE_LOGUIO_USUARIO)
                 {
+                    Menu m = navView.getMenu();
+                    mostrandoMenu(m);
                     Intent intent = new Intent(this,RegistradoActivity.class);
                     startActivityForResult(intent, MI_REQUEST_CODE_REGISTRADO);
                 }
@@ -418,7 +526,7 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
         }
         if(requestCode==MI_REQUEST_CODE_REGISTRADO)
         {
-            if(requestCode==RESULT_OK)
+            if(resultCode==RESULT_OK)
             {
                 vaciarPedidoDespuesDeEnviar();
                 mostrarDialogConfirmarPedido();
@@ -443,8 +551,17 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
         Menu m = navView.getMenu();
         m.getItem(1).setVisible(false);
         btnFinalizarPedido.setVisibility(View.GONE);
-        flechaAtras.setVisibility(View.VISIBLE);
-        btnMenuPrincipal.setVisibility(View.GONE);
+
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        if(currentUser==null)
+        {
+            flechaAtras.setVisibility(View.VISIBLE);
+            btnMenuPrincipal.setVisibility(View.GONE);
+            m.getItem(2).setVisible(false);
+            MenuItem mI=m.getItem(2);
+            Menu submenu=mI.getSubMenu();
+            submenu.getItem(0).setVisible(false);
+        }
     }
 
     private void mostrarDialogConfirmarPedido()

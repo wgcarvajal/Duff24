@@ -45,7 +45,7 @@
 
         <Button
             android:id="@+id/btn_aceptar"
-            android:text="Aceptar"
+            android:text="@string/txt_aceptar"
             android:gravity="center"
             android:textSize="@dimen/size_text_btn_dialog_vaciar"
             android:background="@drawable/bordes_redondos"

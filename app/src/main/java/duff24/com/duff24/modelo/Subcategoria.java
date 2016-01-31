@@ -9,6 +9,16 @@ public class Subcategoria
     String nombreEspanol;
     String nombreCategoria;
 
+    public int getPosicion() {
+        return posicion;
+    }
+
+    public void setPosicion(int posicion) {
+        this.posicion = posicion;
+    }
+
+    int posicion;
+
     public void Subcategoria()
     {
 

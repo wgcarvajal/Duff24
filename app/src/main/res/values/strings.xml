@@ -76,6 +76,16 @@
     <string name="txt_seleccione_direccion">Select address</string>
     <string name="txt_enviando">Sending...</string>
     <string name="txt_registro_exitoso">Successful registration</string>
+    <string name="btn_facebook">Login with Facebook</string>
+    <string name="txt_iniciando_con_facebook">Logging in with facebook</string>
+    <string name="txt_contacto_sugerencias">Contact and suggestions</string>
+    <string name="txt_cancelar">Cancel</string>
+    <string name="txt_aceptar">Ok</string>
+    <string name="txt_enviar">Send</string>
+    <string name="txt_ingrese_correo">Enter email</string>
+    <string name="confirmacion_envio_email">Request sent, check your email.</string>
+    <string name="correo_no_se_encuentra">Email is not registered</string>
+
 
 
 
@@ -90,9 +100,6 @@
     <string name="title_activity_introduccion">IntroduccionActivity</string>
     <string name="title_activity_registrado">RegistradoActivity</string>
     <string name="title_activity_probandofacebook">ProbandofacebookActivity</string>
-
-
-    <string name="btn_facebook">Login with Facebook</string>
 
 
 

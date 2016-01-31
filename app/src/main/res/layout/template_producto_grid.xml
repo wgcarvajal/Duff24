@@ -3,11 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000"
+    android:background="@color/transparente"
     >
-
-
-
     <TextView
         android:id="@+id/txtnombreproducto"
         android:layout_width="match_parent"
@@ -16,16 +13,12 @@
         android:textColor="#ffffff"
         android:textSize="@dimen/tam_nombre_producto"
         android:gravity="center"
-
-
         />
-
-
     <ImageView
         android:id="@+id/img_producto"
         android:layout_width="match_parent"
         android:layout_height="@dimen/tam_imagen_producto_grid"
-        android:scaleType="fitXY"
+
         android:layout_below="@id/txtnombreproducto"
 
         />
@@ -75,9 +68,4 @@
         android:src="@mipmap/ic_disminuir"
         android:background="@drawable/img_view_redondo"
         />
-
-
-
-
-
 </RelativeLayout>

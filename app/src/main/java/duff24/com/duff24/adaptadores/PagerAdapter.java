@@ -4,7 +4,11 @@ import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.view.ViewGroup;
+
 import java.util.List;
+
+import duff24.com.duff24.fragments.FragmentGeneric;
 import duff24.com.duff24.fragments.ProductoFragment;
 
 /**
@@ -12,9 +16,9 @@ import duff24.com.duff24.fragments.ProductoFragment;
  */
 public class PagerAdapter extends FragmentStatePagerAdapter
 {
-    private  List<ProductoFragment> data;
+    private  List<FragmentGeneric> data;
 
-    public PagerAdapter(FragmentManager fm,List<ProductoFragment> data)
+    public PagerAdapter(FragmentManager fm,List<FragmentGeneric> data)
     {
         super(fm);
         this.data=data;
@@ -32,9 +36,8 @@ public class PagerAdapter extends FragmentStatePagerAdapter
         return data.size();
     }
 
-    @Override
-    public void restoreState(Parcelable state, ClassLoader loader)
-    {
-        super.restoreState(state, loader);
-    }
+
+
+
+
 }

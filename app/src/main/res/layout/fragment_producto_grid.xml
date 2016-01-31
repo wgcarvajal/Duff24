@@ -24,8 +24,10 @@
         android:layout_marginLeft="@dimen/margin_small"
         android:layout_marginRight="@dimen/margin_small"
         android:layout_marginBottom="@dimen/margin_small"
-        android:horizontalSpacing="@dimen/super_margin_small"
+        android:horizontalSpacing="@dimen/margin_small"
         android:verticalSpacing="@dimen/super_margin_small"
+        android:background="@color/transparente"
+        android:backgroundTint="@color/transparente"
         android:scrollbars="none">
 
     </GridView>

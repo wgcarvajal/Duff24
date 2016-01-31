@@ -9,6 +9,7 @@
     <color name="grisTransparente">#66555555</color>
     <color name="gris">#999999</color>
     <color name="grisoscuro">#555555</color>
+    <color name="vinotinto">#7C0808</color>
 
     <color name="negroTransparente">#BB000000</color>
 </resources>

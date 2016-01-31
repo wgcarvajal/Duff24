@@ -8,6 +8,7 @@ import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
@@ -25,6 +26,8 @@ import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import duff24.com.duff24.R;
@@ -36,7 +39,7 @@ import duff24.com.duff24.util.AppUtil;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ProductoFragment extends Fragment implements AdapterView.OnItemClickListener
+public class ProductoFragment extends FragmentGeneric implements AdapterView.OnItemClickListener
 {
     private static final String LIST_STATE = "listState";
 
@@ -86,17 +89,22 @@ public class ProductoFragment extends Fragment implements AdapterView.OnItemClic
         adapter= new AdaptadorProducto(v.getContext(),data);
         listaProductos.setAdapter(adapter);
         listaProductos.setOnItemClickListener(this);
+        return v;
+    }
 
-
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState)
+    {
+        super.onActivityCreated(savedInstanceState);
         if(data.size()>0)
         {
+            Log.i("entro:","data size >0");
             adapter.notifyDataSetChanged();
         }
         else
         {
             loadData();
         }
-        return v;
     }
 
     public void init(String subcategoriaing,String subcategoriaesp)
@@ -117,75 +125,112 @@ public class ProductoFragment extends Fragment implements AdapterView.OnItemClic
 
     private void loadData()
     {
-        for(Producto prod: AppUtil.data)
-        {
-            if(prod.getSubcategoriaing().equals(subcategoriaing))
-            {
-                data.add(prod);
-                adapter.notifyDataSetChanged();
-                if (mListState != null)
-                {
-                    listaProductos.onRestoreInstanceState(mListState);
-                }
-                mListState = null;
-            }
-        }
+        LoadDataTask loadDataTask= new LoadDataTask();
+        loadDataTask.execute();
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
     {
-        final MediaPlayer m = MediaPlayer.create(getContext(),R.raw.sonido_click);
-        m.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mp) {
-                if (mp == m) {
-                    m.start();
-                }
-            }
-        });
-
         TextView textconteo= (TextView) view.findViewById(R.id.txtconteo);
-        textconteo.setVisibility(View.VISIBLE);
-
         ImageView btnDisminuir= (ImageView) view.findViewById(R.id.btn_disminuir);
-        btnDisminuir.setVisibility(View.VISIBLE);
-        int conteo = Integer.parseInt(textconteo.getText().toString());
-        conteo= conteo+1;
-        textconteo.setText(conteo + "");
-
-
-        AdminSQliteOpenHelper admin = new AdminSQliteOpenHelper(getContext(),"admin",null,1);
-        SQLiteDatabase db = admin.getWritableDatabase();
-        String prodid = data.get(position).getId();
-
-        Cursor fila = db.rawQuery("select prodcantidad from pedido where prodid = '" + prodid + "'", null);
-        ContentValues registroPedido= new ContentValues();
-        registroPedido.put("prodcantidad",conteo);
-
-        if(fila.moveToFirst())
-        {
-
-            int cant= db.update("pedido",registroPedido,"prodid = '"+prodid+"'",null);
-        }
-        else
-        {
-            registroPedido.put("prodid",prodid);
-            registroPedido.put("prodprecio",data.get(position).getPrecio());
-            registroPedido.put("prodnombreesp",data.get(position).getNombreesp());
-            registroPedido.put("prodnombreing",data.get(position).getNombreing());
-            registroPedido.put("proddescripcioning",data.get(position).getDescripcionIng());
-            registroPedido.put("proddescripcionesp",data.get(position).getDescripcionesp());
-
-            db.insert("pedido",null,registroPedido);
-        }
-        db.close();
+        AgregarProductoPedidoTask agregarProductoPedidoTask= new AgregarProductoPedidoTask(textconteo,btnDisminuir);
+        agregarProductoPedidoTask.execute(data.get(position));
     }
 
+    public class AgregarProductoPedidoTask extends AsyncTask<Producto,Void,Integer>
+    {
+        private WeakReference<TextView> txtcontedo;
+        private WeakReference<ImageView> btndisminuir;
+
+        public AgregarProductoPedidoTask(TextView conteo,ImageView disminuir)
+        {
+            txtcontedo= new WeakReference<TextView>(conteo);
+            btndisminuir= new WeakReference<ImageView>(disminuir);
+        }
+        @Override
+        protected Integer doInBackground(Producto... params)
+        {
+            MediaPlayer m = MediaPlayer.create(getContext(),R.raw.sonido_click);
+            m.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                public void onCompletion(MediaPlayer mp) {
+                    mp.release();
+                }
+            });
+            m.start();
+            AdminSQliteOpenHelper admin = new AdminSQliteOpenHelper(getContext(),"admin",null,1);
+            SQLiteDatabase db = admin.getWritableDatabase();
+            Cursor fila = db.rawQuery("select prodcantidad from pedido where prodid = '" + params[0].getId() + "'", null);
+            ContentValues registroPedido= new ContentValues();
+            int conteo=1;
+            if(fila.moveToFirst())
+            {
+                conteo=fila.getInt(0)+1;
+                registroPedido.put("prodcantidad",conteo);
+                db.update("pedido",registroPedido,"prodid = '"+params[0].getId()+"'",null);
+            }
+            else
+            {
+                registroPedido.put("prodid",params[0].getId());
+                registroPedido.put("prodprecio",params[0].getPrecio());
+                registroPedido.put("prodnombreesp",params[0].getNombreesp());
+                registroPedido.put("prodnombreing",params[0].getNombreing());
+                registroPedido.put("proddescripcioning",params[0].getDescripcionIng());
+                registroPedido.put("proddescripcionesp",params[0].getDescripcionesp());
+                registroPedido.put("prodcantidad",conteo);
+                db.insert("pedido",null,registroPedido);
+            }
+            db.close();
+            return conteo;
+        }
+
+        @Override
+        protected void onPostExecute(Integer resultado) {
+            super.onPostExecute(resultado);
+            txtcontedo.get().setText("" + resultado);
+            txtcontedo.get().setVisibility(View.VISIBLE);
+            btndisminuir.get().setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
     public void actualizarData()
     {
-        adapter.notifyDataSetChanged();
+        if(adapter!=null)
+        {
+            adapter.notifyDataSetChanged();
+        }
+
     }
+
+    public class LoadDataTask extends AsyncTask<Void,Void,Void>
+    {
+        @Override
+        protected Void doInBackground(Void... params)
+        {
+            for(Producto prod: AppUtil.data)
+            {
+                if(prod.getSubcategoriaing().equals(subcategoriaing))
+                {
+                    data.add(prod);
+                    adapter.notifyDataSetChanged();
+                }
+            }
+            return null;
+        }
+        @Override
+        protected void onPostExecute(Void aVoid)
+        {
+            super.onPostExecute(aVoid);
+            if (mListState != null)
+            {
+                listaProductos.onRestoreInstanceState(mListState);
+            }
+            mListState = null;
+        }
+    }
+
+
 
 
 }

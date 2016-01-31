@@ -21,9 +21,19 @@
 
         />
 
+
+
     <Button
         android:id="@+id/cerrar_session_facebook"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="cerrar session"/>
+
+    <Button
+        android:id="@+id/btncompartir"
+        android:text="compartir duff24"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/cerrar_session_facebook"
+        />
 </RelativeLayout>

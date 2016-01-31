@@ -2,12 +2,11 @@ package duff24.com.duff24;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.graphics.Typeface;
+import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -17,7 +16,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
-import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -30,22 +28,18 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import bolts.Task;
-import duff24.com.duff24.adaptadores.AdaptadorProducto;
 import duff24.com.duff24.adaptadores.PagerAdapter;
+import duff24.com.duff24.fragments.FragmentGeneric;
 import duff24.com.duff24.fragments.ProductoFragment;
 import duff24.com.duff24.fragments.ProductoGridFragment;
 import duff24.com.duff24.modelo.Producto;
@@ -62,10 +56,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView titulo;
     private ViewPager pager;
     private PagerAdapter adapter;
-    private List<ProductoFragment> data= new ArrayList<>();
-    private ImageView btnBebidas;
-    private ImageView btnMarket;
-    private ImageView btnComidas;
+    private List<FragmentGeneric> data= new ArrayList<>();
     private NavigationView navView;
     private ImageView btnMenuPrincipal;
     private GifImageView btnMipedido;
@@ -82,36 +73,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
+       /* VideoView videoView = (VideoView) findViewById(R.id.video);
+        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                mp.setLooping(true);
+            }
+        });
+        Uri path = Uri.parse("android.resource://"+getPackageName()+"/"+R.raw.video);
+        videoView.setVideoURI(path);
+        videoView.start();*/
 
         titulo = (TextView)findViewById(R.id.txttitulo);
         tituloMenuHeader=(TextView)findViewById(R.id.titulo_header_menu);
         text_compruebe_conexion=(TextView)findViewById(R.id.txt_sin_conexion);
 
         btnMenuPrincipal=(ImageView)findViewById(R.id.btn_menu_principal);
-        btnMipedido = (GifImageView)findViewById(R.id.btn_mi_pedido);
-        btnBebidas = (ImageView) findViewById(R.id.btnbebida);
-        btnMarket = (ImageView) findViewById(R.id.btnmarket);
-        btnComidas=(ImageView) findViewById(R.id.btncomida);
         btnRecargarVista=(Button)findViewById(R.id.volver_cargar);
-
+        btnMipedido=(GifImageView)findViewById(R.id.btn_mi_pedido);
         drawer=(DrawerLayout)findViewById(R.id.drawer);
         pager= (ViewPager)findViewById(R.id.pager);
+        pager.setOffscreenPageLimit(7);
         navView = (NavigationView) findViewById(R.id.nav);
 
         btnMenuPrincipal.setOnClickListener(this);
-        btnBebidas.setOnClickListener(this);
-        btnMarket.setOnClickListener(this);
         btnMipedido.setOnClickListener(this);
         navView.setNavigationItemSelectedListener(this);
         btnRecargarVista.setOnClickListener(this);
 
         btnMenuPrincipal.setVisibility(View.GONE);
         btnMipedido.setVisibility(View.GONE);
-        btnBebidas.setVisibility(View.GONE);
-        btnMarket.setVisibility(View.GONE);
-        btnComidas.setVisibility(View.GONE);
         text_compruebe_conexion.setVisibility(View.GONE);
         btnRecargarVista.setVisibility(View.GONE);
 
@@ -124,6 +116,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         adapter = new PagerAdapter(getSupportFragmentManager(), data);
         pager.setAdapter(adapter);
+        Log.i("cuantas paginas",pager.getOffscreenPageLimit()+"");
         Menu m = navView.getMenu();
         aplicandoTipoLetraItemMenu(m, font_path_ASimple);
         ocultandoMenu(m);
@@ -185,33 +178,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         {
             for(Subcategoria sub: AppUtil.listaSubcategorias)
             {
-                if(sub.getNombreCategoria().equals("Food"))
+                if(sub.getPosicion() <= 3)
                 {
                     ProductoFragment productoFragment = new ProductoFragment();
                     productoFragment.init(sub.getNombreIngles(), sub.getNombreEspanol());
                     data.add(productoFragment);
-                    adapter.notifyDataSetChanged();
+
                 }
+                else
+                {
+                    ProductoGridFragment productoGridFragment= new ProductoGridFragment();
+                    productoGridFragment.init(sub.getNombreIngles(), sub.getNombreEspanol());
+                    data.add(productoGridFragment);
+                }
+                adapter.notifyDataSetChanged();
             }
             btnMenuPrincipal.setVisibility(View.VISIBLE);
             btnMipedido.setVisibility(View.VISIBLE);
-            btnBebidas.setVisibility(View.VISIBLE);
-            btnMarket.setVisibility(View.VISIBLE);
-            btnComidas.setVisibility(View.VISIBLE);
             Menu m=navView.getMenu();
             mostrandoMenu(m);
 
             ParseUser currentUser = ParseUser.getCurrentUser();
-            if (currentUser != null) {
-                m.getItem(1).setTitle(currentUser.getUsername());
-            } else
+            if (currentUser == null)
             {
-                m.getItem(1).setVisible(false);
-                Menu men=m.getItem(1).getSubMenu();
+                m.getItem(2).setVisible(false);
+                Menu men=m.getItem(2).getSubMenu();
                 men.getItem(0).setVisible(false);
             }
-
-
         }
         else
         {
@@ -222,147 +215,102 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void cargarDatosParse()
     {
-        ParseQuery<ParseObject> queryCategorias= new ParseQuery<>(Producto.TABLACATEGORIA);
-        queryCategorias.selectKeys(Arrays.asList(Producto.ID,Producto.CATEGORIANOMBRE));
-        queryCategorias.findInBackground(new FindCallback<ParseObject>() {
-
+        ParseQuery<ParseObject> querySubcategoria= new ParseQuery<>(Producto.TABLASUBCATEGORIA);
+        querySubcategoria.orderByAscending("posicion");
+        querySubcategoria.selectKeys(Arrays.asList(Producto.ID,Producto.TBLSUBCATEGORIA_NOMBRE,Producto.TBLSUBCATEGORIA_NOMBREESP,Producto.TBLSUBCATEGORIA_CATEGORIA,"posicion"));
+        querySubcategoria.findInBackground(new FindCallback<ParseObject>() {
             @Override
-            public void done(final List<ParseObject> categorias, ParseException e) {
-                if(e==null)
-                {
-                    ParseQuery<ParseObject> querySubcategoria= new ParseQuery<>(Producto.TABLASUBCATEGORIA);
-                    querySubcategoria.orderByAscending(Producto.TBLPRECIO_FECHACREACION);
-                    querySubcategoria.selectKeys(Arrays.asList(Producto.ID,Producto.TBLSUBCATEGORIA_NOMBRE,Producto.TBLSUBCATEGORIA_NOMBREESP,Producto.TBLSUBCATEGORIA_CATEGORIA));
-                    querySubcategoria.findInBackground(new FindCallback<ParseObject>() {
+            public void done(final List<ParseObject> subcategorias, ParseException e) {
+                if (e == null) {
+                    ParseQuery<ParseObject> queryPrecios = new ParseQuery<>(Producto.TABLAPRECIO);
+                    queryPrecios.whereEqualTo(Producto.TBLPRECIO_PREFECHAFIN, null);
+                    queryPrecios.selectKeys(Arrays.asList(Producto.TBLPRECIO_PRODUCTO, Producto.TBLPRECIO_VALOR));
+                    queryPrecios.findInBackground(new FindCallback<ParseObject>() {
                         @Override
-                        public void done(final List<ParseObject> subcategorias, ParseException e) {
-                            if(e==null)
-                            {
-                                ParseQuery<ParseObject> queryPrecios= new ParseQuery<>(Producto.TABLAPRECIO);
-                                queryPrecios.whereEqualTo(Producto.TBLPRECIO_PREFECHAFIN,null);
-                                queryPrecios.selectKeys(Arrays.asList(Producto.TBLPRECIO_PRODUCTO,Producto.TBLPRECIO_VALOR));
-                                queryPrecios.findInBackground(new FindCallback<ParseObject>() {
+                        public void done(final List<ParseObject> precios, ParseException e) {
+                            if (e == null) {
+                                ParseQuery<ParseObject> queryProductos = new ParseQuery<>(Producto.TABLA);
+                                queryProductos.selectKeys(Arrays.asList(Producto.ID, Producto.NOMBREESP, Producto.NOMBREING, Producto.DESCRIPCIONING, Producto.DESCRIPCIONESP, Producto.SUBCATEGORIA));
+                                queryProductos.findInBackground(new FindCallback<ParseObject>() {
                                     @Override
-                                    public void done(final List<ParseObject> precios, ParseException e) {
-                                        if(e==null)
-                                        {
-                                            ParseQuery<ParseObject> queryProductos= new ParseQuery<>(Producto.TABLA);
-                                            queryProductos.selectKeys(Arrays.asList(Producto.ID,Producto.NOMBREESP,Producto.NOMBREING,Producto.DESCRIPCIONING,Producto.DESCRIPCIONESP,Producto.SUBCATEGORIA));
-                                            queryProductos.findInBackground(new FindCallback<ParseObject>() {
-                                                @Override
-                                                public void done(List<ParseObject> productos, ParseException e)
+                                    public void done(List<ParseObject> productos, ParseException e) {
+                                        if (e == null) {
+
+                                            for (ParseObject prod : productos) {
+                                                Producto producto = new Producto();
+                                                producto.setId(prod.getObjectId());
+                                                producto.setNombreing(prod.getString(Producto.NOMBREING));
+                                                producto.setNombreesp(prod.getString(Producto.NOMBREESP));
+                                                producto.setDescripcionIng(prod.getString(Producto.DESCRIPCIONING));
+                                                producto.setDescripcionesp(prod.getString(Producto.DESCRIPCIONESP));
+                                                for (ParseObject pre : precios) {
+                                                    if (pre.getString(Producto.TBLPRECIO_PRODUCTO).equals(prod.getObjectId())) {
+                                                        producto.setPrecio(pre.getInt(Producto.TBLPRECIO_VALOR));
+                                                        break;
+                                                    }
+                                                }
+                                                for (ParseObject sub : subcategorias) {
+                                                    if (sub.getObjectId().equals(prod.getString(Producto.SUBCATEGORIA))) {
+                                                        producto.setSubcategoriaing(sub.getString(Producto.TBLSUBCATEGORIA_NOMBRE));
+                                                        producto.setSubcategoriaesp(sub.getString(Producto.TBLSUBCATEGORIA_NOMBREESP));
+
+                                                        AppUtil.data.add(producto);
+                                                        break;
+                                                    }
+                                                }
+
+                                            }
+                                            for (ParseObject sub : subcategorias) {
+
+                                                Subcategoria subcategoria = new Subcategoria();
+                                                subcategoria.setNombreEspanol(sub.getString(Producto.TBLSUBCATEGORIA_NOMBREESP));
+                                                subcategoria.setNombreIngles(sub.getString(Producto.TBLSUBCATEGORIA_NOMBRE));
+                                                subcategoria.setPosicion(sub.getInt("posicion"));
+                                                AppUtil.listaSubcategorias.add(subcategoria);
+                                            }
+                                            for (Subcategoria sub : AppUtil.listaSubcategorias)
+                                            {
+                                                if (sub.getPosicion() <= 3) {
+                                                    ProductoFragment productoFragment = new ProductoFragment();
+                                                    productoFragment.init(sub.getNombreIngles(), sub.getNombreEspanol());
+                                                    data.add(productoFragment);
+                                                } else
                                                 {
-                                                    if(e==null)
-                                                    {
-
-                                                        for(ParseObject prod: productos)
-                                                        {
-                                                            Producto producto = new Producto();
-                                                            producto.setId(prod.getObjectId());
-                                                            producto.setNombreing(prod.getString(Producto.NOMBREING));
-                                                            producto.setNombreesp(prod.getString(Producto.NOMBREESP));
-                                                            producto.setDescripcionIng(prod.getString(Producto.DESCRIPCIONING));
-                                                            producto.setDescripcionesp(prod.getString(Producto.DESCRIPCIONESP));
-                                                            for(ParseObject pre: precios)
-                                                            {
-                                                                if(pre.getString(Producto.TBLPRECIO_PRODUCTO).equals(prod.getObjectId()))
-                                                                {
-                                                                    producto.setPrecio(pre.getInt(Producto.TBLPRECIO_VALOR));
-                                                                    break;
-                                                                }
-                                                            }
-                                                            for(ParseObject sub: subcategorias)
-                                                            {
-                                                                if(sub.getObjectId().equals(prod.getString(Producto.SUBCATEGORIA)))
-                                                                {
-                                                                    producto.setSubcategoriaing(sub.getString(Producto.TBLSUBCATEGORIA_NOMBRE));
-                                                                    producto.setSubcategoriaesp(sub.getString(Producto.TBLSUBCATEGORIA_NOMBREESP));
-                                                                    for(ParseObject cat: categorias)
-                                                                    {
-                                                                        if(cat.getObjectId().equals(sub.getString(Producto.TBLSUBCATEGORIA_CATEGORIA)))
-                                                                        {
-                                                                            producto.setCategoria(cat.getString(Producto.CATEGORIANOMBRE));
-                                                                            AppUtil.data.add(producto);
-                                                                            break;
-                                                                        }
-                                                                    }
-                                                                    break;
-                                                                }
-
-
-                                                            }
-
-                                                        }
-                                                        for(ParseObject sub: subcategorias)
-                                                        {
-                                                            for (ParseObject cat : categorias)
-                                                            {
-                                                                if (sub.getString(Producto.TBLSUBCATEGORIA_CATEGORIA).equals(cat.getObjectId())) {
-                                                                    Subcategoria subcategoria = new Subcategoria();
-                                                                    subcategoria.setNombreCategoria(cat.getString(Producto.CATEGORIANOMBRE));
-                                                                    subcategoria.setNombreEspanol(sub.getString(Producto.TBLSUBCATEGORIA_NOMBREESP));
-                                                                    subcategoria.setNombreIngles(sub.getString(Producto.TBLSUBCATEGORIA_NOMBRE));
-                                                                    AppUtil.listaSubcategorias.add(subcategoria);
-                                                                    break;
-                                                                }
-                                                            }
-                                                        }
-                                                        for(Subcategoria sub: AppUtil.listaSubcategorias)
-                                                        {
-                                                            if(sub.getNombreCategoria().equals("Food"))
-                                                            {
-                                                                ProductoFragment productoFragment = new ProductoFragment();
-                                                                productoFragment.init(sub.getNombreIngles(), sub.getNombreEspanol());
-                                                                data.add(productoFragment);
-                                                                adapter.notifyDataSetChanged();
-                                                            }
-                                                        }
-                                                        btnMenuPrincipal.setVisibility(View.VISIBLE);
-                                                        btnMipedido.setVisibility(View.VISIBLE);
-                                                        btnBebidas.setVisibility(View.VISIBLE);
-                                                        btnMarket.setVisibility(View.VISIBLE);
-                                                        btnComidas.setVisibility(View.VISIBLE);
-                                                        Menu m= navView.getMenu();
-                                                        mostrandoMenu(m);
-                                                        ParseUser currentUser = ParseUser.getCurrentUser();
-                                                        if (currentUser != null) {
-                                                            m.getItem(1).setTitle(currentUser.getUsername());
-                                                        } else
-                                                        {
-                                                            m.getItem(1).setVisible(false);
-                                                            Menu men=m.getItem(1).getSubMenu();
-                                                            men.getItem(0).setVisible(false);
-                                                        }
-                                                    }
-                                                    else
-                                                    {
-                                                        mostrarMensajeComprobarConexion();
-                                                    }
+                                                    ProductoGridFragment productoGridFragment = new ProductoGridFragment();
+                                                    productoGridFragment.init(sub.getNombreIngles(), sub.getNombreEspanol());
+                                                    data.add(productoGridFragment);
 
                                                 }
-                                            });
-                                        }
-                                        else
-                                        {
+                                                adapter.notifyDataSetChanged();
+                                            }
+
+                                            btnMenuPrincipal.setVisibility(View.VISIBLE);
+                                            btnMipedido.setVisibility(View.VISIBLE);
+                                            Menu m = navView.getMenu();
+                                            mostrandoMenu(m);
+                                            ParseUser currentUser = ParseUser.getCurrentUser();
+                                            if (currentUser == null) {
+                                                m.getItem(2).setVisible(false);
+                                                Menu men = m.getItem(2).getSubMenu();
+                                                men.getItem(0).setVisible(false);
+                                            }
+                                        } else {
                                             mostrarMensajeComprobarConexion();
                                         }
+
                                     }
                                 });
-                            }
-                            else
-                            {
+                            } else {
                                 mostrarMensajeComprobarConexion();
                             }
                         }
                     });
-                }
-                else
+                } else
                 {
                     mostrarMensajeComprobarConexion();
                 }
             }
         });
-
     }
 
     @Override
@@ -371,16 +319,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Intent intent;
         switch (v.getId())
         {
-            case R.id.btnbebida:
-                intent = new Intent(this,BebidasActivity.class);
-                startActivity(intent);
-                finish();
-            break;
-            case  R.id.btnmarket:
-                intent = new Intent(this,MarketActivity.class);
-                startActivity(intent);
-                finish();
-            break;
+
             case R.id.btn_menu_principal:
                     drawer.openDrawer(GravityCompat.START);
             break;
@@ -437,36 +376,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     {
         super.onActivityResult(requestCode, resultCode, data);
 
+        if (requestCode == MI_REQUEST_CODE)
+        {
+            int  tamano= pager.getAdapter().getCount();
+            int posicionActual=pager.getCurrentItem();
+            FragmentGeneric frag=(FragmentGeneric)((PagerAdapter)pager.getAdapter()).getItem(posicionActual);
 
-        if (requestCode == MI_REQUEST_CODE) {
+            if(frag!=null)
+            {
 
-                int posicionactual=pager.getCurrentItem();
-
-                int tamano=pager.getAdapter().getCount();
-
-                ProductoFragment prodFrag=(ProductoFragment)getSupportFragmentManager().getFragments().get(posicionactual);
-                prodFrag.actualizarData();
-                if((posicionactual+1)<tamano)
+                frag.actualizarData();
+                if((posicionActual+1)<tamano)
                 {
-                    prodFrag=(ProductoFragment)getSupportFragmentManager().getFragments().get(posicionactual+1);
-                    prodFrag.actualizarData();
+                    frag=(FragmentGeneric)((PagerAdapter)pager.getAdapter()).getItem(posicionActual+1);
+                    frag.actualizarData();
+                }
+                if((posicionActual-1)>=0)
+                {
+                    frag=(FragmentGeneric)((PagerAdapter)pager.getAdapter()).getItem(posicionActual - 1);
+                    frag.actualizarData();
                 }
 
-                if((posicionactual-1)>=0)
-                {
-                    prodFrag=(ProductoFragment)getSupportFragmentManager().getFragments().get(posicionactual-1);
-                    prodFrag.actualizarData();
-                }
+            }
 
             Menu m=navView.getMenu();
             mostrandoMenu(m);
             ParseUser currentUser = ParseUser.getCurrentUser();
-            if (currentUser != null) {
-                m.getItem(1).setTitle(currentUser.getUsername());
-            } else
+            if (currentUser == null)
             {
-                m.getItem(1).setVisible(false);
-                Menu men=m.getItem(1).getSubMenu();
+                m.getItem(2).setVisible(false);
+                Menu men=m.getItem(2).getSubMenu();
                 men.getItem(0).setVisible(false);
             }
         }
@@ -486,6 +425,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         protected void onPostExecute(Boolean resultado) {
             super.onPostExecute(resultado);
 
+            Log.i("hay conexion:",""+resultado);
             if(resultado)
             {
                 cargarDatosParse();
@@ -545,7 +485,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public class CerrarSesionTask extends  AsyncTask<Void,Void,Void>
     {
-
         @Override
         protected Void doInBackground(Void... params) {
             ParseUser.logOut();
@@ -557,8 +496,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         {
             super.onPostExecute(aVoid);
             Menu m=navView.getMenu();
-            m.getItem(1).setVisible(false);
-            Menu men=m.getItem(1).getSubMenu();
+            m.getItem(2).setVisible(false);
+            Menu men=m.getItem(2).getSubMenu();
             men.getItem(0).setVisible(false);
             mostrarMensaje(R.string.txt_sesion_cerrada);
             if(pd!=null)
@@ -567,6 +506,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
     }
-
-
+    @Override
+    protected void onDestroy() {
+        data=null;
+        adapter=null;
+        pd=null;
+        TF=null;
+        super.onDestroy();
+    }
 }

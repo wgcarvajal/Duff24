@@ -35,7 +35,6 @@
     </LinearLayout>
 
 
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -43,10 +42,23 @@
         android:orientation="horizontal">
 
 
+        <Button
+            android:id="@+id/btn_cancelar"
+            android:text="@string/txt_cancelar"
+            android:textSize="@dimen/size_text_btn_dialog_vaciar"
+            android:background="@drawable/bordes_redondos"
+            android:textColor="@color/blanco"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginLeft="@dimen/super_margin_small"
+            android:layout_marginTop="@dimen/super_margin_small"
+            android:layout_marginBottom="@dimen/margin_small"
+            android:layout_marginRight="@dimen/margin_small"/>
 
         <Button
             android:id="@+id/btn_aceptar"
-            android:text="Aceptar"
+            android:text="@string/txt_aceptar"
             android:textSize="@dimen/size_text_btn_dialog_vaciar"
             android:background="@drawable/bordes_redondos"
             android:textColor="@color/blanco"
@@ -59,18 +71,6 @@
             android:layout_marginLeft="@dimen/margin_small"
             />
 
-        <Button
-            android:id="@+id/btn_cancelar"
-            android:text="Cancelar"
-            android:textSize="@dimen/size_text_btn_dialog_vaciar"
-            android:background="@drawable/bordes_redondos"
-            android:textColor="@color/blanco"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginLeft="@dimen/super_margin_small"
-            android:layout_marginTop="@dimen/super_margin_small"
-            android:layout_marginBottom="@dimen/margin_small"
-            android:layout_marginRight="@dimen/margin_small"/>
+
     </LinearLayout>
 </RelativeLayout>

@@ -3,7 +3,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="duff24.com.duff24.fragments.MascotaFragment">
+    tools:context="duff24.com.duff24.fragments.MascotaFragment"
+    android:background="#00000000"
+    >
 
     <TextView
         android:id="@+id/textsubcategoria"
@@ -22,6 +24,8 @@
         android:layout_margin="@dimen/margin_small"
         android:dividerHeight="@dimen/margin_small"
         android:scrollbars="none"
+        android:background="@color/transparente"
+        android:cacheColorHint="@color/transparente"
         >
     </ListView>
 

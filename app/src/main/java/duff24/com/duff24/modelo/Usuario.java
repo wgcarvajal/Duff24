@@ -12,6 +12,7 @@ public class Usuario
     public static String PASSWORD="password";
     public static String PASSWORDVISIBLE="contrasena";
     public static String NOMBRE="nombre";
+    public static String EMAILFACEBOOK="emailFacebook";
 
     public static String TABLATELEFONO="Telefono";
     public static String TBLTELEFONOID="objectId";
