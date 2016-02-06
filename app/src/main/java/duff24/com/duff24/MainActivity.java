@@ -191,8 +191,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     productoGridFragment.init(sub.getNombreIngles(), sub.getNombreEspanol());
                     data.add(productoGridFragment);
                 }
-                adapter.notifyDataSetChanged();
+
             }
+            adapter.notifyDataSetChanged();
             btnMenuPrincipal.setVisibility(View.VISIBLE);
             btnMipedido.setVisibility(View.VISIBLE);
             Menu m=navView.getMenu();
@@ -222,95 +223,79 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void done(final List<ParseObject> subcategorias, ParseException e) {
                 if (e == null) {
-                    ParseQuery<ParseObject> queryPrecios = new ParseQuery<>(Producto.TABLAPRECIO);
-                    queryPrecios.whereEqualTo(Producto.TBLPRECIO_PREFECHAFIN, null);
-                    queryPrecios.selectKeys(Arrays.asList(Producto.TBLPRECIO_PRODUCTO, Producto.TBLPRECIO_VALOR));
-                    queryPrecios.findInBackground(new FindCallback<ParseObject>() {
+                    ParseQuery<ParseObject> queryProductos = new ParseQuery<>(Producto.TABLA);
+                    queryProductos.selectKeys(Arrays.asList(Producto.ID, Producto.NOMBREESP, Producto.NOMBREING, Producto.DESCRIPCIONING, Producto.DESCRIPCIONESP, Producto.SUBCATEGORIA, "precio","imgFile"));
+                    queryProductos.setLimit(200);
+                    queryProductos.orderByAscending("posicion");
+                    queryProductos.findInBackground(new FindCallback<ParseObject>() {
                         @Override
-                        public void done(final List<ParseObject> precios, ParseException e) {
+                        public void done(List<ParseObject> productos, ParseException e) {
                             if (e == null) {
-                                ParseQuery<ParseObject> queryProductos = new ParseQuery<>(Producto.TABLA);
-                                queryProductos.selectKeys(Arrays.asList(Producto.ID, Producto.NOMBREESP, Producto.NOMBREING, Producto.DESCRIPCIONING, Producto.DESCRIPCIONESP, Producto.SUBCATEGORIA));
-                                queryProductos.findInBackground(new FindCallback<ParseObject>() {
-                                    @Override
-                                    public void done(List<ParseObject> productos, ParseException e) {
-                                        if (e == null) {
 
-                                            for (ParseObject prod : productos) {
-                                                Producto producto = new Producto();
-                                                producto.setId(prod.getObjectId());
-                                                producto.setNombreing(prod.getString(Producto.NOMBREING));
-                                                producto.setNombreesp(prod.getString(Producto.NOMBREESP));
-                                                producto.setDescripcionIng(prod.getString(Producto.DESCRIPCIONING));
-                                                producto.setDescripcionesp(prod.getString(Producto.DESCRIPCIONESP));
-                                                for (ParseObject pre : precios) {
-                                                    if (pre.getString(Producto.TBLPRECIO_PRODUCTO).equals(prod.getObjectId())) {
-                                                        producto.setPrecio(pre.getInt(Producto.TBLPRECIO_VALOR));
-                                                        break;
-                                                    }
-                                                }
-                                                for (ParseObject sub : subcategorias) {
-                                                    if (sub.getObjectId().equals(prod.getString(Producto.SUBCATEGORIA))) {
-                                                        producto.setSubcategoriaing(sub.getString(Producto.TBLSUBCATEGORIA_NOMBRE));
-                                                        producto.setSubcategoriaesp(sub.getString(Producto.TBLSUBCATEGORIA_NOMBREESP));
+                                for (ParseObject prod : productos) {
+                                    Producto producto = new Producto();
+                                    producto.setId(prod.getObjectId());
+                                    producto.setNombreing(prod.getString(Producto.NOMBREING));
+                                    producto.setNombreesp(prod.getString(Producto.NOMBREESP));
+                                    producto.setDescripcionIng(prod.getString(Producto.DESCRIPCIONING));
+                                    producto.setDescripcionesp(prod.getString(Producto.DESCRIPCIONESP));
+                                    producto.setPrecio(prod.getInt("precio"));
+                                    producto.setImagenParse(prod.getParseFile("imgFile"));
 
-                                                        AppUtil.data.add(producto);
-                                                        break;
-                                                    }
-                                                }
 
-                                            }
-                                            for (ParseObject sub : subcategorias) {
+                                    for (ParseObject sub : subcategorias) {
+                                        if (sub.getObjectId().equals(prod.getString(Producto.SUBCATEGORIA))) {
+                                            producto.setSubcategoriaing(sub.getString(Producto.TBLSUBCATEGORIA_NOMBRE));
+                                            producto.setSubcategoriaesp(sub.getString(Producto.TBLSUBCATEGORIA_NOMBREESP));
 
-                                                Subcategoria subcategoria = new Subcategoria();
-                                                subcategoria.setNombreEspanol(sub.getString(Producto.TBLSUBCATEGORIA_NOMBREESP));
-                                                subcategoria.setNombreIngles(sub.getString(Producto.TBLSUBCATEGORIA_NOMBRE));
-                                                subcategoria.setPosicion(sub.getInt("posicion"));
-                                                AppUtil.listaSubcategorias.add(subcategoria);
-                                            }
-                                            for (Subcategoria sub : AppUtil.listaSubcategorias)
-                                            {
-                                                if (sub.getPosicion() <= 3) {
-                                                    ProductoFragment productoFragment = new ProductoFragment();
-                                                    productoFragment.init(sub.getNombreIngles(), sub.getNombreEspanol());
-                                                    data.add(productoFragment);
-                                                } else
-                                                {
-                                                    ProductoGridFragment productoGridFragment = new ProductoGridFragment();
-                                                    productoGridFragment.init(sub.getNombreIngles(), sub.getNombreEspanol());
-                                                    data.add(productoGridFragment);
-
-                                                }
-                                                adapter.notifyDataSetChanged();
-                                            }
-
-                                            btnMenuPrincipal.setVisibility(View.VISIBLE);
-                                            btnMipedido.setVisibility(View.VISIBLE);
-                                            Menu m = navView.getMenu();
-                                            mostrandoMenu(m);
-                                            ParseUser currentUser = ParseUser.getCurrentUser();
-                                            if (currentUser == null) {
-                                                m.getItem(2).setVisible(false);
-                                                Menu men = m.getItem(2).getSubMenu();
-                                                men.getItem(0).setVisible(false);
-                                            }
-                                        } else {
-                                            mostrarMensajeComprobarConexion();
+                                            AppUtil.data.add(producto);
+                                            break;
                                         }
+                                    }
+
+                                }
+                                for (ParseObject sub : subcategorias) {
+
+                                    Subcategoria subcategoria = new Subcategoria();
+                                    subcategoria.setNombreEspanol(sub.getString(Producto.TBLSUBCATEGORIA_NOMBREESP));
+                                    subcategoria.setNombreIngles(sub.getString(Producto.TBLSUBCATEGORIA_NOMBRE));
+                                    subcategoria.setPosicion(sub.getInt("posicion"));
+                                    AppUtil.listaSubcategorias.add(subcategoria);
+                                }
+                                for (Subcategoria sub : AppUtil.listaSubcategorias) {
+                                    if (sub.getPosicion() <= 3) {
+                                        ProductoFragment productoFragment = new ProductoFragment();
+                                        productoFragment.init(sub.getNombreIngles(), sub.getNombreEspanol());
+                                        data.add(productoFragment);
+                                    } else {
+                                        ProductoGridFragment productoGridFragment = new ProductoGridFragment();
+                                        productoGridFragment.init(sub.getNombreIngles(), sub.getNombreEspanol());
+                                        data.add(productoGridFragment);
 
                                     }
-                                });
+
+                                }
+                                adapter.notifyDataSetChanged();
+                                btnMenuPrincipal.setVisibility(View.VISIBLE);
+                                btnMipedido.setVisibility(View.VISIBLE);
+                                Menu m = navView.getMenu();
+                                mostrandoMenu(m);
+                                ParseUser currentUser = ParseUser.getCurrentUser();
+                                if (currentUser == null) {
+                                    m.getItem(2).setVisible(false);
+                                    Menu men = m.getItem(2).getSubMenu();
+                                    men.getItem(0).setVisible(false);
+                                }
                             } else {
                                 mostrarMensajeComprobarConexion();
                             }
+
                         }
                     });
-                } else
-                {
+                } else {
                     mostrarMensajeComprobarConexion();
                 }
-            }
-        });
+            }});
     }
 
     @Override
@@ -362,6 +347,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.nav_mi_pedido:
                 intent = new Intent(this,PedidoActivity.class);
                 startActivityForResult(intent, MI_REQUEST_CODE);
+            break;
+            case R.id.nav_contacto_sugerencias:
+                intent = new Intent(this,ContactoActivity.class);
+                startActivity(intent);
             break;
             case R.id.nav_cerrar_sesion:
                 cerrarSesion();

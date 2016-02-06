@@ -11,7 +11,7 @@
         android:layout_height="@dimen/alto_campo_nombre_producto"
         android:text="Hawaiana"
         android:textColor="#ffffff"
-        android:textSize="@dimen/tam_nombre_producto"
+        android:textSize="@dimen/tam_nombre_productogrid"
         android:gravity="center"
         />
     <ImageView
@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:textColor="#ffffff"
         android:text="$7500"
-        android:textSize="@dimen/tam_precio_producto"
+        android:textSize="@dimen/tam_precio_productogrid"
         android:gravity="center"
         android:layout_below="@id/img_producto"
 
@@ -41,7 +41,7 @@
         android:textColor="#ffffff"
         android:text="350 ml"
         android:gravity="center_horizontal"
-        android:textSize="@dimen/tam_descripcion_producto"
+        android:textSize="@dimen/tam_descripcion_productogrid"
         android:layout_below="@id/txtprecioproducto"
         />
 

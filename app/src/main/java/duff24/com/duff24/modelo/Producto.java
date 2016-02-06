@@ -2,6 +2,8 @@ package duff24.com.duff24.modelo;
 
 import android.graphics.Bitmap;
 
+import com.parse.ParseFile;
+
 /**
  * Created by geovanny on 8/01/16.
  */
@@ -40,7 +42,9 @@ public class Producto
     private String categoria;
     private String subcategoriaing;
     private String subcategoriaesp;
-    private byte[] imagen;
+    private Bitmap imagen;
+
+    private ParseFile imagenParse;
 
     public String getNombreesp()
     {
@@ -110,11 +114,11 @@ public class Producto
         this.categoria = categoria;
     }
 
-    public byte[] getImagen() {
+    public Bitmap getImagen() {
         return imagen;
     }
 
-    public void setImagen(byte[] imagen)
+    public void setImagen(Bitmap imagen)
     {
         this.imagen = imagen;
     }
@@ -137,6 +141,14 @@ public class Producto
     public void setSubcategoriaesp(String subcategoriaesp)
     {
         this.subcategoriaesp = subcategoriaesp;
+    }
+
+    public ParseFile getImagenParse() {
+        return imagenParse;
+    }
+
+    public void setImagenParse(ParseFile imagenParse) {
+        this.imagenParse = imagenParse;
     }
 
 

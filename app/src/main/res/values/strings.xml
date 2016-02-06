@@ -100,7 +100,10 @@
     <string name="title_activity_introduccion">IntroduccionActivity</string>
     <string name="title_activity_registrado">RegistradoActivity</string>
     <string name="title_activity_probandofacebook">ProbandofacebookActivity</string>
-
+    <string name="title_activity_contacto">ContactoActivity</string>
+    <string name="txt_tu_opinion_importante">Your opinion is very important to us.</string>
+    <string name="txt_mensaje_contacto">Message</string>
+    <string name="txt_mensaje_enviado">Message sent</string>
 
 
 </resources>

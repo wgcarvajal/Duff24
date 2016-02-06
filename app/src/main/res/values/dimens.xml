@@ -10,9 +10,6 @@
     <dimen name="tam_titulo_subcategoria">25sp</dimen>
     <dimen name="super_margin_small">5dp</dimen>
     <dimen name="alto_template_producto">160dp</dimen>
-    <dimen name="tam_nombre_producto">19sp</dimen>
-    <dimen name="tam_precio_producto">19sp</dimen>
-    <dimen name="tam_descripcion_producto">14sp</dimen>
     <dimen name="alto_campo_nombre_producto">60dp</dimen>
     <dimen name="tam_imagen_producto_grid">100dp</dimen>
     <dimen name="alto_campo_descripcion_producto">45dp</dimen>
@@ -21,7 +18,7 @@
     <dimen name="tam_logo_menu_header">70dp</dimen>
     <dimen name="tam_titulo_menu_header">70dp</dimen>
     <dimen name="tam_letra_titulo_menu_header">25sp</dimen>
-    <dimen name="tam_letra_item_menu">20sp</dimen>
+    <dimen name="tam_letra_item_menu">16sp</dimen>
     <dimen name="tam_btn_cantidad_producto">48dp</dimen>
     <dimen name="tam_text_cantidad_producto">30sp</dimen>
     <dimen name="tam_btn_cantidad_prod_grid">35dp</dimen>
@@ -64,5 +61,17 @@
     <dimen name="tam_scrollview_observaciones">70dp</dimen>
     <dimen name="size_text_compruebe_conexion">15sp</dimen>
     <dimen name="margin_input_registrase">20dp</dimen>
+
+
+
+
+
+    <dimen name="tam_nombre_producto">19sp</dimen>
+    <dimen name="tam_descripcion_producto">14sp</dimen>
+    <dimen name="tam_precio_producto">19sp</dimen>
+
+    <dimen name="tam_nombre_productogrid">16sp</dimen>
+    <dimen name="tam_descripcion_productogrid">13sp</dimen>
+    <dimen name="tam_precio_productogrid">16sp</dimen>
 
 </resources>

@@ -32,8 +32,6 @@
             android:text="Carne de res, piña, doble queso, cebolla, tomate, lechuga, salsas"
             android:textSize="@dimen/tam_descripcion_producto"/>
 
-
-
     <RelativeLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"

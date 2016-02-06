@@ -13,8 +13,7 @@
         android:text="@string/hamburguesas"
         android:textColor="#ffffff"
         android:gravity="center"
-        android:textSize="@dimen/tam_titulo_subcategoria"
-        android:layout_marginBottom="@dimen/margin_small"/>
+        android:textSize="@dimen/tam_titulo_subcategoria"/>
 
     <GridView
         android:id="@+id/gridProductos"

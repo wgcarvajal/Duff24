@@ -133,29 +133,18 @@ public class AdaptadorProductoPedido extends BaseAdapter implements View.OnClick
 
         if(p.getImagen()!=null)
         {
-            loadBitmap(p.getImagen(), viewHolder.imagenProducto, p.getId(), context);
+            viewHolder.imagenProducto.setImageBitmap(p.getImagen());
         }
         else
         {
-            ParseQuery<ParseObject> queryImagen = new ParseQuery<ParseObject>(Producto.TABLAIMAGEN);
-            queryImagen.whereEqualTo(Producto.TBLIMAGEN_PRODUCTO, p.getId());
-            queryImagen.getFirstInBackground(new GetCallback<ParseObject>() {
+            p.getImagenParse().getDataInBackground(new GetDataCallback() {
                 @Override
-                public void done(ParseObject object, ParseException e) {
-                    if (e == null) {
-                        ParseFile fileObject = (ParseFile) object.get(Producto.TBLIMAGEN_IMGFILE);
-                        fileObject.getDataInBackground(new GetDataCallback() {
-                            @Override
-                            public void done(byte[] data, ParseException e)
-                            {
-                                if(e==null)
-                                {
-                                    p.setImagen(data);
-                                    ImageView imagen = (ImageView) fv.findViewById(R.id.img_producto);
-                                    loadBitmap(data, imagen, p.getId(), context);
-                                }
-                            }
-                        });
+                public void done(byte[] data, ParseException e)
+                {
+                    if(e==null)
+                    {
+                        ImageView imagen = (ImageView) fv.findViewById(R.id.img_producto);
+                        loadBitmap(data, imagen, p.getId(), context,p);
                     }
                 }
             });
@@ -221,35 +210,79 @@ public class AdaptadorProductoPedido extends BaseAdapter implements View.OnClick
     @Override
     public void onClick(View v)
     {
-        MediaPlayer m = MediaPlayer.create(context,R.raw.sonido_click);
-        m.start();
-
-        AdminSQliteOpenHelper admin = new AdminSQliteOpenHelper(context,"admin",null,1);
-        SQLiteDatabase db = admin.getWritableDatabase();
-
+        TextView txtconteo=(TextView)v.getTag(R.id.txtconteo);
+        int precio= data.get(Integer.parseInt(v.getTag().toString())).getPrecio();
         String prodid = data.get(Integer.parseInt(v.getTag().toString())).getId();
+        DisminuirCantidadTask disminuirCantidadTask= new DisminuirCantidadTask(txtconteo,(ImageView)v,context,Integer.parseInt(v.getTag().toString()),precio);
+        disminuirCantidadTask.execute(data.get(Integer.parseInt(v.getTag().toString())).getId());
+    }
 
-        Cursor fila = db.rawQuery("select prodcantidad from pedido where prodid = '" + prodid + "'", null);
-        if(fila.moveToFirst())
+
+
+    public class DisminuirCantidadTask extends AsyncTask<String,Void,Void>
+    {
+        private WeakReference<TextView> textViewWeakReference;
+        private WeakReference<ImageView> imageViewWeakReference;
+        private Context context;
+        private int posicion;
+        private int cantidad=0;
+        private int precio=0;
+
+        public DisminuirCantidadTask(TextView textView,ImageView btn,Context context,int posicion,int precio)
         {
-            int contador=fila.getInt(0);
-            onDisminuirTotal.onDisminuirTotal(data.get(Integer.parseInt(v.getTag().toString())).getPrecio());
-            if(contador==1)
+            this.textViewWeakReference= new WeakReference<TextView>(textView);
+            this.imageViewWeakReference= new WeakReference<ImageView>(btn);
+            this.posicion=posicion;
+            this.context=context;
+            this.precio=precio;
+        }
+        @Override
+        protected Void doInBackground(String... params)
+        {
+            MediaPlayer m = MediaPlayer.create(context, R.raw.sonido_click);
+            m.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                public void onCompletion(MediaPlayer mp) {
+                    mp.release();
+                }
+            });
+            m.start();
+
+            AdminSQliteOpenHelper admin = new AdminSQliteOpenHelper(context,"admin",null,1);
+            SQLiteDatabase db = admin.getWritableDatabase();
+            Cursor fila = db.rawQuery("select prodcantidad from pedido where prodid = '" + params[0] + "'", null);
+            if(fila.moveToFirst())
             {
-                db.delete("pedido","prodid ='"+prodid+"'",null);
-                data.remove(Integer.parseInt(v.getTag().toString()));
+                this.cantidad=fila.getInt(0)-1;
+                if(cantidad==0)
+                {
+                    db.delete("pedido", "prodid ='" + params[0] + "'", null);
+                }
+                else
+                {
+                    ContentValues registroPedido= new ContentValues();
+                    registroPedido.put("prodcantidad",cantidad);
+                    db.update("pedido", registroPedido, "prodid = '" + params[0] + "'", null);
+                }
+            }
+            db.close();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if(cantidad==0)
+            {
+                data.remove(posicion);
+                notifyDataSetChanged();
             }
             else
             {
-                ContentValues registroPedido= new ContentValues();
-                registroPedido.put("prodcantidad",contador-1);
-                int cant= db.update("pedido",registroPedido,"prodid = '"+prodid+"'",null);
+                textViewWeakReference.get().setText(cantidad + "");
             }
-            this.notifyDataSetChanged();
+            onDisminuirTotal.onDisminuirTotal(precio);
         }
-        db.close();
     }
-
 
 
 
@@ -298,12 +331,14 @@ public class AdaptadorProductoPedido extends BaseAdapter implements View.OnClick
         private final WeakReference<ImageView> imageViewReference;
         private byte [] data = null;
         private String prodid="";
+        private Producto producto;
 
-        public BitmapWorkerTask(ImageView imageView,byte [] data,String prodid)
+        public BitmapWorkerTask(ImageView imageView,byte [] data,String prodid,Producto producto)
         {
             imageViewReference = new WeakReference<ImageView>(imageView);
             this.data=data;
             this.prodid=prodid;
+            this.producto=producto;
         }
 
         @Override
@@ -327,15 +362,16 @@ public class AdaptadorProductoPedido extends BaseAdapter implements View.OnClick
                 if (this == bitmapWorkerTask && imageView != null)
                 {
                     imageView.setImageBitmap(bitmap);
+                    producto.setImagen(bitmap);
                 }
             }
         }
     }
-    public void loadBitmap(byte[] data , ImageView imageView,String prodid,Context context)
+    public void loadBitmap(byte[] data , ImageView imageView,String prodid,Context context,Producto producto)
     {
 
         if (cancelPotentialWork(prodid, imageView)) {
-            final BitmapWorkerTask task = new BitmapWorkerTask(imageView,data,prodid);
+            final BitmapWorkerTask task = new BitmapWorkerTask(imageView,data,prodid,producto);
             final AsyncDrawable asyncDrawable =
                     new AsyncDrawable(context.getResources(), null, task);
             imageView.setImageDrawable(asyncDrawable);

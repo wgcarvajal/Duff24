@@ -210,7 +210,6 @@ public class ProductoGridFragment extends FragmentGeneric implements AdapterView
                 if(prod.getSubcategoriaing().equals(subcategoria))
                 {
                     data.add(prod);
-                    adapter.notifyDataSetChanged();
                 }
             }
             return null;
@@ -223,6 +222,7 @@ public class ProductoGridFragment extends FragmentGeneric implements AdapterView
             {
                 gridProductos.onRestoreInstanceState(mListState);
             }
+            adapter.notifyDataSetChanged();
             mListState = null;
         }
     }

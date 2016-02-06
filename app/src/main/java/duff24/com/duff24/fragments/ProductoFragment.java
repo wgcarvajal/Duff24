@@ -213,7 +213,7 @@ public class ProductoFragment extends FragmentGeneric implements AdapterView.OnI
                 if(prod.getSubcategoriaing().equals(subcategoriaing))
                 {
                     data.add(prod);
-                    adapter.notifyDataSetChanged();
+
                 }
             }
             return null;
@@ -226,6 +226,7 @@ public class ProductoFragment extends FragmentGeneric implements AdapterView.OnI
             {
                 listaProductos.onRestoreInstanceState(mListState);
             }
+            adapter.notifyDataSetChanged();
             mListState = null;
         }
     }

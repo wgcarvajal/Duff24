@@ -134,29 +134,17 @@ public class AdaptadorProductoGrid extends BaseAdapter implements View.OnClickLi
 
         if(p.getImagen()!=null)
         {
-            loadBitmap(p.getImagen(), viewHolder.imagenProducto,p.getId(),context);
+            viewHolder.imagenProducto.setImageBitmap(p.getImagen());
         }
         else
         {
-            Log.i("la imagen","es null");
-            ParseQuery<ParseObject> queryImagen = new ParseQuery<ParseObject>(Producto.TABLAIMAGEN);
-            queryImagen.whereEqualTo(Producto.TBLIMAGEN_PRODUCTO, p.getId());
-            queryImagen.getFirstInBackground(new GetCallback<ParseObject>() {
+            p.getImagenParse().getDataInBackground(new GetDataCallback() {
                 @Override
-                public void done(ParseObject object, ParseException e) {
+                public void done(byte[] data, ParseException e) {
                     if (e == null) {
-                        ParseFile fileObject = (ParseFile) object.get(Producto.TBLIMAGEN_IMGFILE);
-                        fileObject.getDataInBackground(new GetDataCallback() {
-                            @Override
-                            public void done(byte[] data, ParseException e) {
-                                if (e == null) {
 
-                                    p.setImagen(data);
-                                    ImageView imagen = (ImageView) fv.findViewById(R.id.img_producto);
-                                    loadBitmap(data, imagen,p.getId(),context);
-                                }
-                            }
-                        });
+                        ImageView imagen = (ImageView) fv.findViewById(R.id.img_producto);
+                        loadBitmap(data, imagen,p.getId(),context,p);
                     }
                 }
             });
@@ -337,12 +325,14 @@ public class AdaptadorProductoGrid extends BaseAdapter implements View.OnClickLi
         private final WeakReference<ImageView> imageViewReference;
         private byte [] data = null;
         private String prodid="";
+        private Producto producto;
 
-        public BitmapWorkerTask(ImageView imageView,byte [] data,String prodid)
+        public BitmapWorkerTask(ImageView imageView,byte [] data,String prodid,Producto producto)
         {
             imageViewReference = new WeakReference<ImageView>(imageView);
             this.data=data;
             this.prodid=prodid;
+            this.producto=producto;
         }
 
         @Override
@@ -366,15 +356,16 @@ public class AdaptadorProductoGrid extends BaseAdapter implements View.OnClickLi
                 if (this == bitmapWorkerTask && imageView != null)
                 {
                     imageView.setImageBitmap(bitmap);
+                    producto.setImagen(bitmap);
                 }
             }
         }
     }
-    public void loadBitmap(byte[] data , ImageView imageView,String prodid,Context context)
+    public void loadBitmap(byte[] data , ImageView imageView,String prodid,Context context,Producto producto)
     {
 
         if (cancelPotentialWork(prodid, imageView)) {
-            final BitmapWorkerTask task = new BitmapWorkerTask(imageView,data,prodid);
+            final BitmapWorkerTask task = new BitmapWorkerTask(imageView,data,prodid,producto);
             final AsyncDrawable asyncDrawable =
                     new AsyncDrawable(context.getResources(), null, task);
 

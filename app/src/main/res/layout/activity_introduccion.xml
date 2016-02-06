@@ -17,13 +17,6 @@
         >
     </VideoView>
 
-    <Button
-        android:text="hola"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:background="@drawable/bordes_redondos_pequeno_fondo_gris"
-        />
 
 
 </RelativeLayout>

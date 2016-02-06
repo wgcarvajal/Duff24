@@ -19,24 +19,14 @@ public class IntroduccionActivity extends AppCompatActivity {
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_introduccion);
+        context=this;
 
         VideoView videoView = (VideoView) findViewById(R.id.video);
-        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mp) {
-                mp.setLooping(true);
-            }
-        });
-
-
-
-        //Uri path = Uri.parse("android.resource://"+getPackageName()+"/"+R.raw.video_prueba_final);
-
-
-        //videoView.setVideoURI(path);
-        //videoView.start();
-        //IrActiviyPrincipal ir= new IrActiviyPrincipal();
-        //ir.execute();
+        Uri path = Uri.parse("android.resource://"+getPackageName()+"/"+R.raw.intro_duff);
+        videoView.setVideoURI(path);
+        videoView.start();
+        IrActiviyPrincipal ir= new IrActiviyPrincipal();
+        ir.execute();
 
 
     }
@@ -45,11 +35,12 @@ public class IntroduccionActivity extends AppCompatActivity {
     {
 
 
+
         @Override
         protected Void doInBackground(Void... params)
         {
             try {
-                Thread.sleep(14000);
+                Thread.sleep(9000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
