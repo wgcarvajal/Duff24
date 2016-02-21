@@ -10,38 +10,30 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.InputType;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.ParseException;
 import com.parse.ParseObject;
-import com.parse.ParseQuery;
 import com.parse.SaveCallback;
-import com.parse.http.ParseHttpResponse;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import bolts.Task;
 import duff24.com.duff24.adaptadores.AdaptadorSpinnerFormaPago;
 import duff24.com.duff24.basededatos.AdminSQliteOpenHelper;
 import duff24.com.duff24.modelo.Pedido;
+import duff24.com.duff24.util.FontCache;
 
 public class NoregistradoActivity extends AppCompatActivity implements View.OnClickListener
 {
     private String font_path="font/A_Simple_Life.ttf";
-    private Typeface TF;
 
     private Spinner spFormapago;
     private TextView textNombre;
@@ -75,7 +67,7 @@ public class NoregistradoActivity extends AppCompatActivity implements View.OnCl
         btnAtras.setOnClickListener(this);
         btnEnviarPedido.setOnClickListener(this);
 
-        TF = Typeface.createFromAsset(getAssets(), font_path);
+        Typeface TF = FontCache.get(font_path,this);
         textNombre.setTypeface(TF);
         textDireccion.setTypeface(TF);
         textBarrio.setTypeface(TF);

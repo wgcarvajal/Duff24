@@ -8,7 +8,6 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,28 +16,19 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 import com.parse.SignUpCallback;
-
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import bolts.Task;
-import duff24.com.duff24.modelo.Producto;
 import duff24.com.duff24.modelo.Usuario;
+import duff24.com.duff24.util.FontCache;
 
 public class RegistrarseActivity extends AppCompatActivity implements View.OnClickListener {
     private String font_path_ASimple="font/A_Simple_Life.ttf";
-    private Typeface TF;
-
     private TextView txtnombre;
     private TextView txtemail;
     private TextView txtpassword;
@@ -62,7 +52,7 @@ public class RegistrarseActivity extends AppCompatActivity implements View.OnCli
         btnRegistrarse=(Button)findViewById(R.id.btnRegistrarse);
         btnAtras=(ImageView)findViewById(R.id.flecha_atras);
 
-        TF = Typeface.createFromAsset(getAssets(), font_path_ASimple);
+        Typeface TF = FontCache.get(font_path_ASimple,this);
 
         txtnombre.setTypeface(TF);
         txtemail.setTypeface(TF);

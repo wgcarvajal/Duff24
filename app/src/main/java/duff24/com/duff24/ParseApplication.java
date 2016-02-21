@@ -26,12 +26,12 @@ public class ParseApplication extends Application
         Parse.initialize(this, APPID, CLIENTKEY);
         ParseFacebookUtils.initialize(this);
         FacebookSdk.sdkInitialize(this);
-        generarHash();
+        //generarHash();
 
     }
 
 
-    private void generarHash()
+   /* private void generarHash()
     {
         try {
             PackageInfo info = getPackageManager().getPackageInfo(
@@ -45,5 +45,5 @@ public class ParseApplication extends Application
         } catch (PackageManager.NameNotFoundException e) {
         } catch (NoSuchAlgorithmException e) {
         }
-    }
+    }*/
 }

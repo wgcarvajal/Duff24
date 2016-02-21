@@ -10,6 +10,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import duff24.com.duff24.R;
+import duff24.com.duff24.util.FontCache;
 
 /**
  * Created by geovanny on 20/01/16.
@@ -17,7 +18,7 @@ import duff24.com.duff24.R;
 public class AdaptadorSpinnerFormaPago extends ArrayAdapter {
 
     private String font_path="font/A_Simple_Life.ttf";
-    private Typeface TF;
+
     private List<String> data;
     private Context context;
 
@@ -55,7 +56,7 @@ public class AdaptadorSpinnerFormaPago extends ArrayAdapter {
         }
 
         TextView item=(TextView)v.findViewById(R.id.txt_item_spinner_forma_pago);
-        TF = Typeface.createFromAsset(context.getAssets(), font_path);
+        Typeface TF = FontCache.get(font_path,context);
         item.setText(data.get(position));
         item.setTypeface(TF);
 

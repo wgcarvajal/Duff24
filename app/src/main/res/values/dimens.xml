@@ -49,7 +49,7 @@
     <dimen name="margin_top_imagen_login">20dp</dimen>
     <dimen name="margin_imagen_login">30dp</dimen>
     <dimen name="margin_text_correo_electronico">15dp</dimen>
-    <dimen name="size_text_caja_texto">15sp</dimen>
+    <dimen name="size_text_caja_texto">12sp</dimen>
     <dimen name="tam_alto_caja_texto">30dp</dimen>
     <dimen name="tam_alto_btn">40dp</dimen>
     <dimen name="tam_icono_caja_text">25dp</dimen>
@@ -73,5 +73,10 @@
     <dimen name="tam_nombre_productogrid">16sp</dimen>
     <dimen name="tam_descripcion_productogrid">13sp</dimen>
     <dimen name="tam_precio_productogrid">16sp</dimen>
+
+
+    <dimen name="size_borde_indicator_circulo">1dp</dimen>
+
+    <dimen name="size_radio_indicator_circulo">3dp</dimen>
 
 </resources>

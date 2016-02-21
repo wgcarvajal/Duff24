@@ -42,9 +42,9 @@ import java.util.List;
 import duff24.com.duff24.adaptadores.AdaptadorProductoPedido;
 import duff24.com.duff24.basededatos.AdminSQliteOpenHelper;
 import duff24.com.duff24.modelo.Producto;
-import duff24.com.duff24.modelo.Usuario;
 import duff24.com.duff24.typeface.CustomTypefaceSpan;
 import duff24.com.duff24.util.AppUtil;
+import duff24.com.duff24.util.FontCache;
 
 public class PedidoActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener, AdapterView.OnItemClickListener, AdaptadorProductoPedido.OnDisminuirTotal {
 
@@ -52,7 +52,7 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
     public final static int MI_REQUEST_CODE_REGISTRADO = 2;
     public final static int MI_REQUEST_SE_LOGUIO_USUARIO=101;
 
-    private Typeface TF;
+
     private String font_path = "font/2-4ef58.ttf";
     private String font_path_ASimple="font/A_Simple_Life.ttf";
     private TextView titulo;
@@ -132,10 +132,10 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
 
         aplicandoTipoLetraItemMenu(m, font_path_ASimple);
 
-        TF = Typeface.createFromAsset(getAssets(), font_path);
+        Typeface TF = FontCache.get(font_path,this);
         titulo.setTypeface(TF);
         tituloMenuHeader.setTypeface(TF);
-        TF = Typeface.createFromAsset(getAssets(), font_path_ASimple);
+        TF = FontCache.get(font_path_ASimple,this);
         btnFinalizarPedido.setTypeface(TF);
         textDomicilio.setTypeface(TF);
 
@@ -259,7 +259,7 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
 
     private void applyFontToMenuItem(MenuItem mi,String rutaTipoLetra)
     {
-        Typeface font = Typeface.createFromAsset(getAssets(), rutaTipoLetra);
+        Typeface font = FontCache.get(rutaTipoLetra,this);
         SpannableString mNewTitle = new SpannableString(mi.getTitle());
         mNewTitle.setSpan(new CustomTypefaceSpan("" , font), 0 , mNewTitle.length(),  Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         mi.setTitle(mNewTitle);
@@ -573,7 +573,7 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
 
         Button btnAceptar=(Button)dialog.findViewById(R.id.btn_aceptar);
         TextView mensaje =(TextView) dialog.findViewById(R.id.txtmensaje);
-        TF = Typeface.createFromAsset(getAssets(), font_path_ASimple);
+        Typeface TF = FontCache.get(font_path_ASimple,this);
 
         mensaje.setTypeface(TF);
         btnAceptar.setTypeface(TF);

@@ -21,6 +21,8 @@ import com.parse.SaveCallback;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import duff24.com.duff24.util.FontCache;
+
 public class ContactoActivity extends AppCompatActivity implements View.OnClickListener {
 
     private ImageView btnFlechaAtras;
@@ -30,7 +32,6 @@ public class ContactoActivity extends AppCompatActivity implements View.OnClickL
     private TextView textOpinion;
     private Button btnEnviar;
     private String font_path_ASimple="font/A_Simple_Life.ttf";
-    private Typeface TF;
     private ProgressDialog pd = null;
 
     @Override
@@ -49,7 +50,7 @@ public class ContactoActivity extends AppCompatActivity implements View.OnClickL
         btnFlechaAtras.setOnClickListener(this);
         btnEnviar.setOnClickListener(this);
 
-        TF = Typeface.createFromAsset(getAssets(), font_path_ASimple);
+        Typeface TF = FontCache.get(font_path_ASimple,this);
         textOpinion.setTypeface(TF);
         textMensaje.setTypeface(TF);
         textNombre.setTypeface(TF);

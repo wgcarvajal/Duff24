@@ -10,7 +10,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,11 +17,6 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import com.parse.FindCallback;
-import com.parse.GetCallback;
-import com.parse.ParseException;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -32,6 +26,7 @@ import duff24.com.duff24.adaptadores.AdaptadorProductoGrid;
 import duff24.com.duff24.basededatos.AdminSQliteOpenHelper;
 import duff24.com.duff24.modelo.Producto;
 import duff24.com.duff24.util.AppUtil;
+import duff24.com.duff24.util.FontCache;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -48,7 +43,6 @@ public class ProductoGridFragment extends FragmentGeneric implements AdapterView
     private List<Producto> data = new ArrayList<>();
     private AdaptadorProductoGrid adapter;
     private String font_path = "font/2-4ef58.ttf";
-    private Typeface TF;
 
     public ProductoGridFragment()
     {
@@ -76,7 +70,7 @@ public class ProductoGridFragment extends FragmentGeneric implements AdapterView
         gridProductos= (GridView) v.findViewById(R.id.gridProductos);
         titulo = (TextView) v.findViewById(R.id.textsubcategoria);
 
-        TF = Typeface.createFromAsset(inflater.getContext().getAssets(), font_path);
+        Typeface TF = FontCache.get(font_path,inflater.getContext());
         titulo.setText(this.subcategoria);
         titulo.setTypeface(TF);
         if(getResources().getString(R.string.idioma).equals("es"))

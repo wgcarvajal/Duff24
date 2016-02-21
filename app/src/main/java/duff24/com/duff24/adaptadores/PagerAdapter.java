@@ -1,15 +1,12 @@
 package duff24.com.duff24.adaptadores;
 
-import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.view.ViewGroup;
 
 import java.util.List;
 
 import duff24.com.duff24.fragments.FragmentGeneric;
-import duff24.com.duff24.fragments.ProductoFragment;
 
 /**
  * Created by geovanny on 9/01/16.

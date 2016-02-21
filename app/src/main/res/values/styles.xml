@@ -5,6 +5,7 @@
         <item name="colorPrimaryDark">#000000</item>
         <item name="android:textColorSecondary">#ff0000</item>
         <item name="android:background">#00000000</item>
+        <item name="vpiCirclePageIndicatorStyle">@style/CustomCirclePageIndicator</item>
     </style>
 
     <style name="NavDrawerTextStyle" parent="Base.TextAppearance.AppCompat">
@@ -12,5 +13,12 @@
         <item name="android:textSize">@dimen/tam_letra_item_menu</item>
     </style>
 
+    <style name="CustomCirclePageIndicator">
+        <item name="fillColor">#ffffff</item>
+        <item name="strokeColor">#ffffff</item>
+        <item name="strokeWidth">@dimen/size_borde_indicator_circulo</item>
+        <item name="radius">@dimen/size_radio_indicator_circulo</item>
+        <item name="centered">true</item>
+    </style>
 
 </resources>

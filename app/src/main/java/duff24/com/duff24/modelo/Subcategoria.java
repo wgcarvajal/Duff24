@@ -5,9 +5,14 @@ package duff24.com.duff24.modelo;
  */
 public class Subcategoria
 {
-    String nombreIngles;
-    String nombreEspanol;
-    String nombreCategoria;
+    public static final int CONDESCRIPCION=1;
+    public static final int SINDESCRIPCION=2;
+    public static final int ANUNCIO=3;
+
+    private String nombreIngles;
+    private String nombreEspanol;
+    private String nombreCategoria;
+    private int tipoFragment;
 
     public int getPosicion() {
         return posicion;
@@ -46,5 +51,15 @@ public class Subcategoria
 
     public void setNombreCategoria(String nombreCategoria) {
         this.nombreCategoria = nombreCategoria;
+    }
+
+    public int getTipoFragment()
+    {
+        return tipoFragment;
+    }
+
+    public void setTipoFragment(int tipoFragment)
+    {
+        this.tipoFragment=tipoFragment;
     }
 }

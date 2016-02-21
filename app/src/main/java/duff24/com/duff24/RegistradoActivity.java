@@ -31,7 +31,6 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -40,11 +39,11 @@ import duff24.com.duff24.adaptadores.AdaptadorSpinnerFormaPago;
 import duff24.com.duff24.basededatos.AdminSQliteOpenHelper;
 import duff24.com.duff24.modelo.Pedido;
 import duff24.com.duff24.modelo.Usuario;
+import duff24.com.duff24.util.FontCache;
 
 public class RegistradoActivity extends AppCompatActivity implements View.OnClickListener {
 
     private String font_path="font/A_Simple_Life.ttf";
-    private Typeface TF;
 
     private ImageView btnFlechaAtras;
     private Spinner spDireccion;
@@ -81,7 +80,7 @@ public class RegistradoActivity extends AppCompatActivity implements View.OnClic
         txtSinConexion=(TextView)findViewById(R.id.txt_sin_conexion);
         btnVolverCargar=(Button)findViewById(R.id.btn_volver_cargar);
 
-        TF = Typeface.createFromAsset(getAssets(), font_path);
+        Typeface TF = FontCache.get(font_path,this);
 
         txtObservaciones.setTypeface(TF);
         btnEnviarPedido.setTypeface(TF);
@@ -279,7 +278,7 @@ public class RegistradoActivity extends AppCompatActivity implements View.OnClic
         dialog.getWindow().setBackgroundDrawableResource(R.drawable.bordes_redondeados_pequenos);
 
 
-        TF = Typeface.createFromAsset(getAssets(), font_path);
+        Typeface TF = FontCache.get(font_path,this);
         Button btnAceptar=(Button)dialog.findViewById(R.id.btn_aceptar);
         Button btnCancelar=(Button)dialog.findViewById(R.id.btn_cancelar);
         final EditText txtTelefono =(EditText)dialog.findViewById(R.id.txt_telefono);
@@ -405,7 +404,7 @@ public class RegistradoActivity extends AppCompatActivity implements View.OnClic
         dialog.getWindow().setBackgroundDrawableResource(R.drawable.bordes_redondeados_pequenos);
 
 
-        TF = Typeface.createFromAsset(getAssets(), font_path);
+        Typeface TF = FontCache.get(font_path,this);
         Button btnAceptar=(Button)dialog.findViewById(R.id.btn_aceptar);
         Button btnCancelar=(Button)dialog.findViewById(R.id.btn_cancelar);
         final EditText txtdireccion =(EditText)dialog.findViewById(R.id.txt_direccion);

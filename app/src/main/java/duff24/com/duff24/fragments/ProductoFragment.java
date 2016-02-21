@@ -5,27 +5,19 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
-import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.SoundPool;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.SoundEffectConstants;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import com.parse.FindCallback;
-import com.parse.GetCallback;
-import com.parse.ParseException;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -35,6 +27,7 @@ import duff24.com.duff24.adaptadores.AdaptadorProducto;
 import duff24.com.duff24.basededatos.AdminSQliteOpenHelper;
 import duff24.com.duff24.modelo.Producto;
 import duff24.com.duff24.util.AppUtil;
+import duff24.com.duff24.util.FontCache;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -51,7 +44,6 @@ public class ProductoFragment extends FragmentGeneric implements AdapterView.OnI
     private List<Producto> data= new ArrayList<>();
     private AdaptadorProducto adapter;
     private String font_path = "font/2-4ef58.ttf";
-    private Typeface TF;
 
 
     public ProductoFragment() {
@@ -78,7 +70,7 @@ public class ProductoFragment extends FragmentGeneric implements AdapterView.OnI
         listaProductos= (ListView) v.findViewById(R.id.lstproductos);
         titulo = (TextView) v.findViewById(R.id.textsubcategoria);
 
-        TF = Typeface.createFromAsset(inflater.getContext().getAssets(), font_path);
+        Typeface TF = FontCache.get(font_path,inflater.getContext());
         titulo.setText(this.subcategoriaing);
         titulo.setTypeface(TF);
         if(getResources().getString(R.string.idioma).equals("es"))

@@ -3,10 +3,8 @@ package duff24.com.duff24;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Typeface;
-import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -28,17 +26,19 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.VideoView;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.viewpagerindicator.PageIndicator;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import duff24.com.duff24.adaptadores.PagerAdapter;
+import duff24.com.duff24.fragments.AnuncioFragment;
 import duff24.com.duff24.fragments.FragmentGeneric;
 import duff24.com.duff24.fragments.ProductoFragment;
 import duff24.com.duff24.fragments.ProductoGridFragment;
@@ -46,6 +46,7 @@ import duff24.com.duff24.modelo.Producto;
 import duff24.com.duff24.modelo.Subcategoria;
 import duff24.com.duff24.typeface.CustomTypefaceSpan;
 import duff24.com.duff24.util.AppUtil;
+import duff24.com.duff24.util.FontCache;
 import pl.droidsonroids.gif.GifImageView;
 
 
@@ -55,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private TextView titulo;
     private ViewPager pager;
+    private PageIndicator pagerIndicator;
     private PagerAdapter adapter;
     private List<FragmentGeneric> data= new ArrayList<>();
     private NavigationView navView;
@@ -64,7 +66,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView tituloMenuHeader;
     private TextView text_compruebe_conexion;
     private Button btnRecargarVista;
-    private Typeface TF;
     private String font_path = "font/2-4ef58.ttf";
     private String font_path_ASimple="font/A_Simple_Life.ttf";
     private ProgressDialog pd = null;
@@ -74,27 +75,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-       /* VideoView videoView = (VideoView) findViewById(R.id.video);
-        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mp) {
-                mp.setLooping(true);
-            }
-        });
-        Uri path = Uri.parse("android.resource://"+getPackageName()+"/"+R.raw.video);
-        videoView.setVideoURI(path);
-        videoView.start();*/
+
+
 
         titulo = (TextView)findViewById(R.id.txttitulo);
-        tituloMenuHeader=(TextView)findViewById(R.id.titulo_header_menu);
         text_compruebe_conexion=(TextView)findViewById(R.id.txt_sin_conexion);
+        tituloMenuHeader=(TextView)findViewById(R.id.titulo_header_menu);
 
         btnMenuPrincipal=(ImageView)findViewById(R.id.btn_menu_principal);
         btnRecargarVista=(Button)findViewById(R.id.volver_cargar);
         btnMipedido=(GifImageView)findViewById(R.id.btn_mi_pedido);
         drawer=(DrawerLayout)findViewById(R.id.drawer);
         pager= (ViewPager)findViewById(R.id.pager);
-        pager.setOffscreenPageLimit(7);
+        pagerIndicator=(PageIndicator)findViewById(R.id.pagerIndicator);
         navView = (NavigationView) findViewById(R.id.nav);
 
         btnMenuPrincipal.setOnClickListener(this);
@@ -107,15 +100,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         text_compruebe_conexion.setVisibility(View.GONE);
         btnRecargarVista.setVisibility(View.GONE);
 
-        TF = Typeface.createFromAsset(getAssets(), font_path);
+        Typeface TF = FontCache.get(font_path,this);
         titulo.setTypeface(TF);
         tituloMenuHeader.setTypeface(TF);
-        TF = Typeface.createFromAsset(getAssets(), font_path_ASimple);
+
+        TF = FontCache.get(font_path_ASimple,this);
         text_compruebe_conexion.setTypeface(TF);
         btnRecargarVista.setTypeface(TF);
 
+
+
         adapter = new PagerAdapter(getSupportFragmentManager(), data);
         pager.setAdapter(adapter);
+        pagerIndicator.setViewPager(pager);
         Log.i("cuantas paginas",pager.getOffscreenPageLimit()+"");
         Menu m = navView.getMenu();
         aplicandoTipoLetraItemMenu(m, font_path_ASimple);
@@ -178,18 +175,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         {
             for(Subcategoria sub: AppUtil.listaSubcategorias)
             {
-                if(sub.getPosicion() <= 3)
+                switch (sub.getTipoFragment())
                 {
-                    ProductoFragment productoFragment = new ProductoFragment();
-                    productoFragment.init(sub.getNombreIngles(), sub.getNombreEspanol());
-                    data.add(productoFragment);
+                    case Subcategoria.CONDESCRIPCION:
+                        ProductoFragment productoFragment = new ProductoFragment();
+                        productoFragment.init(sub.getNombreIngles(), sub.getNombreEspanol());
+                        data.add(productoFragment);
+                        break;
+                    case Subcategoria.SINDESCRIPCION:
+                        ProductoGridFragment productoGridFragment = new ProductoGridFragment();
+                        productoGridFragment.init(sub.getNombreIngles(), sub.getNombreEspanol());
+                        data.add(productoGridFragment);
+                        break;
 
-                }
-                else
-                {
-                    ProductoGridFragment productoGridFragment= new ProductoGridFragment();
-                    productoGridFragment.init(sub.getNombreIngles(), sub.getNombreEspanol());
-                    data.add(productoGridFragment);
+                    case Subcategoria.ANUNCIO:
+                        AnuncioFragment anuncioFragment= new AnuncioFragment();
+                        anuncioFragment.init(sub.getNombreIngles(), sub.getNombreEspanol());
+                        data.add(anuncioFragment);
+                    break;
                 }
 
             }
@@ -218,7 +221,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     {
         ParseQuery<ParseObject> querySubcategoria= new ParseQuery<>(Producto.TABLASUBCATEGORIA);
         querySubcategoria.orderByAscending("posicion");
-        querySubcategoria.selectKeys(Arrays.asList(Producto.ID,Producto.TBLSUBCATEGORIA_NOMBRE,Producto.TBLSUBCATEGORIA_NOMBREESP,Producto.TBLSUBCATEGORIA_CATEGORIA,"posicion"));
+        querySubcategoria.selectKeys(Arrays.asList(Producto.ID,Producto.TBLSUBCATEGORIA_NOMBRE,Producto.TBLSUBCATEGORIA_NOMBREESP,Producto.TBLSUBCATEGORIA_CATEGORIA,"posicion","tipoFragment"));
         querySubcategoria.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(final List<ParseObject> subcategorias, ParseException e) {
@@ -240,7 +243,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     producto.setDescripcionIng(prod.getString(Producto.DESCRIPCIONING));
                                     producto.setDescripcionesp(prod.getString(Producto.DESCRIPCIONESP));
                                     producto.setPrecio(prod.getInt("precio"));
-                                    producto.setImagenParse(prod.getParseFile("imgFile"));
+                                    producto.setUrlImagen(prod.getParseFile("imgFile").getUrl());
 
 
                                     for (ParseObject sub : subcategorias) {
@@ -260,18 +263,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     subcategoria.setNombreEspanol(sub.getString(Producto.TBLSUBCATEGORIA_NOMBREESP));
                                     subcategoria.setNombreIngles(sub.getString(Producto.TBLSUBCATEGORIA_NOMBRE));
                                     subcategoria.setPosicion(sub.getInt("posicion"));
+                                    subcategoria.setTipoFragment(sub.getInt("tipoFragment"));
                                     AppUtil.listaSubcategorias.add(subcategoria);
                                 }
                                 for (Subcategoria sub : AppUtil.listaSubcategorias) {
-                                    if (sub.getPosicion() <= 3) {
-                                        ProductoFragment productoFragment = new ProductoFragment();
-                                        productoFragment.init(sub.getNombreIngles(), sub.getNombreEspanol());
-                                        data.add(productoFragment);
-                                    } else {
-                                        ProductoGridFragment productoGridFragment = new ProductoGridFragment();
-                                        productoGridFragment.init(sub.getNombreIngles(), sub.getNombreEspanol());
-                                        data.add(productoGridFragment);
 
+
+                                    switch (sub.getTipoFragment())
+                                    {
+                                        case Subcategoria.CONDESCRIPCION:
+                                            ProductoFragment productoFragment = new ProductoFragment();
+                                            productoFragment.init(sub.getNombreIngles(), sub.getNombreEspanol());
+                                            data.add(productoFragment);
+                                        break;
+                                        case Subcategoria.SINDESCRIPCION:
+                                            ProductoGridFragment productoGridFragment = new ProductoGridFragment();
+                                            productoGridFragment.init(sub.getNombreIngles(), sub.getNombreEspanol());
+                                            data.add(productoGridFragment);
+                                        break;
+
+                                        case Subcategoria.ANUNCIO:
+                                            AnuncioFragment anuncioFragment= new AnuncioFragment();
+                                            anuncioFragment.init(sub.getNombreIngles(), sub.getNombreEspanol());
+                                            data.add(anuncioFragment);
+                                        break;
                                     }
 
                                 }
@@ -332,7 +347,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void applyFontToMenuItem(MenuItem mi,String rutaTipoLetra)
     {
-        Typeface font = Typeface.createFromAsset(getAssets(), rutaTipoLetra);
+        Typeface font = FontCache.get(rutaTipoLetra,this);
         SpannableString mNewTitle = new SpannableString(mi.getTitle());
         mNewTitle.setSpan(new CustomTypefaceSpan("" , font), 0 , mNewTitle.length(),  Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         mi.setTitle(mNewTitle);
@@ -495,12 +510,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
     }
-    @Override
-    protected void onDestroy() {
-        data=null;
-        adapter=null;
-        pd=null;
-        TF=null;
-        super.onDestroy();
-    }
+
 }

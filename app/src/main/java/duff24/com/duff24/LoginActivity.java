@@ -34,13 +34,13 @@ import com.parse.RequestPasswordResetCallback;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import duff24.com.duff24.modelo.Usuario;
+import duff24.com.duff24.util.FontCache;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener
 {
@@ -49,7 +49,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public final static int MI_REQUEST_SE_LOGUIO_USUARIO=101;
 
     private String font_path="font/A_Simple_Life.ttf";
-    private Typeface TF;
     private ImageView btnAtras;
     private Button btnIniciarSesion;
     private Button btnRegistrarse;
@@ -85,7 +84,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         txtrecuperarClave.setOnClickListener(this);
         btnFacebook.setOnClickListener(this);
 
-        TF = Typeface.createFromAsset(getAssets(), font_path);
+        Typeface TF = FontCache.get(font_path,this);
         btnIniciarSesion.setTypeface(TF);
         btnRegistrarse.setTypeface(TF);
         btnContNoRegistrado.setTypeface(TF);
@@ -138,7 +137,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         dialog.getWindow().setBackgroundDrawableResource(R.drawable.bordes_redondeados_pequenos);
 
 
-        TF = Typeface.createFromAsset(getAssets(), font_path);
+        Typeface TF = FontCache.get(font_path,this);
         Button btnEnviar=(Button)dialog.findViewById(R.id.btn_enviar);
         Button btnCancelar=(Button)dialog.findViewById(R.id.btn_cancelar);
         final EditText txtemail =(EditText)dialog.findViewById(R.id.txt_email);
@@ -412,7 +411,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         Button btnAceptar=(Button)dialog.findViewById(R.id.btn_aceptar);
         TextView mensaje =(TextView) dialog.findViewById(R.id.txtmensaje);
-        TF = Typeface.createFromAsset(getAssets(), font_path);
+        Typeface TF = FontCache.get(font_path,this);
         mensaje.setText(getResources().getString(R.string.confirmar_registro));
         mensaje.setTypeface(TF);
         btnAceptar.setTypeface(TF);
