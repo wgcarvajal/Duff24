@@ -113,7 +113,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         adapter = new PagerAdapter(getSupportFragmentManager(), data);
         pager.setAdapter(adapter);
         pagerIndicator.setViewPager(pager);
-        Log.i("cuantas paginas",pager.getOffscreenPageLimit()+"");
         Menu m = navView.getMenu();
         aplicandoTipoLetraItemMenu(m, font_path_ASimple);
         ocultandoMenu(m);
@@ -190,7 +189,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                     case Subcategoria.ANUNCIO:
                         AnuncioFragment anuncioFragment= new AnuncioFragment();
-                        anuncioFragment.init(sub.getNombreIngles(), sub.getNombreEspanol());
+                        anuncioFragment.init(sub.getNombreIngles(), sub.getNombreEspanol(),sub.getID());
                         data.add(anuncioFragment);
                     break;
                 }
@@ -260,6 +259,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 for (ParseObject sub : subcategorias) {
 
                                     Subcategoria subcategoria = new Subcategoria();
+                                    subcategoria.setId(sub.getObjectId());
                                     subcategoria.setNombreEspanol(sub.getString(Producto.TBLSUBCATEGORIA_NOMBREESP));
                                     subcategoria.setNombreIngles(sub.getString(Producto.TBLSUBCATEGORIA_NOMBRE));
                                     subcategoria.setPosicion(sub.getInt("posicion"));
@@ -284,7 +284,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                                         case Subcategoria.ANUNCIO:
                                             AnuncioFragment anuncioFragment= new AnuncioFragment();
-                                            anuncioFragment.init(sub.getNombreIngles(), sub.getNombreEspanol());
+                                            anuncioFragment.init(sub.getNombreIngles(), sub.getNombreEspanol(),sub.getID());
                                             data.add(anuncioFragment);
                                         break;
                                     }

@@ -12,6 +12,7 @@ public class Subcategoria
     private String nombreIngles;
     private String nombreEspanol;
     private String nombreCategoria;
+    private String id;
     private int tipoFragment;
 
     public int getPosicion() {
@@ -61,5 +62,15 @@ public class Subcategoria
     public void setTipoFragment(int tipoFragment)
     {
         this.tipoFragment=tipoFragment;
+    }
+
+    public String getID()
+    {
+        return id;
+    }
+
+    public void setId(String id)
+    {
+        this.id=id;
     }
 }
