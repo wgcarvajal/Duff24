@@ -152,23 +152,23 @@ public class ProductoGridFragment extends FragmentGeneric implements AdapterView
             m.start();
             AdminSQliteOpenHelper admin = new AdminSQliteOpenHelper(getContext(),"admin",null,1);
             SQLiteDatabase db = admin.getWritableDatabase();
-            Cursor fila = db.rawQuery("select prodcantidad from pedido where prodid = '" + params[0].getId() + "'", null);
+            Cursor fila = db.rawQuery("select prodcantidad from pedido where prodid = '" + params[0].getObjectId() + "'", null);
             ContentValues registroPedido= new ContentValues();
             int conteo=1;
             if(fila.moveToFirst())
             {
                 conteo=fila.getInt(0)+1;
                 registroPedido.put("prodcantidad",conteo);
-                db.update("pedido",registroPedido,"prodid = '"+params[0].getId()+"'",null);
+                db.update("pedido",registroPedido,"prodid = '"+params[0].getObjectId()+"'",null);
             }
             else
             {
-                registroPedido.put("prodid",params[0].getId());
+                registroPedido.put("prodid",params[0].getObjectId());
                 registroPedido.put("prodprecio",params[0].getPrecio());
-                registroPedido.put("prodnombreesp",params[0].getNombreesp());
-                registroPedido.put("prodnombreing",params[0].getNombreing());
-                registroPedido.put("proddescripcioning",params[0].getDescripcionIng());
-                registroPedido.put("proddescripcionesp",params[0].getDescripcionesp());
+                registroPedido.put("prodnombreesp",params[0].getProdnombreesp());
+                registroPedido.put("prodnombreing",params[0].getProdnombre());
+                registroPedido.put("proddescripcioning",params[0].getProddescripcion());
+                registroPedido.put("proddescripcionesp",params[0].getProddescripcionesp());
                 registroPedido.put("prodcantidad",conteo);
                 db.insert("pedido",null,registroPedido);
             }

@@ -9,68 +9,47 @@ public class Subcategoria
     public static final int SINDESCRIPCION=2;
     public static final int ANUNCIO=3;
 
-    private String nombreIngles;
-    private String nombreEspanol;
-    private String nombreCategoria;
-    private String id;
+    private String subcatnombre;
+    private String subcatnombresp;
+    private String objectId;
     private int tipoFragment;
 
-    public int getPosicion() {
-        return posicion;
-    }
-
-    public void setPosicion(int posicion) {
-        this.posicion = posicion;
-    }
-
-    int posicion;
-
-    public void Subcategoria()
+    public String getSubcatnombre()
     {
-
+        return subcatnombre;
     }
 
-    public String getNombreIngles() {
-        return nombreIngles;
-    }
-
-    public void setNombreIngles(String nombreIngles) {
-        this.nombreIngles = nombreIngles;
-    }
-
-    public String getNombreEspanol() {
-        return nombreEspanol;
-    }
-
-    public void setNombreEspanol(String nombreEspanol) {
-        this.nombreEspanol = nombreEspanol;
-    }
-
-    public String getNombreCategoria() {
-        return nombreCategoria;
-    }
-
-    public void setNombreCategoria(String nombreCategoria) {
-        this.nombreCategoria = nombreCategoria;
-    }
-
-    public int getTipoFragment()
+    public void setSubcatnombre(String subcatnombre)
     {
+        this.subcatnombre = subcatnombre;
+    }
+
+    public String getSubcatnombresp()
+    {
+        return subcatnombresp;
+    }
+
+    public void setSubcatnombresp(String subcatnombresp)
+    {
+        this.subcatnombresp = subcatnombresp;
+    }
+
+    public String getObjectId()
+    {
+        return objectId;
+    }
+
+    public void setObjectId(String objectId)
+    {
+        this.objectId = objectId;
+    }
+
+    public int getTipoFragment() {
         return tipoFragment;
     }
 
     public void setTipoFragment(int tipoFragment)
     {
-        this.tipoFragment=tipoFragment;
-    }
-
-    public String getID()
-    {
-        return id;
-    }
-
-    public void setId(String id)
-    {
-        this.id=id;
+        this.tipoFragment = tipoFragment;
     }
 }

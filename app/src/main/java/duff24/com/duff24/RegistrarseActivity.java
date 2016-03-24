@@ -16,15 +16,15 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.parse.GetCallback;
-import com.parse.ParseException;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
-import com.parse.ParseUser;
-import com.parse.SignUpCallback;
+
+import com.backendless.Backendless;
+import com.backendless.BackendlessUser;
+import com.backendless.async.callback.AsyncCallback;
+import com.backendless.exceptions.BackendlessFault;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import duff24.com.duff24.modelo.Usuario;
+
+import duff24.com.duff24.modelo.Telefono;
 import duff24.com.duff24.util.FontCache;
 
 public class RegistrarseActivity extends AppCompatActivity implements View.OnClickListener {
@@ -227,58 +227,48 @@ public class RegistrarseActivity extends AppCompatActivity implements View.OnCli
 
     }
 
-    private void enviarDatosParse(final String nombre, final String email, final String password, final String telefono)
+    private void enviarDatosParse(String nombre, String email, String password, final String telefono)
     {
-        ParseQuery<ParseObject> queryUser = new ParseQuery<>(Usuario.TABLA);
-        queryUser.whereEqualTo(Usuario.EMAIL,email);
-        queryUser.getFirstInBackground(new GetCallback<ParseObject>() {
+
+        final Telefono t= new Telefono();
+        t.setNumero(telefono);
+        BackendlessUser user = new BackendlessUser();
+        user.setEmail(email);
+        user.setPassword(password);
+        user.setProperty("nombre", nombre);
+        Backendless.UserService.register(user, new AsyncCallback<BackendlessUser>()
+        {
             @Override
-            public void done(ParseObject object, ParseException e)
+            public void handleResponse(BackendlessUser response)
             {
-                if(e==null)
+                pd.dismiss();
+                t.setUser(response.getObjectId());
+                Backendless.Persistence.of(Telefono.class).save(t, new AsyncCallback<Telefono>() {
+                    @Override
+                    public void handleResponse(Telefono response) {
+
+                    }
+
+                    @Override
+                    public void handleFault(BackendlessFault fault) {
+
+                    }
+                });
+                setResult(Activity.RESULT_OK);
+                finish();
+            }
+            @Override
+            public void handleFault(BackendlessFault fault)
+            {
+
+                if (fault.getCode().equals("3033"))
                 {
                     pd.dismiss();
                     mostrarMensaje(R.string.correo_ya_esta);
-                }
-                else
+                } else
                 {
-                    if(e.getCode()==101)
-                    {
-                        final ParseUser user = new ParseUser();
-                        user.setUsername(email);
-                        user.setPassword(password);
-                        user.setEmail(email);
-                        user.put(Usuario.NOMBRE, nombre);
-                        user.signUpInBackground(new SignUpCallback() {
-                            @Override
-                            public void done(ParseException e)
-                            {
-                                if(e==null)
-                                {
-                                    ParseObject telefonoParse = new ParseObject(Usuario.TABLATELEFONO);
-                                    telefonoParse.put(Usuario.TBLTELEFONONUMERO, telefono);
-                                    telefonoParse.put(Usuario.TBLTELEFONOUSER, user.getObjectId());
-                                    telefonoParse.saveInBackground();
-
-                                    pd.dismiss();
-                                    setResult(Activity.RESULT_OK);
-                                    finish();
-                                }
-                                else
-                                {
-                                    pd.dismiss();
-                                    mostrarMensaje(R.string.compruebe_conexion);
-                                }
-
-                            }
-                        });
-
-                    }
-                    else
-                    {
-                        pd.dismiss();
-                        mostrarMensaje(R.string.compruebe_conexion);
-                    }
+                    pd.dismiss();
+                    mostrarMensaje(R.string.compruebe_conexion);
                 }
             }
         });

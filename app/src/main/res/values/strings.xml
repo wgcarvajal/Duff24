@@ -104,6 +104,8 @@
     <string name="txt_tu_opinion_importante">Your opinion is very important to us.</string>
     <string name="txt_mensaje_contacto">Message</string>
     <string name="txt_mensaje_enviado">Message sent</string>
+    <string name="txt_mensaje_usuario_no_puede_ser_logueado">The registration email on facebook authentication.</string>
+
 
 
 </resources>

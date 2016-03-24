@@ -5,33 +5,34 @@ package duff24.com.duff24.modelo;
  */
 public class Anuncio
 {
-    private String id;
-    private String urlImagenIngles;
-    private String urlImagenEsp;
+    private String objectId;
+    private String imgFile;
+    private String imgFileEsp;
     private String idSubcategoria;
 
-    public String getId() {
-        return id;
+
+    public String getObjectId() {
+        return objectId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setObjectId(String objectId) {
+        this.objectId = objectId;
     }
 
-    public String getUrlImagenIngles() {
-        return urlImagenIngles;
+    public String getImgFile() {
+        return imgFile;
     }
 
-    public void setUrlImagenIngles(String urlImagenIngles) {
-        this.urlImagenIngles = urlImagenIngles;
+    public void setImgFile(String imgFile) {
+        this.imgFile = imgFile;
     }
 
-    public String getUrlImagenEsp() {
-        return urlImagenEsp;
+    public String getImgFileEsp() {
+        return imgFileEsp;
     }
 
-    public void setUrlImagenEsp(String urlImagenEsp) {
-        this.urlImagenEsp = urlImagenEsp;
+    public void setImgFileEsp(String imgFileEsp) {
+        this.imgFileEsp = imgFileEsp;
     }
 
     public String getIdSubcategoria() {
@@ -41,6 +42,4 @@ public class Anuncio
     public void setIdSubcategoria(String idSubcategoria) {
         this.idSubcategoria = idSubcategoria;
     }
-
-
 }

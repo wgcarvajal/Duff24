@@ -14,13 +14,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.parse.ParseException;
-import com.parse.ParseObject;
-import com.parse.SaveCallback;
+import com.backendless.Backendless;
+import com.backendless.async.callback.AsyncCallback;
+import com.backendless.exceptions.BackendlessFault;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import duff24.com.duff24.modelo.Contacto;
 import duff24.com.duff24.util.FontCache;
 
 public class ContactoActivity extends AppCompatActivity implements View.OnClickListener {
@@ -92,26 +93,31 @@ public class ContactoActivity extends AppCompatActivity implements View.OnClickL
             }
             else
             {
+
+
                 pd = ProgressDialog.show(this, getResources().getString(R.string.enviando_datos), getResources().getString(R.string.por_favor_espere), true, false);
-                ParseObject contacto= new ParseObject("Contacto");
-                contacto.put("email",email);
-                contacto.put("nombre",nombre);
-                contacto.put("mensaje",mensaje);
-                contacto.saveInBackground(new SaveCallback() {
+
+                Contacto contacto = new Contacto();
+                contacto.setEmail(email);
+                contacto.setMensaje(mensaje);
+                contacto.setNombre(nombre);
+
+                Backendless.Persistence.save(contacto, new AsyncCallback<Contacto>() {
                     @Override
-                    public void done(ParseException e) {
+                    public void handleResponse(Contacto response)
+                    {
                         pd.dismiss();
-                        if(e==null)
-                        {
-                            mostrarMensaje(R.string.txt_mensaje_enviado);
-                            textEmail.setText("");
-                            textNombre.setText("");
-                            textMensaje.setText("");
-                        }
-                        else
-                        {
-                            mostrarMensaje(R.string.compruebe_conexion);
-                        }
+                        mostrarMensaje(R.string.txt_mensaje_enviado);
+                        textEmail.setText("");
+                        textNombre.setText("");
+                        textMensaje.setText("");
+                    }
+
+                    @Override
+                    public void handleFault(BackendlessFault fault)
+                    {
+                        pd.dismiss();
+                        mostrarMensaje(R.string.compruebe_conexion);
                     }
                 });
 

@@ -9,7 +9,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
 import android.media.MediaPlayer;
-import android.os.AsyncTask;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -33,7 +32,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.parse.ParseUser;
+import com.backendless.Backendless;
+import com.backendless.BackendlessUser;
+import com.backendless.async.callback.AsyncCallback;
+import com.backendless.exceptions.BackendlessFault;
+import com.facebook.login.LoginManager;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -98,7 +101,7 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
         flechaAtras.setOnClickListener(this);
         Menu m = navView.getMenu();
 
-        ParseUser currentUser = ParseUser.getCurrentUser();
+        BackendlessUser currentUser = Backendless.UserService.CurrentUser();
 
         if(!hayProductos())
         {
@@ -163,7 +166,7 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
 
                     for(Producto p: AppUtil.data)
                     {
-                        if(p.getId().equals(fila.getString(fila.getColumnIndex("prodid"))))
+                        if(p.getObjectId().equals(fila.getString(fila.getColumnIndex("prodid"))))
                         {
                             data.add(p);
                             contador=contador+(fila.getInt(fila.getColumnIndex("prodcantidad"))*p.getPrecio());
@@ -241,7 +244,7 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
         }
         else
         {
-            ParseUser currentUser = ParseUser.getCurrentUser();
+            BackendlessUser currentUser = Backendless.UserService.CurrentUser();
             if (currentUser != null)
             {
                 Intent intent = new Intent(this,RegistradoActivity.class);
@@ -291,42 +294,39 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
 
     private void cerrarSesion()
     {
+
         pd = ProgressDialog.show(this, "", getResources().getString(R.string.por_favor_espere), true, false);
 
-        CerrarSesionTask cst= new CerrarSesionTask();
-        cst.execute();
-
-    }
-
-    public class CerrarSesionTask extends AsyncTask<Void,Void,Void>
-    {
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            ParseUser.logOut();
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid)
-        {
-            super.onPostExecute(aVoid);
-            Menu m=navView.getMenu();
-            m.getItem(2).setVisible(false);
-            Menu men=m.getItem(2).getSubMenu();
-            men.getItem(0).setVisible(false);
-            mostrarMensaje(R.string.txt_sesion_cerrada);
-            if(!m.getItem(1).isVisible())
+        Backendless.UserService.logout(new AsyncCallback<Void>() {
+            @Override
+            public void handleResponse(Void response)
             {
-                btnMenuPrincipal.setVisibility(View.GONE);
-                flechaAtras.setVisibility(View.VISIBLE);
+                LoginManager.getInstance().logOut();
+                Menu m=navView.getMenu();
+                m.getItem(2).setVisible(false);
+                Menu men=m.getItem(2).getSubMenu();
+                men.getItem(0).setVisible(false);
+                mostrarMensaje(R.string.txt_sesion_cerrada);
+                if(!m.getItem(1).isVisible())
+                {
+                    btnMenuPrincipal.setVisibility(View.GONE);
+                    flechaAtras.setVisibility(View.VISIBLE);
+                }
+
+                if(pd!=null)
+                {
+                    pd.dismiss();
+                }
+
             }
 
-            if(pd!=null)
-            {
+            @Override
+            public void handleFault(BackendlessFault fault) {
                 pd.dismiss();
+                mostrarMensaje(R.string.compruebe_conexion);
             }
-        }
+        });
+
     }
 
     private void mostrarMensaje(int idmensaje)
@@ -373,7 +373,7 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
         ContentValues registroPedido= new ContentValues();
         registroPedido.put("prodcantidad",conteo);
 
-        int cant= db.update("pedido",registroPedido,"prodid = '"+data.get(position).getId()+"'",null);
+        int cant= db.update("pedido",registroPedido,"prodid = '"+data.get(position).getObjectId()+"'",null);
 
         db.close();
 
@@ -447,7 +447,7 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
                 mostrandoMenu(m);
                 m.getItem(1).setVisible(false);
                 btnFinalizarPedido.setVisibility(View.GONE);
-                ParseUser currentUser = ParseUser.getCurrentUser();
+                BackendlessUser currentUser = Backendless.UserService.CurrentUser();
                 if(currentUser==null)
                 {
                     flechaAtras.setVisibility(View.VISIBLE);
@@ -552,7 +552,7 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
         m.getItem(1).setVisible(false);
         btnFinalizarPedido.setVisibility(View.GONE);
 
-        ParseUser currentUser = ParseUser.getCurrentUser();
+        BackendlessUser currentUser = Backendless.UserService.CurrentUser();
         if(currentUser==null)
         {
             flechaAtras.setVisibility(View.VISIBLE);

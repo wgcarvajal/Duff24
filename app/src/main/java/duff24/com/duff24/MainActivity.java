@@ -27,15 +27,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.parse.FindCallback;
-import com.parse.ParseException;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
-import com.parse.ParseUser;
+import com.backendless.Backendless;
+import com.backendless.BackendlessCollection;
+import com.backendless.BackendlessUser;
+import com.backendless.async.callback.AsyncCallback;
+import com.backendless.exceptions.BackendlessFault;
+import com.backendless.persistence.BackendlessDataQuery;
+import com.backendless.persistence.QueryOptions;
+import com.backendless.persistence.local.UserIdStorageFactory;
+import com.facebook.login.LoginManager;
 import com.viewpagerindicator.PageIndicator;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import duff24.com.duff24.adaptadores.PagerAdapter;
 import duff24.com.duff24.fragments.AnuncioFragment;
@@ -178,18 +181,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 {
                     case Subcategoria.CONDESCRIPCION:
                         ProductoFragment productoFragment = new ProductoFragment();
-                        productoFragment.init(sub.getNombreIngles(), sub.getNombreEspanol());
+                        productoFragment.init(sub.getSubcatnombre(), sub.getSubcatnombresp());
                         data.add(productoFragment);
                         break;
                     case Subcategoria.SINDESCRIPCION:
                         ProductoGridFragment productoGridFragment = new ProductoGridFragment();
-                        productoGridFragment.init(sub.getNombreIngles(), sub.getNombreEspanol());
+                        productoGridFragment.init(sub.getSubcatnombre(), sub.getSubcatnombresp());
                         data.add(productoGridFragment);
                         break;
 
                     case Subcategoria.ANUNCIO:
                         AnuncioFragment anuncioFragment= new AnuncioFragment();
-                        anuncioFragment.init(sub.getNombreIngles(), sub.getNombreEspanol(),sub.getID());
+                        anuncioFragment.init(sub.getSubcatnombre(), sub.getSubcatnombresp(),sub.getObjectId());
                         data.add(anuncioFragment);
                     break;
                 }
@@ -201,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Menu m=navView.getMenu();
             mostrandoMenu(m);
 
-            ParseUser currentUser = ParseUser.getCurrentUser();
+            BackendlessUser currentUser = Backendless.UserService.CurrentUser();
             if (currentUser == null)
             {
                 m.getItem(2).setVisible(false);
@@ -218,99 +221,183 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void cargarDatosParse()
     {
-        ParseQuery<ParseObject> querySubcategoria= new ParseQuery<>(Producto.TABLASUBCATEGORIA);
-        querySubcategoria.orderByAscending("posicion");
-        querySubcategoria.selectKeys(Arrays.asList(Producto.ID,Producto.TBLSUBCATEGORIA_NOMBRE,Producto.TBLSUBCATEGORIA_NOMBREESP,Producto.TBLSUBCATEGORIA_CATEGORIA,"posicion","tipoFragment"));
-        querySubcategoria.findInBackground(new FindCallback<ParseObject>() {
+
+        BackendlessDataQuery dataQuerysubcategoria= new BackendlessDataQuery();
+        List<String>subcategoriaSelect=new ArrayList<>();
+        subcategoriaSelect.add("objectId");
+        subcategoriaSelect.add("tipoFragment");
+        subcategoriaSelect.add("subcatnombre");
+        subcategoriaSelect.add("subcatnombresp");
+
+        dataQuerysubcategoria.setProperties(subcategoriaSelect);
+        QueryOptions queryOptionsSubcategoria= new QueryOptions();
+        queryOptionsSubcategoria.setPageSize(100);
+        queryOptionsSubcategoria.addSortByOption("posicion ASC");
+        dataQuerysubcategoria.setQueryOptions(queryOptionsSubcategoria);
+        Backendless.Persistence.of(Subcategoria.class).find(dataQuerysubcategoria, new AsyncCallback<BackendlessCollection<Subcategoria>>() {
             @Override
-            public void done(final List<ParseObject> subcategorias, ParseException e) {
-                if (e == null) {
-                    ParseQuery<ParseObject> queryProductos = new ParseQuery<>(Producto.TABLA);
-                    queryProductos.selectKeys(Arrays.asList(Producto.ID, Producto.NOMBREESP, Producto.NOMBREING, Producto.DESCRIPCIONING, Producto.DESCRIPCIONESP, Producto.SUBCATEGORIA, "precio","imgFile"));
-                    queryProductos.setLimit(200);
-                    queryProductos.orderByAscending("posicion");
-                    queryProductos.findInBackground(new FindCallback<ParseObject>() {
-                        @Override
-                        public void done(List<ParseObject> productos, ParseException e) {
-                            if (e == null) {
+            public void handleResponse(BackendlessCollection<Subcategoria> response)
+            {
+                AppUtil.listaSubcategorias= response.getData();
+                BackendlessDataQuery dataQueryProductos= new BackendlessDataQuery();
+                List<String> productoSelect=new ArrayList<>();
+                productoSelect.add("objectId");
+                productoSelect.add("precio");
+                productoSelect.add("proddescripcion");
+                productoSelect.add("proddescripcionesp");
+                productoSelect.add("prodnombre");
+                productoSelect.add("prodnombreesp");
+                productoSelect.add("subcategoria");
+                productoSelect.add("imgFile");
+                dataQueryProductos.setProperties(productoSelect);
+                QueryOptions queryOptionsProductos= new QueryOptions();
+                queryOptionsProductos.setPageSize(100);
+                queryOptionsProductos.addSortByOption("posicion ASC");
+                dataQueryProductos.setQueryOptions(queryOptionsProductos);
+                Backendless.Persistence.of(Producto.class).find(dataQueryProductos, new AsyncCallback<BackendlessCollection<Producto>>() {
+                    @Override
+                    public void handleResponse(BackendlessCollection<Producto> prods)
+                    {
 
-                                for (ParseObject prod : productos) {
-                                    Producto producto = new Producto();
-                                    producto.setId(prod.getObjectId());
-                                    producto.setNombreing(prod.getString(Producto.NOMBREING));
-                                    producto.setNombreesp(prod.getString(Producto.NOMBREESP));
-                                    producto.setDescripcionIng(prod.getString(Producto.DESCRIPCIONING));
-                                    producto.setDescripcionesp(prod.getString(Producto.DESCRIPCIONESP));
-                                    producto.setPrecio(prod.getInt("precio"));
-                                    producto.setUrlImagen(prod.getParseFile("imgFile").getUrl());
-
-
-                                    for (ParseObject sub : subcategorias) {
-                                        if (sub.getObjectId().equals(prod.getString(Producto.SUBCATEGORIA))) {
-                                            producto.setSubcategoriaing(sub.getString(Producto.TBLSUBCATEGORIA_NOMBRE));
-                                            producto.setSubcategoriaesp(sub.getString(Producto.TBLSUBCATEGORIA_NOMBREESP));
-
-                                            AppUtil.data.add(producto);
-                                            break;
-                                        }
-                                    }
-
-                                }
-                                for (ParseObject sub : subcategorias) {
-
-                                    Subcategoria subcategoria = new Subcategoria();
-                                    subcategoria.setId(sub.getObjectId());
-                                    subcategoria.setNombreEspanol(sub.getString(Producto.TBLSUBCATEGORIA_NOMBREESP));
-                                    subcategoria.setNombreIngles(sub.getString(Producto.TBLSUBCATEGORIA_NOMBRE));
-                                    subcategoria.setPosicion(sub.getInt("posicion"));
-                                    subcategoria.setTipoFragment(sub.getInt("tipoFragment"));
-                                    AppUtil.listaSubcategorias.add(subcategoria);
-                                }
-                                for (Subcategoria sub : AppUtil.listaSubcategorias) {
-
-
-                                    switch (sub.getTipoFragment())
+                        AppUtil.data=prods.getData();
+                        if(prods.getTotalObjects()>100)
+                        {
+                            prods.nextPage(new AsyncCallback<BackendlessCollection<Producto>>() {
+                                @Override
+                                public void handleResponse(BackendlessCollection<Producto> prodspagdos)
+                                {
+                                    List<Producto> pds=prodspagdos.getData();
+                                    for(Producto p :pds)
                                     {
-                                        case Subcategoria.CONDESCRIPCION:
-                                            ProductoFragment productoFragment = new ProductoFragment();
-                                            productoFragment.init(sub.getNombreIngles(), sub.getNombreEspanol());
-                                            data.add(productoFragment);
-                                        break;
-                                        case Subcategoria.SINDESCRIPCION:
-                                            ProductoGridFragment productoGridFragment = new ProductoGridFragment();
-                                            productoGridFragment.init(sub.getNombreIngles(), sub.getNombreEspanol());
-                                            data.add(productoGridFragment);
-                                        break;
-
-                                        case Subcategoria.ANUNCIO:
-                                            AnuncioFragment anuncioFragment= new AnuncioFragment();
-                                            anuncioFragment.init(sub.getNombreIngles(), sub.getNombreEspanol(),sub.getID());
-                                            data.add(anuncioFragment);
-                                        break;
+                                        AppUtil.data.add(p);
                                     }
 
+
+                                    for(Producto pr : AppUtil.data)
+                                    {
+                                        for(Subcategoria sb: AppUtil.listaSubcategorias)
+                                        {
+                                            if(sb.getObjectId().equals(pr.getSubcategoria()))
+                                            {
+                                                pr.setSubcategoriaing(sb.getSubcatnombre());
+                                                pr.setSubcategoriaesp(sb.getSubcatnombresp());
+                                                break;
+                                            }
+                                        }
+
+                                    }
+
+                                    crearFragments();
+
                                 }
-                                adapter.notifyDataSetChanged();
-                                btnMenuPrincipal.setVisibility(View.VISIBLE);
-                                btnMipedido.setVisibility(View.VISIBLE);
-                                Menu m = navView.getMenu();
-                                mostrandoMenu(m);
-                                ParseUser currentUser = ParseUser.getCurrentUser();
-                                if (currentUser == null) {
-                                    m.getItem(2).setVisible(false);
-                                    Menu men = m.getItem(2).getSubMenu();
-                                    men.getItem(0).setVisible(false);
+
+                                @Override
+                                public void handleFault(BackendlessFault fault)
+                                {
+                                    AppUtil.data= new ArrayList<>();
+                                    mostrarMensajeComprobarConexion();
+
                                 }
-                            } else {
-                                mostrarMensajeComprobarConexion();
-                            }
+                            });
+
+
+                        }
+                        else
+                        {
+                            crearFragments();
+                        }
+                    }
+
+                    @Override
+                    public void handleFault(BackendlessFault fault)
+                    {
+                        mostrarMensajeComprobarConexion();
+                    }
+                });
+            }
+
+            @Override
+            public void handleFault(BackendlessFault fault)
+            {
+                mostrarMensajeComprobarConexion();
+            }
+        });
+    }
+
+
+    private void crearFragments()
+    {
+
+        btnMenuPrincipal.setVisibility(View.VISIBLE);
+        btnMipedido.setVisibility(View.VISIBLE);
+        final Menu m = navView.getMenu();
+        mostrandoMenu(m);
+
+        Backendless.UserService.isValidLogin(new AsyncCallback<Boolean>() {
+            @Override
+            public void handleResponse(Boolean response) {
+
+                if (response) {
+                    String currentUserObjectId = UserIdStorageFactory.instance().getStorage().get();
+                    Backendless.Data.of(BackendlessUser.class).findById(currentUserObjectId, new AsyncCallback<BackendlessUser>() {
+                        @Override
+                        public void handleResponse(BackendlessUser response)
+                        {
+                            Backendless.UserService.setCurrentUser(response);
+                        }
+
+                        @Override
+                        public void handleFault(BackendlessFault fault)
+                        {
+                            m.getItem(2).setVisible(false);
+                            Menu men = m.getItem(2).getSubMenu();
+                            men.getItem(0).setVisible(false);
+
 
                         }
                     });
                 } else {
-                    mostrarMensajeComprobarConexion();
+                    m.getItem(2).setVisible(false);
+                    Menu men = m.getItem(2).getSubMenu();
+                    men.getItem(0).setVisible(false);
+
                 }
-            }});
+            }
+            @Override
+            public void handleFault(BackendlessFault fault)
+            {
+                m.getItem(2).setVisible(false);
+                Menu men = m.getItem(2).getSubMenu();
+                men.getItem(0).setVisible(false);
+
+            }
+        });
+
+
+        for (Subcategoria sub : AppUtil.listaSubcategorias)
+        {
+            switch (sub.getTipoFragment())
+            {
+                case Subcategoria.CONDESCRIPCION:
+                    ProductoFragment productoFragment = new ProductoFragment();
+                    productoFragment.init(sub.getSubcatnombre(), sub.getSubcatnombresp());
+                    data.add(productoFragment);
+                    break;
+                case Subcategoria.SINDESCRIPCION:
+                    ProductoGridFragment productoGridFragment = new ProductoGridFragment();
+                    productoGridFragment.init(sub.getSubcatnombre(), sub.getSubcatnombresp());
+                    data.add(productoGridFragment);
+                    break;
+
+                case Subcategoria.ANUNCIO:
+                    AnuncioFragment anuncioFragment= new AnuncioFragment();
+                    anuncioFragment.init(sub.getSubcatnombre(), sub.getSubcatnombresp(),sub.getObjectId());
+                    data.add(anuncioFragment);
+                    break;
+            }
+
+        }
+        adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -405,7 +492,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             Menu m=navView.getMenu();
             mostrandoMenu(m);
-            ParseUser currentUser = ParseUser.getCurrentUser();
+            BackendlessUser currentUser = Backendless.UserService.CurrentUser();
             if (currentUser == null)
             {
                 m.getItem(2).setVisible(false);
@@ -464,10 +551,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
     private void cerrarSesion()
     {
+
         pd = ProgressDialog.show(this,"", getResources().getString(R.string.por_favor_espere), true, false);
 
-        CerrarSesionTask cst= new CerrarSesionTask();
-        cst.execute();
+        Backendless.UserService.logout(new AsyncCallback<Void>() {
+            @Override
+            public void handleResponse(Void response)
+            {
+
+                LoginManager.getInstance().logOut();
+                Menu m=navView.getMenu();
+                m.getItem(2).setVisible(false);
+                Menu men=m.getItem(2).getSubMenu();
+                men.getItem(0).setVisible(false);
+                mostrarMensaje(R.string.txt_sesion_cerrada);
+                if(pd!=null)
+                {
+                    pd.dismiss();
+                }
+
+
+            }
+
+            @Override
+            public void handleFault(BackendlessFault fault)
+            {
+                if (pd != null) {
+                    pd.dismiss();
+                }
+                mostrarMensaje(R.string.compruebe_conexion);
+            }
+        });
 
     }
 
@@ -487,28 +601,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         toast.show();
     }
 
-    public class CerrarSesionTask extends  AsyncTask<Void,Void,Void>
-    {
-        @Override
-        protected Void doInBackground(Void... params) {
-            ParseUser.logOut();
-            return null;
-        }
 
-        @Override
-        protected void onPostExecute(Void aVoid)
-        {
-            super.onPostExecute(aVoid);
-            Menu m=navView.getMenu();
-            m.getItem(2).setVisible(false);
-            Menu men=m.getItem(2).getSubMenu();
-            men.getItem(0).setVisible(false);
-            mostrarMensaje(R.string.txt_sesion_cerrada);
-            if(pd!=null)
-            {
-                pd.dismiss();
-            }
-        }
-    }
 
 }

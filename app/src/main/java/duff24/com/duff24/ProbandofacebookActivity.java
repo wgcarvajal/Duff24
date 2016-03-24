@@ -19,10 +19,7 @@ import android.widget.Toast;
 
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.widget.ShareDialog;
-import com.parse.LogInCallback;
-import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
-import com.parse.ParseUser;
 
 import java.util.Arrays;
 import java.util.List;
@@ -52,7 +49,7 @@ public class ProbandofacebookActivity extends AppCompatActivity implements View.
 
     @Override
     public void onClick(View v)
-    {
+    {/*
         switch (v.getId())
         {
             case R.id.btn_facebook:
@@ -97,7 +94,7 @@ public class ProbandofacebookActivity extends AppCompatActivity implements View.
                 break;
         }
 
-
+*/
     }
 
     @Override

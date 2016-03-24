@@ -12,7 +12,6 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,20 +24,22 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.parse.FindCallback;
-import com.parse.ParseException;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
-import com.parse.ParseUser;
-import com.parse.SaveCallback;
+import com.backendless.Backendless;
+import com.backendless.BackendlessCollection;
+import com.backendless.BackendlessUser;
+import com.backendless.async.callback.AsyncCallback;
+import com.backendless.exceptions.BackendlessFault;
+import com.backendless.persistence.BackendlessDataQuery;
+import com.backendless.persistence.QueryOptions;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import duff24.com.duff24.adaptadores.AdaptadorSpinnerFormaPago;
 import duff24.com.duff24.basededatos.AdminSQliteOpenHelper;
+import duff24.com.duff24.modelo.Direccion;
+import duff24.com.duff24.modelo.Itempedido;
 import duff24.com.duff24.modelo.Pedido;
-import duff24.com.duff24.modelo.Usuario;
+import duff24.com.duff24.modelo.Telefono;
 import duff24.com.duff24.util.FontCache;
 
 public class RegistradoActivity extends AppCompatActivity implements View.OnClickListener {
@@ -155,7 +156,7 @@ public class RegistradoActivity extends AppCompatActivity implements View.OnClic
 
     private void enviarPedido()
     {
-        String nombre=ParseUser.getCurrentUser().getString(Usuario.NOMBRE);
+        String nombre=(String)Backendless.UserService.CurrentUser().getProperty("nombre");
         int indiceDireccion=spDireccion.getSelectedItemPosition();
         int indiceTelefono=spTelefono.getSelectedItemPosition();
         int indiceFormaPago=spFormaPago.getSelectedItemPosition();
@@ -226,46 +227,58 @@ public class RegistradoActivity extends AppCompatActivity implements View.OnClic
 
     private void enviarParse(String nombre,String direccion,String telefono,String observaciones,String formaPago)
     {
-        final ParseObject pedido = new ParseObject(Pedido.TABLA);
-        pedido.put(Pedido.PERSONANOMBRE, nombre);
-        pedido.put(Pedido.DIRECCION, direccion);
-        pedido.put(Pedido.TELEFONO, telefono);
-        pedido.put(Pedido.FORMAPAGO, formaPago);
-        pedido.put(Pedido.OBSERVACIONES, observaciones);
-        pedido.saveInBackground(new SaveCallback() {
+
+        Pedido pedido= new Pedido();
+        pedido.setPeddireccion(direccion);
+        pedido.setPedformapago(formaPago);
+        pedido.setPedtelefono(telefono);
+        pedido.setPedobservaciones(observaciones);
+        pedido.setPedpersonanombre(nombre);
+
+        Backendless.Persistence.save(pedido, new AsyncCallback<Pedido>() {
             @Override
-            public void done(ParseException e) {
-                if (e == null) {
+            public void handleResponse(Pedido response)
+            {
 
-                    AdminSQliteOpenHelper admin = new AdminSQliteOpenHelper(getApplicationContext(), "admin", null, 1);
-                    SQLiteDatabase db = admin.getReadableDatabase();
+                AdminSQliteOpenHelper admin = new AdminSQliteOpenHelper(getApplicationContext(), "admin", null, 1);
+                SQLiteDatabase db = admin.getReadableDatabase();
+                Cursor fila = db.rawQuery("select prodid,prodcantidad from pedido", null);
+                if (fila != null) {
 
-                    Cursor fila = db.rawQuery("select prodid,prodcantidad from pedido", null);
-                    if (fila != null) {
+                    if (fila.moveToFirst()) {
+                        do {
+                            Itempedido itempedido = new Itempedido();
+                            itempedido.setPedido(response.getObjectId());
+                            itempedido.setProducto(fila.getString(fila.getColumnIndex("prodid")));
+                            itempedido.setItemcantidad(fila.getInt(fila.getColumnIndex("prodcantidad")));
+                            Backendless.Persistence.save(itempedido, new AsyncCallback<Itempedido>() {
+                                @Override
+                                public void handleResponse(Itempedido response) {
 
-                        if (fila.moveToFirst()) {
-                            do {
-                                ParseObject itempedido = new ParseObject(Pedido.TABLAITEMPEDIDO);
-                                itempedido.put(Pedido.TBLITEMPEDIDO_PEDIDO, pedido.getObjectId());
-                                itempedido.put(Pedido.TBLITEMPEDIDO_PRODUCTO, fila.getString(fila.getColumnIndex("prodid")));
-                                itempedido.put(Pedido.TBLITEMPEDIDO_CANTIDAD, fila.getInt(fila.getColumnIndex("prodcantidad")));
-                                itempedido.saveInBackground();
+                                }
 
+                                @Override
+                                public void handleFault(BackendlessFault fault) {
 
-                            } while (fila.moveToNext());
-                            setResult(Activity.RESULT_OK);
-                            if (pd != null) {
-                                pd.dismiss();
-                            }
-                            finish();
+                                }
+                            });
+                        } while (fila.moveToNext());
+                        setResult(Activity.RESULT_OK);
+                        if (pd != null) {
+                            pd.dismiss();
                         }
+                        finish();
                     }
-                } else {
-                    if (pd != null) {
-                        pd.dismiss();
-                    }
-                    mostrarMensaje(R.string.compruebe_conexion);
                 }
+
+            }
+
+            @Override
+            public void handleFault(BackendlessFault fault) {
+                if (pd != null) {
+                    pd.dismiss();
+                }
+                mostrarMensaje(R.string.compruebe_conexion);
             }
         });
     }
@@ -364,48 +377,48 @@ public class RegistradoActivity extends AppCompatActivity implements View.OnClic
 
     public void guardarTelefonoParse(String telefono)
     {
-        Log.i("Entro","parse telefono");
-        final ParseObject objtelefono= new ParseObject(Usuario.TABLATELEFONO);
-        objtelefono.put(Usuario.TBLTELEFONONUMERO,telefono);
-        objtelefono.put(Usuario.TBLTELEFONOUSER,ParseUser.getCurrentUser().getObjectId());
-        objtelefono.saveInBackground(new SaveCallback() {
+
+        Telefono phone= new Telefono();
+        phone.setNumero(telefono);
+        phone.setUser(Backendless.UserService.CurrentUser().getObjectId());
+        Backendless.Persistence.save(phone, new AsyncCallback<Telefono>() {
             @Override
-            public void done(ParseException e)
+            public void handleResponse(Telefono response)
             {
-                if(e==null)
+                listaTelfonos.add(response.getNumero());
+                adapterTelefono.notifyDataSetChanged();
+                spTelefono.setSelection(adapterTelefono.getCount()-1);
+                if(pd!=null)
                 {
-                    if(pd!=null)
-                    {
-                        pd.dismiss();
-                    }
-                    mostrarMensaje(R.string.txt_registro_exitoso);
-                    dialog.dismiss();
-                    listaTelfonos.add(objtelefono.getString(Usuario.TBLTELEFONONUMERO));
-                    adapterTelefono.notifyDataSetChanged();
-                    spTelefono.setSelection(adapterTelefono.getCount()-1);
+                    pd.dismiss();
                 }
-                else
+                mostrarMensaje(R.string.txt_registro_exitoso);
+                dialog.dismiss();
+            }
+
+            @Override
+            public void handleFault(BackendlessFault fault)
+            {
+
+                if(pd!=null)
                 {
-                    if(pd!=null)
-                    {
-                        pd.dismiss();
-                    }
-                    mostrarMensaje(R.string.compruebe_conexion);
+                    pd.dismiss();
                 }
+                mostrarMensaje(R.string.compruebe_conexion);
             }
         });
+
     }
 
-    private void agregarDireccion()
-    {
-        dialog= new Dialog(this);
+    private void agregarDireccion() {
+        dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.template_agregar_direccion);
         dialog.getWindow().setBackgroundDrawableResource(R.drawable.bordes_redondeados_pequenos);
 
 
-        Typeface TF = FontCache.get(font_path,this);
-        Button btnAceptar=(Button)dialog.findViewById(R.id.btn_aceptar);
+        Typeface TF = FontCache.get(font_path, this);
+        Button btnAceptar= (Button)dialog.findViewById(R.id.btn_aceptar);
         Button btnCancelar=(Button)dialog.findViewById(R.id.btn_cancelar);
         final EditText txtdireccion =(EditText)dialog.findViewById(R.id.txt_direccion);
         final EditText txtbarrio=(EditText)dialog.findViewById(R.id.txt_barrio);
@@ -485,33 +498,33 @@ public class RegistradoActivity extends AppCompatActivity implements View.OnClic
 
     public void guardarDireccionParse(String direccion,String barrio)
     {
-        final ParseObject objdireccion= new ParseObject(Usuario.TABLADIRECCION);
-        objdireccion.put(Usuario.TBLDIRECCIONDIRECCION,direccion+" "+barrio);
-        objdireccion.put(Usuario.TBLDIRECCIONUSER,ParseUser.getCurrentUser().getObjectId());
-        objdireccion.saveInBackground(new SaveCallback() {
+        Direccion address= new Direccion();
+        address.setDireccion(direccion+" "+barrio);
+        address.setUser(Backendless.UserService.CurrentUser().getObjectId());
+        Backendless.Persistence.save(address, new AsyncCallback<Direccion>() {
             @Override
-            public void done(ParseException e)
+            public void handleResponse(Direccion response)
             {
-                if(e==null)
+                listaDirecciones.add(response.getDireccion());
+                adapterDireccion.notifyDataSetChanged();
+                spDireccion.setSelection(adapterDireccion.getCount()-1);
+                if(pd!=null)
                 {
-                    if(pd!=null)
-                    {
-                        pd.dismiss();
-                    }
-                    mostrarMensaje(R.string.txt_registro_exitoso);
-                    dialog.dismiss();
-                    listaDirecciones.add(objdireccion.getString(Usuario.TBLDIRECCIONDIRECCION));
-                    adapterDireccion.notifyDataSetChanged();
-                    spDireccion.setSelection(adapterDireccion.getCount()-1);
+                    pd.dismiss();
                 }
-                else
+                mostrarMensaje(R.string.txt_registro_exitoso);
+                dialog.dismiss();
+            }
+
+            @Override
+            public void handleFault(BackendlessFault fault)
+            {
+
+                if(pd!=null)
                 {
-                    if(pd!=null)
-                    {
-                        pd.dismiss();
-                    }
-                    mostrarMensaje(R.string.compruebe_conexion);
+                    pd.dismiss();
                 }
+                mostrarMensaje(R.string.compruebe_conexion);
             }
         });
     }
@@ -542,82 +555,75 @@ public class RegistradoActivity extends AppCompatActivity implements View.OnClic
 
     private void cargarDatosParse()
     {
+
+        BackendlessDataQuery querydireccion = new BackendlessDataQuery();
+        final BackendlessUser user= Backendless.UserService.CurrentUser();
         final Context context =this;
-        final ParseUser currentuser= ParseUser.getCurrentUser();
-        ParseQuery<ParseObject> queryDireccion= new ParseQuery<>(Usuario.TABLADIRECCION);
-        queryDireccion.whereEqualTo(Usuario.TBLDIRECCIONUSER,currentuser.getObjectId());
-        queryDireccion.selectKeys(Arrays.asList(Usuario.TBLDIRECCIONDIRECCION));
-        queryDireccion.findInBackground(new FindCallback<ParseObject>() {
+        querydireccion.setWhereClause("user = '" + user.getObjectId()+"'");
+        QueryOptions optionsdireccion= new QueryOptions();
+        optionsdireccion.setPageSize(100);
+        querydireccion.setQueryOptions(optionsdireccion);
+        Backendless.Persistence.of(Direccion.class).find(querydireccion ,new AsyncCallback<BackendlessCollection<Direccion>>() {
             @Override
-            public void done(final List<ParseObject> direcciones, ParseException e)
+            public void handleResponse(final BackendlessCollection<Direccion> direcciones)
             {
-                if(e==null)
-                {
-                    ParseQuery <ParseObject> queryTelefono= new ParseQuery<>(Usuario.TABLATELEFONO);
-                    queryTelefono.whereEqualTo(Usuario.TBLTELEFONOUSER,currentuser.getObjectId());
-                    queryTelefono.selectKeys(Arrays.asList(Usuario.TBLTELEFONONUMERO));
-                    queryTelefono.findInBackground(new FindCallback<ParseObject>() {
-                        @Override
-                        public void done(List<ParseObject> telefonos, ParseException e)
-                        {
-                            if(e==null)
-                            {
-                                listaDirecciones=new ArrayList<>();
-                                listaDirecciones.add(getResources().getString(R.string.txt_seleccione_direccion));
-                                for(ParseObject dir: direcciones)
-                                {
-                                    listaDirecciones.add(dir.getString(Usuario.TBLDIRECCIONDIRECCION));
-                                }
-                                adapterDireccion=new AdaptadorSpinnerFormaPago(context,R.layout.template_spinner_forma_pago,listaDirecciones);
-                                spDireccion.setAdapter(adapterDireccion);
-
-
-                                listaTelfonos=new ArrayList<>();
-                                listaTelfonos.add(getResources().getString(R.string.txt_seleccione_telefono));
-                                for(ParseObject tel: telefonos)
-                                {
-                                    listaTelfonos.add(tel.getString(Usuario.TBLTELEFONONUMERO));
-                                }
-                                adapterTelefono=new AdaptadorSpinnerFormaPago(context,R.layout.template_spinner_forma_pago,listaTelfonos);
-                                spTelefono.setAdapter(adapterTelefono);
-
-                                if(pd!=null)
-                                {
-                                    pd.dismiss();
-                                }
-
-                                findViewById(R.id.espacio_spinner_direccion).setVisibility(View.VISIBLE);
-                                findViewById(R.id.espacio_spinner_telefono).setVisibility(View.VISIBLE);
-                                findViewById(R.id.scrollView_observaciones).setVisibility(View.VISIBLE);
-                                btnEnviarPedido.setVisibility(View.VISIBLE);
-                                findViewById(R.id.icon_sp_forma_pago).setVisibility(View.VISIBLE);
-                                spFormaPago.setVisibility(View.VISIBLE);
-
-                            }
-                            else
-                            {
-                                if(pd!=null)
-                                {
-                                    pd.dismiss();
-                                    txtSinConexion.setVisibility(View.VISIBLE);
-                                    btnVolverCargar.setVisibility(View.VISIBLE);
-
-                                }
-                            }
-                        }
-                    });
-                }
-                else
-                {
-                    if(pd!=null)
+                BackendlessDataQuery querytelefono = new BackendlessDataQuery();
+                querytelefono.setWhereClause("user = '" + user.getObjectId()+"'");
+                QueryOptions optionstelefono= new QueryOptions();
+                optionstelefono.setPageSize(100);
+                querytelefono.setQueryOptions(optionstelefono);
+                Backendless.Persistence.of(Telefono.class).find(querytelefono, new AsyncCallback<BackendlessCollection<Telefono>>() {
+                    @Override
+                    public void handleResponse(BackendlessCollection<Telefono> telefonos)
                     {
-                        pd.dismiss();
+
+                        listaDirecciones=new ArrayList<>();
+                        listaDirecciones.add(getResources().getString(R.string.txt_seleccione_direccion));
+                        for(Direccion dir: direcciones.getData())
+                        {
+                            listaDirecciones.add(dir.getDireccion());
+                        }
+                        adapterDireccion=new AdaptadorSpinnerFormaPago(context,R.layout.template_spinner_forma_pago,listaDirecciones);
+                        spDireccion.setAdapter(adapterDireccion);
+                        listaTelfonos=new ArrayList<>();
+                        listaTelfonos.add(getResources().getString(R.string.txt_seleccione_telefono));
+                        for(Telefono tel: telefonos.getData()) {
+                            listaTelfonos.add(tel.getNumero());                        }
+                        adapterTelefono=new AdaptadorSpinnerFormaPago(context,R.layout.template_spinner_forma_pago,listaTelfonos);
+                        spTelefono.setAdapter(adapterTelefono);
+                        findViewById(R.id.espacio_spinner_direccion).setVisibility(View.VISIBLE);
+                        findViewById(R.id.espacio_spinner_telefono).setVisibility(View.VISIBLE);
+                        btnEnviarPedido.setVisibility(View.VISIBLE);
+                        findViewById(R.id.icon_sp_forma_pago).setVisibility(View.VISIBLE);
+                        findViewById(R.id.scrollView_observaciones).setVisibility(View.VISIBLE);
+                        spFormaPago.setVisibility(View.VISIBLE);
+
+                        if(pd!=null)
+                        {
+                            pd.dismiss();
+                        }
+                    }
+                    @Override
+                    public void handleFault(BackendlessFault fault)
+                    {
                         txtSinConexion.setVisibility(View.VISIBLE);
                         btnVolverCargar.setVisibility(View.VISIBLE);
+                        if(pd!=null)
+                        {
+                            pd.dismiss();
+                        }
                     }
-
+                });
+            }
+            @Override
+            public void handleFault(BackendlessFault fault)
+            {
+                txtSinConexion.setVisibility(View.VISIBLE);
+                btnVolverCargar.setVisibility(View.VISIBLE);
+                if(pd!=null)
+                {
+                    pd.dismiss();
                 }
-
             }
         });
     }

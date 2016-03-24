@@ -1,5 +1,6 @@
 package duff24.com.duff24.fragments;
 
+import android.content.Context;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,11 +11,15 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.parse.GetCallback;
-import com.parse.ParseException;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
+import com.backendless.Backendless;
+import com.backendless.async.callback.AsyncCallback;
+import com.backendless.exceptions.BackendlessFault;
+import com.backendless.persistence.BackendlessDataQuery;
+import com.backendless.persistence.QueryOptions;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import duff24.com.duff24.R;
 import duff24.com.duff24.modelo.Anuncio;
@@ -111,13 +116,13 @@ public class AnuncioFragment extends FragmentGeneric {
                 if(getResources().getString(R.string.idioma).equals("es"))
                 {
                     Picasso.with(getContext())
-                            .load(Uri.parse(an.getUrlImagenEsp()))
+                            .load(an.getImgFileEsp())
                             .into(anuncio);
                 }
                 else
                 {
                     Picasso.with(getContext())
-                            .load(Uri.parse(an.getUrlImagenIngles()))
+                            .load(an.getImgFile())
                             .into(anuncio);
                 }
             }
@@ -131,34 +136,44 @@ public class AnuncioFragment extends FragmentGeneric {
 
     private void cargarDatoRemoto()
     {
-        ParseQuery <ParseObject> queryAnuncio =  new ParseQuery<>("Anuncio");
-        queryAnuncio.whereEqualTo("idSubcategoria", anuncioId);
-        queryAnuncio.getFirstInBackground(new GetCallback<ParseObject>() {
-            @Override
-            public void done(ParseObject object, ParseException e) {
-                if(e==null)
-                {
-                    Log.i("entro,", "encontro un anuncio");
-                    Anuncio a= new Anuncio();
-                    a.setId(object.getObjectId());
-                    a.setIdSubcategoria(object.getString("idSubcategoria"));
-                    a.setUrlImagenEsp(object.getParseFile("imgFileEsp").getUrl());
-                    a.setUrlImagenIngles(object.getParseFile("imgFileEsp").getUrl());
-                    AppUtil.listaAnuncios.add(a);
+        final Context context=getContext();
 
-                    if(getResources().getString(R.string.idioma).equals("es"))
-                    {
-                        Picasso.with(getContext())
-                                .load(Uri.parse(a.getUrlImagenEsp()))
-                                .into(anuncio);
-                    }
-                    else
-                    {
-                        Picasso.with(getContext())
-                                .load(Uri.parse(a.getUrlImagenIngles()))
-                                .into(anuncio);
-                    }
+        BackendlessDataQuery dataQueryanuncio= new BackendlessDataQuery();
+        List<String> anuncioSelect=new ArrayList<>();
+        anuncioSelect.add("objectId");
+        anuncioSelect.add("imgFile");
+        anuncioSelect.add("imgFileEsp");
+        anuncioSelect.add("idSubcategoria");
+
+        dataQueryanuncio.setProperties(anuncioSelect);
+        dataQueryanuncio.setWhereClause("subcategoria='"+anuncioId+"'");
+        QueryOptions queryOptionsAnuncio= new QueryOptions();
+        queryOptionsAnuncio.setPageSize(100);
+        dataQueryanuncio.setQueryOptions(queryOptionsAnuncio);
+        Backendless.Persistence.of(Anuncio.class).findFirst(new AsyncCallback<Anuncio>() {
+            @Override
+            public void handleResponse(Anuncio response)
+            {
+                AppUtil.listaAnuncios.add(response);
+
+                if(context.getResources().getString(R.string.idioma).equals("es"))
+                {
+                    Picasso.with(getContext())
+                            .load(response.getImgFileEsp())
+                            .into(anuncio);
                 }
+                else
+                {
+                    Picasso.with(getContext())
+                            .load(response.getImgFile())
+                            .into(anuncio);
+                }
+            }
+
+            @Override
+            public void handleFault(BackendlessFault fault)
+            {
+
             }
         });
     }

@@ -16,7 +16,7 @@
             android:value="@string/facebook_app_id" />
 
         <activity
-            android:name=".IntroduccionActivity"
+            android:name=".MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" >
             <intent-filter>
@@ -50,7 +50,7 @@
             android:theme="@style/AppTheme" >
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name=".IntroduccionActivity"
             android:label="@string/title_activity_introduccion"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" >

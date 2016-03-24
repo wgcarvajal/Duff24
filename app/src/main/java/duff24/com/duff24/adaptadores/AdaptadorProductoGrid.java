@@ -15,6 +15,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.lang.ref.WeakReference;
@@ -121,7 +122,7 @@ public class AdaptadorProductoGrid extends BaseAdapter implements View.OnClickLi
         fijarDatos(p, viewHolder, context.getResources().getString(R.string.idioma), position);
 
         Picasso.with(context)
-                .load(Uri.parse(p.getUrlImagen()))
+                .load(Uri.parse(p.getImgFile()))
                 .into(viewHolder.imagenProducto);
 
         return v;
@@ -135,20 +136,20 @@ public class AdaptadorProductoGrid extends BaseAdapter implements View.OnClickLi
         viewHolder.txtPrecioProducto.setText("$" + valorProducto);
         if(idioma.equals("es"))
         {
-            viewHolder.txtnombreProducto.setText(producto.getNombreesp());
-            viewHolder.txtDescripcionProducto.setText(producto.getDescripcionesp());
+            viewHolder.txtnombreProducto.setText(producto.getProdnombreesp());
+            viewHolder.txtDescripcionProducto.setText(producto.getProddescripcionesp());
         }
         else
         {
-            viewHolder.txtnombreProducto.setText(producto.getNombreing());
-            viewHolder.txtDescripcionProducto.setText(producto.getDescripcionIng());
+            viewHolder.txtnombreProducto.setText(producto.getProdnombre());
+            viewHolder.txtDescripcionProducto.setText(producto.getProddescripcion());
         }
         viewHolder.txtconteo.setVisibility(View.GONE);
         viewHolder.btnDisminuir.setVisibility(View.GONE);
         viewHolder.btnDisminuir.setTag(position);
         viewHolder.btnDisminuir.setOnClickListener(this);
         FijarCantidadTask fijarCantidadTask=new FijarCantidadTask(context,viewHolder);
-        fijarCantidadTask.execute(producto.getId());
+        fijarCantidadTask.execute(producto.getObjectId());
 
     }
 
@@ -195,9 +196,9 @@ public class AdaptadorProductoGrid extends BaseAdapter implements View.OnClickLi
     public void onClick(View v)
     {
         TextView txtconteo=(TextView)v.getTag(R.id.txtconteo);
-        String prodid = data.get(Integer.parseInt(v.getTag().toString())).getId();
+        String prodid = data.get(Integer.parseInt(v.getTag().toString())).getObjectId();
         DisminuirCantidadTask disminuirCantidadTask= new DisminuirCantidadTask(txtconteo,(ImageView)v,context);
-        disminuirCantidadTask.execute(data.get(Integer.parseInt(v.getTag().toString())).getId());
+        disminuirCantidadTask.execute(data.get(Integer.parseInt(v.getTag().toString())).getObjectId());
 
     }
 
