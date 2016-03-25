@@ -31,15 +31,20 @@ import com.backendless.async.callback.AsyncCallback;
 import com.backendless.exceptions.BackendlessFault;
 import com.backendless.persistence.BackendlessDataQuery;
 import com.backendless.persistence.QueryOptions;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimeZone;
 
 import duff24.com.duff24.adaptadores.AdaptadorSpinnerFormaPago;
 import duff24.com.duff24.basededatos.AdminSQliteOpenHelper;
 import duff24.com.duff24.modelo.Direccion;
 import duff24.com.duff24.modelo.Itempedido;
 import duff24.com.duff24.modelo.Pedido;
+import duff24.com.duff24.modelo.Producto;
 import duff24.com.duff24.modelo.Telefono;
+import duff24.com.duff24.util.AppUtil;
 import duff24.com.duff24.util.FontCache;
 
 public class RegistradoActivity extends AppCompatActivity implements View.OnClickListener {
@@ -239,7 +244,37 @@ public class RegistradoActivity extends AppCompatActivity implements View.OnClic
             @Override
             public void handleResponse(Pedido response)
             {
+                ArrayList<String> recipients = new ArrayList<String>();
+                recipients.add( "duff24horas@gmail.com" );
+                String asunto="Nuevo pedido";
+                String fp;
+                if(response.getPedformapago().equals("tc"))
+                {
+                    fp="Tarjeta";
+                }
+                else
+                {
+                    fp="Efectivo";
+                }
+                SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss");
+                ft.setTimeZone(TimeZone.getTimeZone("GMT-5:00"));
 
+                String mailBody = "<h1>Nuevo pedido</h1>" +
+                        "<b>Fecha y hora : </b>"+ft.format(response.getCreated())+"<br>"+
+                        "<b>Nombre cliente : </b>"+response.getPedpersonanombre()+"<br>"+
+                        "<b>Teléfono : </b>"+response.getPedtelefono()+"<br>"+
+                        "<b>Dirección : </b>"+response.getPeddireccion()+"<br>"+
+                        "<b>Forma de Pago : </b>"+fp+"<br>"+
+                        "<b>Observaciones : </b>"+response.getPedobservaciones()+"<br><br><br>"+
+                        "<table border='1'>" +
+                        "<tr>" +
+                        "<th>Producto</th>" +
+                        "<th>cantidad</th>"+
+                        "<th>Precio</th>"+
+                        "<th>Total</th>"+
+                        "</tr>";
+
+                int totalPedido=0;
                 AdminSQliteOpenHelper admin = new AdminSQliteOpenHelper(getApplicationContext(), "admin", null, 1);
                 SQLiteDatabase db = admin.getReadableDatabase();
                 Cursor fila = db.rawQuery("select prodid,prodcantidad from pedido", null);
@@ -262,7 +297,46 @@ public class RegistradoActivity extends AppCompatActivity implements View.OnClic
 
                                 }
                             });
+                            Producto producto= new Producto();
+
+                            for(Producto p: AppUtil.data)
+                            {
+                                if(p.getObjectId().equals(fila.getString(fila.getColumnIndex("prodid"))))
+                                {
+                                    producto=p;
+                                    break;
+                                }
+                            }
+                            int total=producto.getPrecio()*fila.getInt(fila.getColumnIndex("prodcantidad"));
+                            totalPedido=totalPedido+total;
+                            mailBody=mailBody+
+                                    "<tr>"+
+                                    "<td>"+producto.getProdnombreesp()+"</td>"+
+                                    "<td>"+fila.getInt(fila.getColumnIndex("prodcantidad"))+"</td>"+
+                                    "<td>"+producto.getPrecio()+"</td>"+
+                                    "<td>"+total+"</td>"+
+                                    "</tr>";
+
                         } while (fila.moveToNext());
+
+
+                        mailBody=mailBody+"</table>"+
+                                "<h2>Costo domicilio :  </h2> 2.000"+
+                                "<h2>Subtotal :  </h2>"+totalPedido+
+                                "<h2>Total Pedido:</h2>"+(totalPedido+2000);
+                        Backendless.Messaging.sendHTMLEmail(asunto, mailBody, recipients, new AsyncCallback<Void>() {
+                            @Override
+                            public void handleResponse(Void response) {
+
+                            }
+
+                            @Override
+                            public void handleFault(BackendlessFault fault) {
+
+                            }
+                        });
+
+
                         setResult(Activity.RESULT_OK);
                         if (pd != null) {
                             pd.dismiss();

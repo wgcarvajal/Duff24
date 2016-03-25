@@ -1,5 +1,7 @@
 package duff24.com.duff24.modelo;
 
+import java.util.Date;
+
 /**
  * Created by geovanny on 21/01/16.
  */
@@ -12,6 +14,7 @@ public class Pedido
     private String pedtelefono;
     private String pedformapago;
     private String pedobservaciones;
+    private Date created;
 
     public String getObjectId() {
         return objectId;
@@ -67,5 +70,13 @@ public class Pedido
 
     public void setPedobservaciones(String pedobservaciones) {
         this.pedobservaciones = pedobservaciones;
+    }
+
+    public Date getCreated() {
+        return created;
+    }
+
+    public void setCreated(Date created) {
+        this.created = created;
     }
 }
