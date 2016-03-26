@@ -10,6 +10,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import duff24.com.duff24.R;
+import duff24.com.duff24.modelo.Formapago;
 import duff24.com.duff24.util.FontCache;
 
 /**
@@ -19,7 +20,7 @@ public class AdaptadorSpinnerFormaPago extends ArrayAdapter {
 
     private String font_path="font/A_Simple_Life.ttf";
 
-    private List<String> data;
+    private List<Formapago> data;
     private Context context;
 
     public AdaptadorSpinnerFormaPago(Context context, int resource, List objects) {
@@ -54,12 +55,19 @@ public class AdaptadorSpinnerFormaPago extends ArrayAdapter {
         {
             v = convertView;
         }
-
         TextView item=(TextView)v.findViewById(R.id.txt_item_spinner_forma_pago);
         Typeface TF = FontCache.get(font_path,context);
-        item.setText(data.get(position));
         item.setTypeface(TF);
 
+
+        if(context.getResources().getString(R.string.idioma).equals("es"))
+        {
+            item.setText(data.get(position).getNombre());
+        }
+        else
+        {
+            item.setText(data.get(position).getNombreing());
+        }
 
         return v;
     }

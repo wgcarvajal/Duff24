@@ -33,7 +33,6 @@ public class RegistrarseActivity extends AppCompatActivity implements View.OnCli
     private TextView txtemail;
     private TextView txtpassword;
     private TextView txtrepetirpassword;
-    private TextView txttelefono;
     private Button btnRegistrarse;
     private ImageView btnAtras;
     private ProgressDialog pd = null;
@@ -48,7 +47,6 @@ public class RegistrarseActivity extends AppCompatActivity implements View.OnCli
         txtemail=(TextView)findViewById(R.id.txt_email);
         txtpassword=(TextView)findViewById(R.id.txt_password);
         txtrepetirpassword=(TextView)findViewById(R.id.txt_repetirpassword);
-        txttelefono=(TextView)findViewById(R.id.txt_telefono);
         btnRegistrarse=(Button)findViewById(R.id.btnRegistrarse);
         btnAtras=(ImageView)findViewById(R.id.flecha_atras);
 
@@ -58,7 +56,6 @@ public class RegistrarseActivity extends AppCompatActivity implements View.OnCli
         txtemail.setTypeface(TF);
         txtpassword.setTypeface(TF);
         txtrepetirpassword.setTypeface(TF);
-        txttelefono.setTypeface(TF);
         btnRegistrarse.setTypeface(TF);
 
         btnAtras.setOnClickListener(this);
@@ -88,21 +85,21 @@ public class RegistrarseActivity extends AppCompatActivity implements View.OnCli
         String email=txtemail.getText().toString();
         String password=txtpassword.getText().toString();
         String repetirPassword=txtrepetirpassword.getText().toString();
-        String telefono=txttelefono.getText().toString();
 
-        if(comprobarCampos(nombre,email,password,repetirPassword,telefono))
+
+        if(comprobarCampos(nombre,email,password,repetirPassword))
         {
             pd = ProgressDialog.show(this, getResources().getString(R.string.enviando_datos), getResources().getString(R.string.por_favor_espere), true, false);
             RegistroTask reg= new RegistroTask();
-            reg.execute(nombre,email,password,telefono);
+            reg.execute(nombre,email,password);
         }
     }
 
-    private boolean comprobarCampos(String nombre,String email,String password,String repetirPassword,String telefono)
+    private boolean comprobarCampos(String nombre,String email,String password,String repetirPassword)
     {
 
 
-        if(nombre.equals("") || email.equals("") || password.equals("") || repetirPassword.equals("") || telefono.equals(""))
+        if(nombre.equals("") || email.equals("") || password.equals("") || repetirPassword.equals(""))
         {
             mostrarMensaje(R.string.todos_campos_obligatorios);
             return false;
@@ -135,14 +132,7 @@ public class RegistrarseActivity extends AppCompatActivity implements View.OnCli
                             mostrarMensaje(R.string.campo_repetir_password);
                             return false;
                         }
-                        else
-                        {
-                            if(telefono.length()<6)
-                            {
-                                mostrarMensaje(R.string.campo_telefono);
-                                return false;
-                            }
-                        }
+
                     }
                 }
             }
@@ -181,7 +171,6 @@ public class RegistrarseActivity extends AppCompatActivity implements View.OnCli
         String nombre;
         String email;
         String password;
-        String telefono;
 
         @Override
         protected Boolean doInBackground(String... params)
@@ -189,7 +178,6 @@ public class RegistrarseActivity extends AppCompatActivity implements View.OnCli
             nombre=params[0];
             email=params[1];
             password=params[2];
-            telefono=params[3];
             return hayConexionInternet();
         }
 
@@ -198,7 +186,7 @@ public class RegistrarseActivity extends AppCompatActivity implements View.OnCli
             super.onPostExecute(resultado);
             if(resultado)
             {
-                enviarDatosParse(nombre,email,password,telefono);
+                enviarDatosParse(nombre,email,password);
             }
             else
             {
@@ -227,11 +215,9 @@ public class RegistrarseActivity extends AppCompatActivity implements View.OnCli
 
     }
 
-    private void enviarDatosParse(String nombre, String email, String password, final String telefono)
+    private void enviarDatosParse(String nombre, String email, String password)
     {
 
-        final Telefono t= new Telefono();
-        t.setNumero(telefono);
         BackendlessUser user = new BackendlessUser();
         user.setEmail(email);
         user.setPassword(password);
@@ -242,18 +228,6 @@ public class RegistrarseActivity extends AppCompatActivity implements View.OnCli
             public void handleResponse(BackendlessUser response)
             {
                 pd.dismiss();
-                t.setUser(response.getObjectId());
-                Backendless.Persistence.of(Telefono.class).save(t, new AsyncCallback<Telefono>() {
-                    @Override
-                    public void handleResponse(Telefono response) {
-
-                    }
-
-                    @Override
-                    public void handleFault(BackendlessFault fault) {
-
-                    }
-                });
                 setResult(Activity.RESULT_OK);
                 finish();
             }

@@ -49,6 +49,7 @@
     <string name="campos_obligatorios">All fields are required unless the observations</string>
     <string name="todos_campos_obligatorios">All fields are required.</string>
     <string name="seleccione_forma_pago">Select a payment method</string>
+    <string name="seleccione_ciudad">Select city</string>
     <string name="compruebe_conexion">Check your internet connection...</string>
     <string name="enviando_pedido">Sending order</string>
     <string name="por_favor_espere">please wait...</string>

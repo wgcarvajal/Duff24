@@ -14,11 +14,69 @@
         android:src="@mipmap/ic_atras"
         />
 
+    <ImageView
+        android:id="@+id/imagen_login"
+        android:layout_width="@dimen/tam_ancho_imagen_login"
+        android:layout_height="@dimen/tam_alto_imagen_login"
+        android:layout_marginBottom="@dimen/margin_imagen_login"
+        android:src="@drawable/gorrita_grande"
+        android:scaleType="fitXY"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/flecha_atras"
+
+        />
+
+    <Spinner
+        android:id="@+id/sp_ciudad"
+        android:layout_width="match_parent"
+        android:background="@drawable/bordes_redondeados_pequenos"
+        android:layout_height="@dimen/tam_alto_caja_texto"
+        android:layout_below="@id/imagen_login"
+        android:layout_marginLeft="@dimen/margin_small"
+        android:layout_marginRight="@dimen/margin_small"
+        android:layout_marginBottom="@dimen/margin_small"
+        android:popupBackground="@color/negro"
+        />
+
+    <ImageView
+        android:id="@+id/iconospinerciudad"
+        android:layout_width="@dimen/tam_icono_caja_text"
+        android:layout_height="@dimen/tam_icono_caja_text"
+        android:src="@mipmap/ic_icono_spinner"
+        android:layout_alignBottom="@id/sp_ciudad"
+        android:layout_alignRight="@id/sp_ciudad"/>
+
+
+    <TextView
+        android:id="@+id/txt_sin_conexion"
+        android:layout_width="match_parent"
+        android:text="Compruebe su conexión a internet...."
+        android:textSize="@dimen/size_text_compruebe_conexion"
+        android:textColor="@color/blanco"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginLeft="@dimen/margin_small"
+        android:layout_marginRight="@dimen/margin_small"
+        android:background="@drawable/background_mensaje_toast"
+        android:padding="@dimen/margin_small"
+        />
+    <Button
+        android:id="@+id/volver_cargar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/tam_alto_btn"
+        android:text="@string/volver_cargar_vista"
+        android:textColor="@color/blanco"
+        android:background="@drawable/bordes_redondos_pequno_fondo_rojo"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="@dimen/margin_small"
+        />
+
     <ScrollView
+        android:id="@+id/scrollformularionoregistrado"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scrollbars="none"
-        android:layout_below="@id/flecha_atras"
+        android:layout_below="@id/sp_ciudad"
         android:layout_marginBottom="@dimen/margin_small"
         >
 
@@ -28,24 +86,13 @@
             android:layout_height="match_parent"
             >
 
-            <ImageView
-                android:id="@+id/imagen_login"
-                android:layout_width="@dimen/tam_ancho_imagen_login"
-                android:layout_height="@dimen/tam_alto_imagen_login"
-                android:layout_marginTop="@dimen/margin_top_imagen_login"
-                android:layout_marginBottom="@dimen/margin_imagen_login"
-                android:src="@drawable/gorrita_grande"
-                android:scaleType="fitXY"
-                android:layout_centerHorizontal="true"
 
-                />
 
             <EditText
                 android:id="@+id/txt_nombre"
                 android:maxLength="40"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/tam_alto_caja_texto"
-                android:layout_below="@id/imagen_login"
                 android:hint="@string/txt_nombre"
                 android:textColorHint="@color/gris"
                 android:textColor="@color/blanco"
@@ -113,6 +160,8 @@
                 android:ellipsize="end"
                 android:inputType="phone"
                 />
+
+
 
             <Spinner
                 android:id="@+id/sp_forma_pago"

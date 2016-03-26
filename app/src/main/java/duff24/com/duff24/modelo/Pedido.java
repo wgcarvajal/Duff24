@@ -14,6 +14,7 @@ public class Pedido
     private String pedtelefono;
     private String pedformapago;
     private String pedobservaciones;
+    private String ciudad;
     private Date created;
 
     public String getObjectId() {
@@ -78,5 +79,15 @@ public class Pedido
 
     public void setCreated(Date created) {
         this.created = created;
+    }
+
+    public String getCiudad()
+    {
+        return ciudad;
+    }
+
+    public void setCiudad(String ciudad)
+    {
+        this.ciudad = ciudad;
     }
 }

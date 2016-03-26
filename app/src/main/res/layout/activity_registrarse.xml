@@ -114,24 +114,7 @@
                 android:ellipsize="end"
                 android:inputType="textPassword"
                 />
-            <EditText
-                android:id="@+id/txt_telefono"
-                android:layout_width="match_parent"
-                android:maxLength="12"
-                android:layout_height="@dimen/tam_alto_caja_texto"
-                android:layout_below="@id/txt_repetirpassword"
-                android:textColor="@color/blanco"
-                android:hint="@string/txt_telefono"
-                android:layout_marginTop="@dimen/margin_input_registrase"
-                android:textColorHint="@color/gris"
-                android:layout_marginLeft="@dimen/margin_small"
-                android:layout_marginRight="@dimen/margin_small"
-                android:textSize="@dimen/size_text_caja_texto"
-                android:background="@drawable/bordes_redondeados_pequenos"
-                android:gravity="center"
-                android:ellipsize="end"
-                android:inputType="phone"
-                />
+
 
 
             <Button
@@ -141,7 +124,7 @@
                 android:text="@string/text_registrarse"
                 android:textSize="@dimen/size_text_btn_continuar_no_registrado"
                 android:textColor="@color/blanco"
-                android:layout_below="@id/txt_telefono"
+                android:layout_below="@id/txt_repetirpassword"
                 android:gravity="center"
                 android:layout_marginTop="@dimen/margin_top_btn"
                 android:layout_marginRight="@dimen/margin_small"

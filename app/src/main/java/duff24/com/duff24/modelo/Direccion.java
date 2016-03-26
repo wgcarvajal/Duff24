@@ -8,6 +8,7 @@ public class Direccion
     private String objectId;
     private String user;
     private String direccion;
+    private String ciudad;
 
     public String getObjectId() {
         return objectId;
@@ -31,5 +32,13 @@ public class Direccion
 
     public void setDireccion(String direccion) {
         this.direccion = direccion;
+    }
+
+    public String getCiudad() {
+        return ciudad;
+    }
+
+    public void setCiudad(String ciudad) {
+        this.ciudad = ciudad;
     }
 }

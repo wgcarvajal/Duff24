@@ -14,11 +14,44 @@
         android:src="@mipmap/ic_atras"
         />
 
+    <ImageView
+        android:id="@+id/imagen_login"
+        android:layout_width="@dimen/tam_ancho_imagen_login"
+        android:layout_height="@dimen/tam_alto_imagen_login"
+        android:layout_marginBottom="@dimen/margin_imagen_login"
+        android:layout_below="@id/flecha_atras"
+        android:src="@drawable/gorrita_grande"
+        android:scaleType="fitXY"
+        android:layout_centerHorizontal="true"
+
+        />
+
+    <Spinner
+        android:id="@+id/sp_ciudad"
+        android:layout_width="match_parent"
+        android:background="@drawable/bordes_redondeados_pequenos"
+        android:layout_height="@dimen/tam_alto_caja_texto"
+        android:layout_below="@id/imagen_login"
+        android:layout_marginLeft="@dimen/margin_small"
+        android:layout_marginRight="@dimen/margin_small"
+        android:layout_marginBottom="@dimen/margin_small"
+        android:popupBackground="@color/negro"
+        />
+
+    <ImageView
+        android:id="@+id/iconospinerciudad"
+        android:layout_width="@dimen/tam_icono_caja_text"
+        android:layout_height="@dimen/tam_icono_caja_text"
+        android:src="@mipmap/ic_icono_spinner"
+        android:layout_alignBottom="@id/sp_ciudad"
+        android:layout_alignRight="@id/sp_ciudad"/>
+
     <ScrollView
+        android:id="@+id/scrollformularioregistrado"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scrollbars="none"
-        android:layout_below="@id/flecha_atras"
+        android:layout_below="@id/sp_ciudad"
         android:layout_marginBottom="@dimen/margin_small"
         >
 
@@ -28,24 +61,11 @@
             android:layout_height="match_parent"
             >
 
-            <ImageView
-                android:id="@+id/imagen_login"
-                android:layout_width="@dimen/tam_ancho_imagen_login"
-                android:layout_height="@dimen/tam_alto_imagen_login"
-                android:layout_marginTop="@dimen/margin_top_imagen_login"
-                android:layout_marginBottom="@dimen/margin_imagen_login"
-                android:src="@drawable/gorrita_grande"
-                android:scaleType="fitXY"
-                android:layout_centerHorizontal="true"
-
-                />
-
             <LinearLayout
                 android:id="@+id/espacio_spinner_direccion"
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/imagen_login">
+                android:layout_height="wrap_content">
                 <RelativeLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"

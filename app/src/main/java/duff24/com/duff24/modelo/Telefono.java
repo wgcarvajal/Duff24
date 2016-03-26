@@ -8,6 +8,7 @@ public class Telefono
     private String objectId;
     private String numero;
     private String user;
+    private String ciudad;
 
     public String getObjectId() {
         return objectId;
@@ -31,6 +32,14 @@ public class Telefono
 
     public void setUser(String user) {
         this.user = user;
+    }
+
+    public String getCiudad() {
+        return ciudad;
+    }
+
+    public void setCiudad(String ciudad) {
+        this.ciudad = ciudad;
     }
 }
 

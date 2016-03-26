@@ -36,6 +36,7 @@ import com.backendless.persistence.BackendlessDataQuery;
 import com.backendless.persistence.QueryOptions;
 import com.backendless.persistence.local.UserIdStorageFactory;
 import com.facebook.login.LoginManager;
+import com.squareup.picasso.Picasso;
 import com.viewpagerindicator.PageIndicator;
 
 import java.util.ArrayList;
@@ -110,9 +111,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         TF = FontCache.get(font_path_ASimple,this);
         text_compruebe_conexion.setTypeface(TF);
         btnRecargarVista.setTypeface(TF);
-
-
-
         adapter = new PagerAdapter(getSupportFragmentManager(), data);
         pager.setAdapter(adapter);
         pagerIndicator.setViewPager(pager);
