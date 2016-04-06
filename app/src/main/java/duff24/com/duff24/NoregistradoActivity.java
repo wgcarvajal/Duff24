@@ -26,6 +26,7 @@ import android.widget.Toast;
 
 import com.backendless.Backendless;
 import com.backendless.BackendlessCollection;
+import com.backendless.Messaging;
 import com.backendless.async.callback.AsyncCallback;
 import com.backendless.exceptions.BackendlessFault;
 import com.backendless.persistence.BackendlessDataQuery;
@@ -348,6 +349,19 @@ public class NoregistradoActivity extends AppCompatActivity implements View.OnCl
                             @Override
                             public void handleFault(BackendlessFault fault) {
 
+                            }
+                        });
+
+                        Messaging.DEVICE_ID=response.getObjectId();
+                        Backendless.Messaging.registerDevice("464411838818", new AsyncCallback<Void>() {
+                            @Override
+                            public void handleResponse(Void response) {
+                                Log.i("device:", "registrado");
+                            }
+
+                            @Override
+                            public void handleFault(BackendlessFault fault) {
+                                Log.i("device error:", fault.getMessage());
                             }
                         });
 

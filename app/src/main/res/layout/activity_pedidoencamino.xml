@@ -1,0 +1,74 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="duff24.com.duff24.PedidoencaminoActivity"
+    android:background="@color/negro">
+
+    <TextView
+        android:id="@+id/tituloNotificacion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/super_margin_small"
+        android:layout_marginRight="@dimen/super_margin_small"
+        android:layout_marginLeft="@dimen/super_margin_small"
+        android:textSize="30sp"
+        android:text="Pedido en camino!"
+        android:gravity="center"
+        android:textColor="@color/blanco"
+        />
+
+    <ImageView
+        android:id="@+id/imagen_login"
+        android:layout_width="@dimen/tam_ancho_imagen_login"
+        android:layout_height="@dimen/tam_alto_imagen_login"
+        android:layout_marginTop="@dimen/margin_imagen_login"
+        android:layout_marginBottom="@dimen/margin_imagen_login"
+        android:layout_below="@id/tituloNotificacion"
+        android:src="@drawable/gorrita_grande"
+        android:scaleType="fitXY"
+        android:layout_centerHorizontal="true"
+
+        />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="none"
+        android:layout_below="@id/imagen_login"
+        android:layout_marginBottom="@dimen/margin_small"
+        >
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/mensaje"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:text="Su pedido esta listo y en camino."
+                android:textColor="@color/blanco"
+                android:layout_marginTop="40dp"
+                android:gravity="center"
+                />
+
+            <Button
+                android:id="@+id/cerrar_notifiacion"
+                android:layout_width="wrap_content"
+                android:textColor="@color/blanco"
+                android:textSize="15sp"
+                android:text="Cerrar"
+                android:layout_height="wrap_content"
+                android:paddingRight="@dimen/margin_small"
+                android:paddingLeft="@dimen/margin_small"
+                android:layout_marginTop="40dp"
+                android:background="@drawable/bordes_redondos_pequno_fondo_rojo"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@id/mensaje"
+                />
+        </RelativeLayout>
+
+    </ScrollView>
+
+
+</RelativeLayout>

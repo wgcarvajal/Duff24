@@ -8,8 +8,8 @@ android {
         applicationId "duff24.com.duff24"
         minSdkVersion 10
         targetSdkVersion 23
-        versionCode 5
-        versionName "1.0"
+        versionCode 7
+        versionName "1.1"
     }
     buildTypes {
         release {
@@ -29,5 +29,4 @@ dependencies {
     compile 'pl.droidsonroids.gif:android-gif-drawable:1.1.11'
     compile 'com.facebook.android:facebook-android-sdk:4.1.2'
     compile 'fr.avianey.com.viewpagerindicator:library:2.4.1@aar'
-    compile 'com.backendless:backendless:3.0.11'
 }

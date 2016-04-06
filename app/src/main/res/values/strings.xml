@@ -106,6 +106,8 @@
     <string name="txt_mensaje_contacto">Message</string>
     <string name="txt_mensaje_enviado">Message sent</string>
     <string name="txt_mensaje_usuario_no_puede_ser_logueado">The registration email on facebook authentication.</string>
+    <string name="title_activity_notificacion">NotificacionActivity</string>
+    <string name="title_activity_pedidoencamino">PedidoencaminoActivity</string>
 
 
 
