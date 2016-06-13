@@ -2,6 +2,7 @@ package duff24.com.duff24.fragments;
 
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
@@ -27,18 +28,20 @@ import duff24.com.duff24.basededatos.AdminSQliteOpenHelper;
 import duff24.com.duff24.modelo.Producto;
 import duff24.com.duff24.util.AppUtil;
 import duff24.com.duff24.util.FontCache;
+import pl.droidsonroids.gif.GifImageView;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ProductoGridFragment extends FragmentGeneric implements AdapterView.OnItemClickListener
-{
+public class ProductoGridFragment extends FragmentGeneric implements AdapterView.OnItemClickListener, View.OnClickListener {
     private static final String LIST_STATE = "listState";
 
     private Parcelable mListState = null;
     private String subcategoria;
     private String subcategoriaesp;
     private TextView titulo;
+    private ImageView btnMenuPrincipal;
+    private GifImageView btnMipedido;
     private GridView gridProductos;
     private List<Producto> data = new ArrayList<>();
     private AdaptadorProductoGrid adapter;
@@ -47,6 +50,22 @@ public class ProductoGridFragment extends FragmentGeneric implements AdapterView
     public ProductoGridFragment()
     {
 
+    }
+
+    public interface OnComunicationFragmentGrid
+    {
+        void onIrAlPedidoFragmenGrid();
+        void onAbrirMenuPrincipalFragmentGrid();
+    }
+
+    OnComunicationFragmentGrid onComunicationFragmentGrid;
+
+
+    @Override
+    public void onAttach(Context context)
+    {
+        super.onAttach(context);
+        onComunicationFragmentGrid=(OnComunicationFragmentGrid)context;
     }
 
     @Override
@@ -77,7 +96,11 @@ public class ProductoGridFragment extends FragmentGeneric implements AdapterView
         {
             titulo.setText(this.subcategoriaesp);
         }
+        btnMenuPrincipal=(ImageView)v.findViewById(R.id.btn_menu_principal);
+        btnMipedido=(GifImageView)v.findViewById(R.id.btn_mi_pedido);
 
+        btnMenuPrincipal.setOnClickListener(this);
+        btnMipedido.setOnClickListener(this);
         adapter= new AdaptadorProductoGrid(v.getContext(),data);
         gridProductos.setAdapter(adapter);
         gridProductos.setOnItemClickListener(this);
@@ -117,15 +140,27 @@ public class ProductoGridFragment extends FragmentGeneric implements AdapterView
 
     public void loadData()
     {
-        LoadDataTask loadDataTask= new LoadDataTask();
-        loadDataTask.execute();
+        for(Producto prod: AppUtil.data)
+        {
+            if(prod.getSubcategoriaing().equals(subcategoria))
+            {
+                data.add(prod);
+            }
+        }
+
+        if (mListState != null)
+        {
+            gridProductos.onRestoreInstanceState(mListState);
+        }
+        adapter.notifyDataSetChanged();
+        mListState = null;
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
     {
         TextView textconteo= (TextView) view.findViewById(R.id.txtconteo);
-        ImageView btnDisminuir= (ImageView) view.findViewById(R.id.btn_disminuir);
+        TextView btnDisminuir= (TextView) view.findViewById(R.id.btn_disminuir);
         AgregarProductoPedidoTask agregarProductoPedidoTask= new AgregarProductoPedidoTask(textconteo,btnDisminuir);
         agregarProductoPedidoTask.execute(data.get(position));
     }
@@ -133,12 +168,12 @@ public class ProductoGridFragment extends FragmentGeneric implements AdapterView
     public class AgregarProductoPedidoTask extends AsyncTask<Producto,Void,Integer>
     {
         private WeakReference<TextView> txtcontedo;
-        private WeakReference<ImageView> btndisminuir;
+        private WeakReference<TextView> btndisminuir;
 
-        public AgregarProductoPedidoTask(TextView conteo,ImageView disminuir)
+        public AgregarProductoPedidoTask(TextView conteo,TextView disminuir)
         {
             txtcontedo= new WeakReference<TextView>(conteo);
-            btndisminuir= new WeakReference<ImageView>(disminuir);
+            btndisminuir= new WeakReference<TextView>(disminuir);
         }
         @Override
         protected Integer doInBackground(Producto... params)
@@ -150,7 +185,7 @@ public class ProductoGridFragment extends FragmentGeneric implements AdapterView
                 }
             });
             m.start();
-            AdminSQliteOpenHelper admin = new AdminSQliteOpenHelper(getContext(),"admin",null,1);
+            AdminSQliteOpenHelper admin = AdminSQliteOpenHelper.crearSQLite(getContext());
             SQLiteDatabase db = admin.getWritableDatabase();
             Cursor fila = db.rawQuery("select prodcantidad from pedido where prodid = '" + params[0].getObjectId() + "'", null);
             ContentValues registroPedido= new ContentValues();
@@ -194,30 +229,20 @@ public class ProductoGridFragment extends FragmentGeneric implements AdapterView
         }
     }
 
-    public class LoadDataTask extends AsyncTask<Void,Void,Void>
+
+    @Override
+    public void onClick(View v)
     {
-        @Override
-        protected Void doInBackground(Void... params)
+        switch (v.getId())
         {
-            for(Producto prod: AppUtil.data)
-            {
-                if(prod.getSubcategoriaing().equals(subcategoria))
-                {
-                    data.add(prod);
-                }
-            }
-            return null;
-        }
-        @Override
-        protected void onPostExecute(Void aVoid)
-        {
-            super.onPostExecute(aVoid);
-            if (mListState != null)
-            {
-                gridProductos.onRestoreInstanceState(mListState);
-            }
-            adapter.notifyDataSetChanged();
-            mListState = null;
+
+            case R.id.btn_menu_principal:
+                onComunicationFragmentGrid.onAbrirMenuPrincipalFragmentGrid();
+                break;
+            case R.id.btn_mi_pedido:
+                onComunicationFragmentGrid.onIrAlPedidoFragmenGrid();
+                break;
+
         }
     }
 }

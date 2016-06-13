@@ -3,13 +3,10 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:background="@drawable/fondo"
+    >
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:src="@drawable/fondo"
-        android:scaleType="fitXY"/>
 
     <android.support.v4.widget.DrawerLayout
         android:id="@+id/drawer"
@@ -45,33 +42,7 @@
                     />
 
 
-                    <TextView
-                        android:id="@+id/txttitulo"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin_small"
-                        android:text="@string/la_carta"
-                        android:textSize="@dimen/tam_titulo_vista"
 
-                        android:textColor="#ffffff"
-                        android:gravity="center"
-                        />
-                    <ImageView
-                        android:id="@+id/btn_menu_principal"
-                        android:layout_width="@dimen/tamano_icono_menu_principal"
-                        android:layout_height="@dimen/tamano_icono_menu_principal"
-                        android:src="@mipmap/ic_menu_principal"
-                        android:layout_margin="@dimen/margin_small"
-                        />
-                    <pl.droidsonroids.gif.GifImageView
-                        android:id="@+id/btn_mi_pedido"
-                        android:layout_width="@dimen/tam_ancho_icono_carro_pedido"
-                        android:layout_height="@dimen/tamano_icono_carro_pedido"
-                        android:layout_margin="@dimen/super_margin_small"
-                        android:src="@drawable/carro_pedido"
-                        android:layout_alignRight="@id/txttitulo"
-                        android:scaleType="fitXY"
-                        />
 
 
 
@@ -90,9 +61,6 @@
                     android:id="@+id/pager"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_below="@id/btn_mi_pedido"
-                    android:layout_above="@id/pagerIndicator"
-
                     />
 
         </RelativeLayout>

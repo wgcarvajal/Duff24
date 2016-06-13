@@ -294,7 +294,7 @@ public class NoregistradoActivity extends AppCompatActivity implements View.OnCl
                         "</tr>";
 
                 int totalPedido = 0;
-                AdminSQliteOpenHelper admin = new AdminSQliteOpenHelper(getApplicationContext(), "admin", null, 1);
+                AdminSQliteOpenHelper admin = AdminSQliteOpenHelper.crearSQLite(getApplicationContext());
                 SQLiteDatabase db = admin.getReadableDatabase();
                 Cursor fila = db.rawQuery("select prodid,prodcantidad from pedido", null);
                 if (fila != null) {
@@ -365,7 +365,7 @@ public class NoregistradoActivity extends AppCompatActivity implements View.OnCl
                             }
                         });
 
-
+                        db.close();
                         setResult(Activity.RESULT_OK);
                         if (pd != null) {
                             pd.dismiss();

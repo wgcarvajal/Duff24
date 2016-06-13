@@ -8,7 +8,7 @@
     <ImageView
         android:layout_width="@dimen/tam_logo_menu_header"
         android:layout_height="@dimen/tam_logo_menu_header"
-        android:src="@mipmap/ic_logo_gorra"
+        android:src="@drawable/gorra_nevigation_menu"
         android:layout_margin="@dimen/margin_small"/>
 
     <TextView

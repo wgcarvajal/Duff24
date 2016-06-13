@@ -15,6 +15,7 @@ import com.backendless.async.callback.AsyncCallback;
 import com.backendless.exceptions.BackendlessFault;
 import com.backendless.persistence.BackendlessDataQuery;
 import com.backendless.persistence.QueryOptions;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -31,8 +32,8 @@ public class AnuncioFragment extends FragmentGeneric {
     private String subcategoriaing;
     private String subcategoriaesp;
     private String anuncioId;
-    private TextView titulo;
     private ImageView anuncio;
+    private ImageView placeholder;
     private String font_path = "font/2-4ef58.ttf";
 
 
@@ -78,18 +79,9 @@ public class AnuncioFragment extends FragmentGeneric {
         // Inflate the layout for this fragment
         View v=inflater.inflate(R.layout.fragment_anuncio, container, false);
 
-        titulo=(TextView)v.findViewById(R.id.textsubcategoria);
+
         anuncio=(ImageView)v.findViewById(R.id.anuncio);
-        Typeface TF= FontCache.get(font_path,inflater.getContext());
-        titulo.setTypeface(TF);
-        if(getResources().getString(R.string.idioma).equals("es"))
-        {
-            titulo.setText(this.subcategoriaesp);
-        }
-        else
-        {
-            titulo.setText(this.subcategoriaing);
-        }
+        placeholder = (ImageView)v.findViewById(R.id.placeholder);
         return v;
     }
 
@@ -114,15 +106,44 @@ public class AnuncioFragment extends FragmentGeneric {
                 bandera=1;
                 if(getResources().getString(R.string.idioma).equals("es"))
                 {
+                    placeholder.setVisibility(View.VISIBLE);
+                    placeholder.setImageResource(R.drawable.carga);
+
                     Picasso.with(getContext())
                             .load(an.getImgFileEsp())
-                            .into(anuncio);
+                            .into(anuncio, new Callback() {
+                                @Override
+                                public void onSuccess()
+                                {
+                                    placeholder.setVisibility(View.GONE);
+                                    placeholder.setImageDrawable(null);
+
+                                }
+
+                                @Override
+                                public void onError() {
+
+                                }
+                            });
                 }
                 else
                 {
+                    placeholder.setVisibility(View.VISIBLE);
+                    placeholder.setImageResource(R.drawable.carga);
                     Picasso.with(getContext())
                             .load(an.getImgFile())
-                            .into(anuncio);
+                            .into(anuncio, new Callback() {
+                                @Override
+                                public void onSuccess() {
+                                    placeholder.setVisibility(View.GONE);
+                                    placeholder.setImageDrawable(null);
+                                }
+
+                                @Override
+                                public void onError() {
+
+                                }
+                            });
                 }
             }
 
@@ -155,17 +176,41 @@ public class AnuncioFragment extends FragmentGeneric {
             {
                 AppUtil.listaAnuncios.add(response);
 
+                placeholder.setVisibility(View.VISIBLE);
+                placeholder.setImageResource(R.drawable.carga);
                 if(context.getResources().getString(R.string.idioma).equals("es"))
                 {
                     Picasso.with(getContext())
                             .load(response.getImgFileEsp())
-                            .into(anuncio);
+                            .into(anuncio, new Callback() {
+                                @Override
+                                public void onSuccess() {
+                                    placeholder.setVisibility(View.GONE);
+                                    placeholder.setImageDrawable(null);
+                                }
+
+                                @Override
+                                public void onError() {
+
+                                }
+                            });
                 }
                 else
                 {
                     Picasso.with(getContext())
                             .load(response.getImgFile())
-                            .into(anuncio);
+                            .into(anuncio, new Callback() {
+                                @Override
+                                public void onSuccess() {
+                                    placeholder.setVisibility(View.GONE);
+                                    placeholder.setImageDrawable(null);
+                                }
+
+                                @Override
+                                public void onError() {
+
+                                }
+                            });
                 }
             }
 

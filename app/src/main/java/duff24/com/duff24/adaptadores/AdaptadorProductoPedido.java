@@ -14,6 +14,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.lang.ref.WeakReference;
@@ -34,6 +36,7 @@ public class AdaptadorProductoPedido extends BaseAdapter implements View.OnClick
     private List<Producto> data;
     private String font_path = "font/2-4ef58.ttf";
     private String font_pathOds="font/odstemplik.otf";
+    private String font_path_ASimple="font/A_Simple_Life.ttf";
     private LayoutInflater mInflater;
 
 
@@ -48,8 +51,9 @@ public class AdaptadorProductoPedido extends BaseAdapter implements View.OnClick
     {
         public TextView txtnombreProducto;
         public ImageView imagenProducto;
+        public ImageView placeholder;
         public TextView txtconteo;
-        public ImageView btnDisminuir;
+        public TextView btnDisminuir;
         public TextView txtPrecioProducto;
     }
 
@@ -91,7 +95,7 @@ public class AdaptadorProductoPedido extends BaseAdapter implements View.OnClick
     public View getView(int position, View convertView, ViewGroup parent)
     {
         View v = convertView;
-        ViewHolder viewHolder;
+        final ViewHolder viewHolder;
 
         if(convertView == null)
         {
@@ -99,14 +103,17 @@ public class AdaptadorProductoPedido extends BaseAdapter implements View.OnClick
             viewHolder=new ViewHolder();
             viewHolder.txtnombreProducto=(TextView) v.findViewById(R.id.txtnombreproducto);
             viewHolder.imagenProducto=(ImageView) v.findViewById(R.id.img_producto);
+            viewHolder.placeholder=(ImageView)v.findViewById(R.id.placeholder);
             viewHolder.txtconteo=(TextView) v.findViewById(R.id.txtconteo);
-            viewHolder.btnDisminuir=(ImageView) v.findViewById(R.id.btn_disminuir);
+            viewHolder.btnDisminuir=(TextView) v.findViewById(R.id.btn_disminuir);
             viewHolder.txtPrecioProducto=(TextView) v.findViewById(R.id.txtprecioproducto);
             Typeface TF = FontCache.get(font_path,context);
             viewHolder.txtnombreProducto.setTypeface(TF);
             TF = FontCache.get(font_pathOds,context);
             viewHolder.txtconteo.setTypeface(TF);
             viewHolder.txtconteo.setText("0");
+            TF = FontCache.get(font_path_ASimple,context);
+            viewHolder.txtPrecioProducto.setTypeface(TF);
             viewHolder.btnDisminuir.setTag(R.id.txtconteo,viewHolder.txtconteo);
             v.setTag(viewHolder);
         }
@@ -119,9 +126,28 @@ public class AdaptadorProductoPedido extends BaseAdapter implements View.OnClick
         fijarDatos(p, viewHolder, context.getResources().getString(R.string.idioma), position);
 
 
+        viewHolder.placeholder.setVisibility(View.VISIBLE);
+        viewHolder.placeholder.setImageResource(R.drawable.carga);
+        viewHolder.txtPrecioProducto.setVisibility(View.INVISIBLE);
+        viewHolder.txtnombreProducto.setVisibility(View.INVISIBLE);
+
         Picasso.with(context)
-                .load(Uri.parse(p.getImgFile()))
-                .into(viewHolder.imagenProducto);
+                .load(p.getImgFile())
+                .into(viewHolder.imagenProducto, new Callback() {
+
+                    @Override
+                    public void onSuccess() {
+                        viewHolder.placeholder.setImageDrawable(null);
+                        viewHolder.placeholder.setVisibility(View.GONE);
+                        viewHolder.txtPrecioProducto.setVisibility(View.VISIBLE);
+                        viewHolder.txtnombreProducto.setVisibility(View.VISIBLE);
+                    }
+
+                    @Override
+                    public void onError() {
+
+                    }
+                });
 
         return v;
     }
@@ -161,7 +187,7 @@ public class AdaptadorProductoPedido extends BaseAdapter implements View.OnClick
         @Override
         protected Void doInBackground(String... params)
         {
-            AdminSQliteOpenHelper admin = new AdminSQliteOpenHelper(context,"admin",null,1);
+            AdminSQliteOpenHelper admin = AdminSQliteOpenHelper.crearSQLite(context);
 
             SQLiteDatabase db = admin.getReadableDatabase();
             Cursor fila = db.rawQuery("select prodcantidad from pedido where prodid = '"+params[0]+"'",null);
@@ -187,7 +213,7 @@ public class AdaptadorProductoPedido extends BaseAdapter implements View.OnClick
         TextView txtconteo=(TextView)v.getTag(R.id.txtconteo);
         int precio= data.get(Integer.parseInt(v.getTag().toString())).getPrecio();
         String prodid = data.get(Integer.parseInt(v.getTag().toString())).getObjectId();
-        DisminuirCantidadTask disminuirCantidadTask= new DisminuirCantidadTask(txtconteo,(ImageView)v,context,Integer.parseInt(v.getTag().toString()),precio);
+        DisminuirCantidadTask disminuirCantidadTask= new DisminuirCantidadTask(txtconteo,(TextView)v,context,Integer.parseInt(v.getTag().toString()),precio);
         disminuirCantidadTask.execute(data.get(Integer.parseInt(v.getTag().toString())).getObjectId());
     }
 
@@ -196,16 +222,16 @@ public class AdaptadorProductoPedido extends BaseAdapter implements View.OnClick
     public class DisminuirCantidadTask extends AsyncTask<String,Void,Void>
     {
         private WeakReference<TextView> textViewWeakReference;
-        private WeakReference<ImageView> imageViewWeakReference;
+        private WeakReference<TextView> imageViewWeakReference;
         private Context context;
         private int posicion;
         private int cantidad=0;
         private int precio=0;
 
-        public DisminuirCantidadTask(TextView textView,ImageView btn,Context context,int posicion,int precio)
+        public DisminuirCantidadTask(TextView textView,TextView btn,Context context,int posicion,int precio)
         {
             this.textViewWeakReference= new WeakReference<TextView>(textView);
-            this.imageViewWeakReference= new WeakReference<ImageView>(btn);
+            this.imageViewWeakReference= new WeakReference<TextView>(btn);
             this.posicion=posicion;
             this.context=context;
             this.precio=precio;
@@ -221,7 +247,7 @@ public class AdaptadorProductoPedido extends BaseAdapter implements View.OnClick
             });
             m.start();
 
-            AdminSQliteOpenHelper admin = new AdminSQliteOpenHelper(context,"admin",null,1);
+            AdminSQliteOpenHelper admin = AdminSQliteOpenHelper.crearSQLite(context);
             SQLiteDatabase db = admin.getWritableDatabase();
             Cursor fila = db.rawQuery("select prodcantidad from pedido where prodid = '" + params[0] + "'", null);
             if(fila.moveToFirst())

@@ -152,7 +152,7 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
 
     private void loadData()
     {
-        AdminSQliteOpenHelper admin = new AdminSQliteOpenHelper(this,"admin",null,1);
+        AdminSQliteOpenHelper admin = AdminSQliteOpenHelper.crearSQLite(this);
         SQLiteDatabase db = admin.getReadableDatabase();
 
         Cursor fila = db.rawQuery("select prodid, prodcantidad from pedido", null);
@@ -367,7 +367,7 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
         conteo= conteo+1;
         textconteo.setText(conteo+"");
 
-        AdminSQliteOpenHelper admin = new AdminSQliteOpenHelper(this,"admin",null,1);
+        AdminSQliteOpenHelper admin = AdminSQliteOpenHelper.crearSQLite(this);
         SQLiteDatabase db = admin.getWritableDatabase();
 
         ContentValues registroPedido= new ContentValues();
@@ -419,7 +419,7 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
             @Override
             public void onClick(View v)
             {
-                AdminSQliteOpenHelper admin = new AdminSQliteOpenHelper(context,"admin",null,1);
+                AdminSQliteOpenHelper admin = AdminSQliteOpenHelper.crearSQLite(context);
                 SQLiteDatabase db = admin.getWritableDatabase();
 
                 db.delete("pedido", "", null);
@@ -472,7 +472,7 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
 
     private boolean hayProductos()
     {
-        AdminSQliteOpenHelper admin = new AdminSQliteOpenHelper(this,"admin",null,1);
+        AdminSQliteOpenHelper admin = AdminSQliteOpenHelper.crearSQLite(this);
         SQLiteDatabase db = admin.getReadableDatabase();
 
         Cursor fila = db.rawQuery("select prodid from pedido ", null);
@@ -537,7 +537,7 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
 
     private void vaciarPedidoDespuesDeEnviar()
     {
-        AdminSQliteOpenHelper admin = new AdminSQliteOpenHelper(this,"admin",null,1);
+        AdminSQliteOpenHelper admin = AdminSQliteOpenHelper.crearSQLite(this);
         SQLiteDatabase db = admin.getWritableDatabase();
 
         db.delete("pedido", "", null);

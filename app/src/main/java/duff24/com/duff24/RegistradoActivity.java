@@ -277,7 +277,7 @@ public class RegistradoActivity extends AppCompatActivity implements View.OnClic
                         "</tr>";
 
                 int totalPedido=0;
-                AdminSQliteOpenHelper admin = new AdminSQliteOpenHelper(getApplicationContext(), "admin", null, 1);
+                AdminSQliteOpenHelper admin = AdminSQliteOpenHelper.crearSQLite(getApplicationContext());
                 SQLiteDatabase db = admin.getReadableDatabase();
                 Cursor fila = db.rawQuery("select prodid,prodcantidad from pedido", null);
                 if (fila != null) {
@@ -338,6 +338,8 @@ public class RegistradoActivity extends AppCompatActivity implements View.OnClic
                             }
                         });
 
+
+
                         Messaging.DEVICE_ID=response.getObjectId();
                         Backendless.Messaging.registerDevice("464411838818", new AsyncCallback<Void>() {
                             @Override
@@ -350,7 +352,7 @@ public class RegistradoActivity extends AppCompatActivity implements View.OnClic
                                 Log.i("device error:", fault.getMessage());
                             }
                         });
-
+                        db.close();
                         setResult(Activity.RESULT_OK);
                         if (pd != null) {
                             pd.dismiss();
@@ -358,6 +360,7 @@ public class RegistradoActivity extends AppCompatActivity implements View.OnClic
                         finish();
                     }
                 }
+
 
             }
 

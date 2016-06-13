@@ -1,19 +1,39 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context="duff24.com.duff24.fragments.ProductoGridFragment"
+    android:background="#44000000"
     >
 
     <TextView
         android:id="@+id/textsubcategoria"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/hamburguesas"
+        android:layout_marginTop="@dimen/margin_small"
+        android:text="@string/la_carta"
+        android:textSize="@dimen/tam_titulo_subcategoria"
+
         android:textColor="#ffffff"
         android:gravity="center"
-        android:textSize="@dimen/tam_titulo_subcategoria"/>
+        />
+    <ImageView
+        android:id="@+id/btn_menu_principal"
+        android:layout_width="@dimen/tamano_icono_menu_principal"
+        android:layout_height="@dimen/tamano_icono_menu_principal"
+        android:src="@mipmap/ic_menu_principal"
+        android:layout_margin="@dimen/margin_small"
+        />
+    <pl.droidsonroids.gif.GifImageView
+        android:id="@+id/btn_mi_pedido"
+        android:layout_width="@dimen/tamano_icono_carro_pedido"
+        android:layout_height="@dimen/tam_ancho_icono_carro_pedido"
+        android:layout_margin="@dimen/super_margin_small"
+        android:src="@drawable/carro_pedido"
+        android:layout_alignRight="@id/textsubcategoria"
+        android:scaleType="fitXY"
+        />
 
     <GridView
         android:id="@+id/gridProductos"
@@ -22,13 +42,16 @@
         android:numColumns="3"
         android:layout_marginLeft="@dimen/margin_small"
         android:layout_marginRight="@dimen/margin_small"
-        android:layout_marginBottom="@dimen/margin_small"
+        android:layout_marginTop="@dimen/margin_small"
+        android:layout_marginBottom="30dp"
         android:horizontalSpacing="@dimen/margin_small"
         android:verticalSpacing="@dimen/super_margin_small"
         android:background="@color/transparente"
         android:backgroundTint="@color/transparente"
-        android:scrollbars="none">
+        android:scrollbars="none"
+        android:layout_below="@id/btn_mi_pedido">
+
 
     </GridView>
 
-</LinearLayout>
+</RelativeLayout>

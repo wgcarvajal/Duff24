@@ -1,24 +1,27 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" 
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#00000000"
+    android:background="#44000000"
     tools:context="duff24.com.duff24.fragments.AnuncioFragment">
 
-    <TextView
-        android:id="@+id/textsubcategoria"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/hamburguesas"
-        android:textColor="#ffffff"
-        android:gravity="center"
-        android:textSize="@dimen/tam_titulo_subcategoria"/>
+
 
     <ImageView
         android:id="@+id/anuncio"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginBottom="30dp"
+        android:scaleType="fitXY"
         />
 
-</LinearLayout>
+    <pl.droidsonroids.gif.GifImageView
+        android:id="@+id/placeholder"
+        android:layout_width="@dimen/tam_place_holder"
+        android:layout_height="@dimen/tam_place_holder"
+        android:scaleType="fitXY"
+        android:layout_centerInParent="true"
+        />
+
+</RelativeLayout>

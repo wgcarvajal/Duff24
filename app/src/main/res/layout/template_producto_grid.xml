@@ -2,9 +2,18 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="@color/transparente"
     >
+
+    <pl.droidsonroids.gif.GifImageView
+        android:id="@+id/placeholder"
+        android:layout_width="@dimen/tam_place_holder_grid"
+        android:layout_height="@dimen/tam_place_holder_grid"
+        android:scaleType="fitXY"
+        android:layout_centerInParent="true"
+        />
+
     <TextView
         android:id="@+id/txtnombreproducto"
         android:layout_width="match_parent"
@@ -58,7 +67,7 @@
         android:background="@drawable/text_view_redondo"
         android:gravity="center"
         />
-    <ImageView
+    <TextView
         android:id="@+id/btn_disminuir"
         android:layout_width="@dimen/tam_btn_cantidad_prod_grid"
         android:layout_height="@dimen/tam_btn_cantidad_prod_grid"
@@ -66,6 +75,9 @@
         android:layout_alignBottom="@id/img_producto"
         android:layout_toLeftOf="@id/txtconteo"
         android:src="@mipmap/ic_disminuir"
+        android:text="──"
+        android:textColor="@color/blanco"
+        android:gravity="center"
         android:background="@drawable/img_view_redondo"
         />
 </RelativeLayout>

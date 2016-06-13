@@ -3,8 +3,10 @@ package duff24.com.duff24;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -26,7 +28,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.backendless.Backendless;
 import com.backendless.BackendlessCollection;
 import com.backendless.BackendlessUser;
@@ -36,7 +37,6 @@ import com.backendless.persistence.BackendlessDataQuery;
 import com.backendless.persistence.QueryOptions;
 import com.backendless.persistence.local.UserIdStorageFactory;
 import com.facebook.login.LoginManager;
-import com.squareup.picasso.Picasso;
 import com.viewpagerindicator.PageIndicator;
 
 import java.util.ArrayList;
@@ -51,21 +51,18 @@ import duff24.com.duff24.modelo.Subcategoria;
 import duff24.com.duff24.typeface.CustomTypefaceSpan;
 import duff24.com.duff24.util.AppUtil;
 import duff24.com.duff24.util.FontCache;
-import pl.droidsonroids.gif.GifImageView;
 
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener,
+        ProductoFragment.OnComunicationFragment, ProductoGridFragment.OnComunicationFragmentGrid {
 
     public final static int MI_REQUEST_CODE = 1;
 
-    private TextView titulo;
     private ViewPager pager;
     private PageIndicator pagerIndicator;
     private PagerAdapter adapter;
     private List<FragmentGeneric> data= new ArrayList<>();
     private NavigationView navView;
-    private ImageView btnMenuPrincipal;
-    private GifImageView btnMipedido;
     private DrawerLayout drawer;
     private TextView tituloMenuHeader;
     private TextView text_compruebe_conexion;
@@ -80,32 +77,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        /*VideoView videoView = (VideoView) findViewById(R.id.videofondo);
+        Uri path = Uri.parse("android.resource://"+getPackageName()+"/"+R.raw.video);
+        videoView.setVideoURI(path);
 
+        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                mp.setLooping(true);
+            }
+        });
 
-        titulo = (TextView)findViewById(R.id.txttitulo);
+        videoView.start();*/
+
         text_compruebe_conexion=(TextView)findViewById(R.id.txt_sin_conexion);
         tituloMenuHeader=(TextView)findViewById(R.id.titulo_header_menu);
 
-        btnMenuPrincipal=(ImageView)findViewById(R.id.btn_menu_principal);
+
         btnRecargarVista=(Button)findViewById(R.id.volver_cargar);
-        btnMipedido=(GifImageView)findViewById(R.id.btn_mi_pedido);
+
         drawer=(DrawerLayout)findViewById(R.id.drawer);
         pager= (ViewPager)findViewById(R.id.pager);
+        pager.setPageTransformer(true, new com.ToxicBakery.viewpager.transforms.ZoomOutSlideTransformer());
         pagerIndicator=(PageIndicator)findViewById(R.id.pagerIndicator);
         navView = (NavigationView) findViewById(R.id.nav);
 
-        btnMenuPrincipal.setOnClickListener(this);
-        btnMipedido.setOnClickListener(this);
         navView.setNavigationItemSelectedListener(this);
         btnRecargarVista.setOnClickListener(this);
 
-        btnMenuPrincipal.setVisibility(View.GONE);
-        btnMipedido.setVisibility(View.GONE);
+
         text_compruebe_conexion.setVisibility(View.GONE);
         btnRecargarVista.setVisibility(View.GONE);
 
         Typeface TF = FontCache.get(font_path,this);
-        titulo.setTypeface(TF);
         tituloMenuHeader.setTypeface(TF);
 
         TF = FontCache.get(font_path_ASimple,this);
@@ -197,8 +201,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             }
             adapter.notifyDataSetChanged();
-            btnMenuPrincipal.setVisibility(View.VISIBLE);
-            btnMipedido.setVisibility(View.VISIBLE);
             Menu m=navView.getMenu();
             mostrandoMenu(m);
 
@@ -325,9 +327,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void crearFragments()
     {
-
-        btnMenuPrincipal.setVisibility(View.VISIBLE);
-        btnMipedido.setVisibility(View.VISIBLE);
         final Menu m = navView.getMenu();
         mostrandoMenu(m);
 
@@ -401,24 +400,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v)
     {
-        Intent intent;
         switch (v.getId())
         {
-
-            case R.id.btn_menu_principal:
-                    drawer.openDrawer(GravityCompat.START);
-            break;
-            case R.id.btn_mi_pedido:
-                intent = new Intent(this,PedidoActivity.class);
-                startActivityForResult(intent,MI_REQUEST_CODE);
-            break;
-
             case R.id.volver_cargar:
-
                 volverAcargar();
-
             break;
-
         }
     }
 
@@ -465,6 +451,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     {
         super.onActivityResult(requestCode, resultCode, data);
 
+        /*VideoView videoView = (VideoView) findViewById(R.id.videofondo);
+        videoView.start();*/
+
         if (requestCode == MI_REQUEST_CODE)
         {
             int  tamano= pager.getAdapter().getCount();
@@ -499,6 +488,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
     }
+
 
     class CargarDatosRemotosTask extends AsyncTask<Void, Void, Boolean>
     {
@@ -554,17 +544,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         Backendless.UserService.logout(new AsyncCallback<Void>() {
             @Override
-            public void handleResponse(Void response)
-            {
+            public void handleResponse(Void response) {
 
                 LoginManager.getInstance().logOut();
-                Menu m=navView.getMenu();
+                Menu m = navView.getMenu();
                 m.getItem(2).setVisible(false);
-                Menu men=m.getItem(2).getSubMenu();
+                Menu men = m.getItem(2).getSubMenu();
                 men.getItem(0).setVisible(false);
                 mostrarMensaje(R.string.txt_sesion_cerrada);
-                if(pd!=null)
-                {
+                if (pd != null) {
                     pd.dismiss();
                 }
 
@@ -572,8 +560,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
 
             @Override
-            public void handleFault(BackendlessFault fault)
-            {
+            public void handleFault(BackendlessFault fault) {
                 if (pd != null) {
                     pd.dismiss();
                 }
@@ -599,6 +586,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         toast.show();
     }
 
+    @Override
+    public void onIrAlPedidoFragment()
+    {
+        Intent intent = new Intent(this,PedidoActivity.class);
+        startActivityForResult(intent, MI_REQUEST_CODE);
+    }
+
+    @Override
+    public void onAbrirMenuPrincipalFragment()
+    {
+        drawer.openDrawer(GravityCompat.START);
+    }
+
+    @Override
+    public void onIrAlPedidoFragmenGrid()
+    {
+        Intent intent = new Intent(this,PedidoActivity.class);
+        startActivityForResult(intent, MI_REQUEST_CODE);
+    }
+
+    @Override
+    public void onAbrirMenuPrincipalFragmentGrid() {
+        drawer.openDrawer(GravityCompat.START);
+    }
 
 
 }
