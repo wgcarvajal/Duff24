@@ -14,6 +14,10 @@ public class Subcategoria
     private String objectId;
     private int tipoFragment;
 
+
+
+    private int domicilio;
+
     public String getSubcatnombre()
     {
         return subcatnombre;
@@ -51,5 +55,13 @@ public class Subcategoria
     public void setTipoFragment(int tipoFragment)
     {
         this.tipoFragment = tipoFragment;
+    }
+
+    public int getDomicilio() {
+        return domicilio;
+    }
+
+    public void setDomicilio(int domicilio) {
+        this.domicilio = domicilio;
     }
 }

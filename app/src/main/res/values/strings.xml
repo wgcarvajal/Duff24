@@ -27,7 +27,7 @@
     <string name="title_activity_bitmap_decodificacion">BitmapDecodificacion</string>
     <string name="title_activity_pedido">PedidoActivity</string>
     <string name="title_activity_prueba">PruebaActivity</string>
-    <string name="domicilio_incluido">(Delivery included $2.000)</string>
+    <string name="domicilio_incluido">(Delivery included </string>
     <string name="menaje_desea_vaciar_pedido">You want to empty the order?</string>
     <string name="mensaje_pedido_vacio">It has emptied the order.</string>
     <string name="mensaje_pedido_minimo">Minimum order value $10.000</string>

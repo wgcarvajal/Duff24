@@ -239,6 +239,7 @@ public class RegistradoActivity extends AppCompatActivity implements View.OnClic
         pedido.setPedtelefono(telefono);
         pedido.setPedobservaciones(observaciones);
         pedido.setPedpersonanombre(nombre);
+        pedido.setPeddomicilio(AppUtil.listaSubcategorias.get(0).getDomicilio());
         pedido.setCiudad(ciudadid);
 
         Backendless.Persistence.save(pedido, new AsyncCallback<Pedido>() {
@@ -288,17 +289,7 @@ public class RegistradoActivity extends AppCompatActivity implements View.OnClic
                             itempedido.setPedido(response.getObjectId());
                             itempedido.setProducto(fila.getString(fila.getColumnIndex("prodid")));
                             itempedido.setItemcantidad(fila.getInt(fila.getColumnIndex("prodcantidad")));
-                            Backendless.Persistence.save(itempedido, new AsyncCallback<Itempedido>() {
-                                @Override
-                                public void handleResponse(Itempedido response) {
 
-                                }
-
-                                @Override
-                                public void handleFault(BackendlessFault fault) {
-
-                                }
-                            });
                             Producto producto= new Producto();
 
                             for(Producto p: AppUtil.data)
@@ -311,6 +302,22 @@ public class RegistradoActivity extends AppCompatActivity implements View.OnClic
                             }
                             int total=producto.getPrecio()*fila.getInt(fila.getColumnIndex("prodcantidad"));
                             totalPedido=totalPedido+total;
+
+                            itempedido.setPrecioProducto(producto.getPrecio());
+                            Backendless.Persistence.save(itempedido, new AsyncCallback<Itempedido>() {
+                                @Override
+                                public void handleResponse(Itempedido response) {
+
+                                }
+
+                                @Override
+                                public void handleFault(BackendlessFault fault) {
+
+                                }
+                            });
+
+
+
                             mailBody=mailBody+
                                     "<tr>"+
                                     "<td>"+producto.getProdnombreesp()+"</td>"+
@@ -323,9 +330,9 @@ public class RegistradoActivity extends AppCompatActivity implements View.OnClic
 
 
                         mailBody=mailBody+"</table>"+
-                                "<h2>Costo domicilio :  </h2> 2.000"+
+                                "<h2>Costo domicilio :  </h2> "+ AppUtil.listaSubcategorias.get(0).getDomicilio() +
                                 "<h2>Subtotal :  </h2>"+totalPedido+
-                                "<h2>Total Pedido:</h2>"+(totalPedido+2000);
+                                "<h2>Total Pedido:</h2>"+(totalPedido+AppUtil.listaSubcategorias.get(0).getDomicilio());
                         Backendless.Messaging.sendHTMLEmail(asunto, mailBody, recipients, new AsyncCallback<Void>() {
                             @Override
                             public void handleResponse(Void response) {

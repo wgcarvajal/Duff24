@@ -261,7 +261,7 @@ public class NoregistradoActivity extends AppCompatActivity implements View.OnCl
         pedido.setPedpersonanombre(nombre);
         pedido.setPedobservaciones(observaciones);
         pedido.setCiudad(ciudadid);
-
+        pedido.setPeddomicilio(AppUtil.listaSubcategorias.get(0).getDomicilio());
         Backendless.Persistence.save(pedido, new AsyncCallback<Pedido>() {
             @Override
             public void handleResponse(Pedido response) {
@@ -305,6 +305,19 @@ public class NoregistradoActivity extends AppCompatActivity implements View.OnCl
                             itempedido.setPedido(response.getObjectId());
                             itempedido.setProducto(fila.getString(fila.getColumnIndex("prodid")));
                             itempedido.setItemcantidad(fila.getInt(fila.getColumnIndex("prodcantidad")));
+
+                            Producto producto = new Producto();
+
+                            for (Producto p : AppUtil.data) {
+                                if (p.getObjectId().equals(fila.getString(fila.getColumnIndex("prodid")))) {
+                                    producto = p;
+                                    break;
+                                }
+                            }
+                            int total = producto.getPrecio() * fila.getInt(fila.getColumnIndex("prodcantidad"));
+                            totalPedido = totalPedido + total;
+
+                            itempedido.setPrecioProducto(producto.getPrecio());
                             Backendless.Persistence.save(itempedido, new AsyncCallback<Itempedido>() {
                                 @Override
                                 public void handleResponse(Itempedido response) {
@@ -316,16 +329,8 @@ public class NoregistradoActivity extends AppCompatActivity implements View.OnCl
 
                                 }
                             });
-                            Producto producto = new Producto();
 
-                            for (Producto p : AppUtil.data) {
-                                if (p.getObjectId().equals(fila.getString(fila.getColumnIndex("prodid")))) {
-                                    producto = p;
-                                    break;
-                                }
-                            }
-                            int total = producto.getPrecio() * fila.getInt(fila.getColumnIndex("prodcantidad"));
-                            totalPedido = totalPedido + total;
+
                             mailBody = mailBody +
                                     "<tr>" +
                                     "<td>" + producto.getProdnombreesp() + "</td>" +
@@ -337,9 +342,9 @@ public class NoregistradoActivity extends AppCompatActivity implements View.OnCl
 
                         } while (fila.moveToNext());
                         mailBody = mailBody + "</table>" +
-                                "<h2>Costo domicilio :  </h2> 2.000" +
+                                "<h2>Costo domicilio :  </h2>" + AppUtil.listaSubcategorias.get(0).getDomicilio() +
                                 "<h2>Subtotal :  </h2>" + totalPedido +
-                                "<h2>Total Pedido:</h2>" + (totalPedido + 2000);
+                                "<h2>Total Pedido:</h2>" + (totalPedido + AppUtil.listaSubcategorias.get(0).getDomicilio());
                         Backendless.Messaging.sendHTMLEmail(asunto, mailBody, recipients, new AsyncCallback<Void>() {
                             @Override
                             public void handleResponse(Void response) {

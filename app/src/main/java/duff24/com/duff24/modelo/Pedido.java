@@ -15,6 +15,7 @@ public class Pedido
     private String pedformapago;
     private String pedobservaciones;
     private String ciudad;
+    private int peddomicilio;
     private Date created;
 
     public String getObjectId() {
@@ -89,5 +90,13 @@ public class Pedido
     public void setCiudad(String ciudad)
     {
         this.ciudad = ciudad;
+    }
+
+    public int getPeddomicilio() {
+        return peddomicilio;
+    }
+
+    public void setPeddomicilio(int peddomicilio) {
+        this.peddomicilio = peddomicilio;
     }
 }

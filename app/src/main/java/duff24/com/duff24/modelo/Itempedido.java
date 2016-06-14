@@ -9,6 +9,7 @@ public class Itempedido
     private String pedido;
     private int itemcantidad;
     private String producto;
+    private int precioProducto;
 
     public String getObjectId() {
         return objectId;
@@ -40,5 +41,13 @@ public class Itempedido
 
     public void setProducto(String producto) {
         this.producto = producto;
+    }
+
+    public int getPrecioProducto() {
+        return precioProducto;
+    }
+
+    public void setPrecioProducto(int precioProducto) {
+        this.precioProducto = precioProducto;
     }
 }

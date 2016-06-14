@@ -228,6 +228,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         subcategoriaSelect.add("tipoFragment");
         subcategoriaSelect.add("subcatnombre");
         subcategoriaSelect.add("subcatnombresp");
+        subcategoriaSelect.add("domicilio");
 
         dataQuerysubcategoria.setProperties(subcategoriaSelect);
         QueryOptions queryOptionsSubcategoria= new QueryOptions();
@@ -254,6 +255,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 queryOptionsProductos.setPageSize(100);
                 queryOptionsProductos.addSortByOption("posicion ASC");
                 dataQueryProductos.setQueryOptions(queryOptionsProductos);
+                dataQueryProductos.setWhereClause("activo = TRUE");
                 Backendless.Persistence.of(Producto.class).find(dataQueryProductos, new AsyncCallback<BackendlessCollection<Producto>>() {
                     @Override
                     public void handleResponse(BackendlessCollection<Producto> prods)

@@ -161,7 +161,7 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
             if (fila.moveToFirst())
             {
 
-                int contador=2000;
+                int contador=AppUtil.listaSubcategorias.get(0).getDomicilio();
                 do {
 
                     for(Producto p: AppUtil.data)
@@ -180,6 +180,7 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
                 String valorTotal=format.format(contador);
                 valorTotal=valorTotal.replace(",",".");
                 textValorTotalPedido.setText("$"+valorTotal);
+                textDomicilio.setText(getResources().getString(R.string.domicilio_incluido)+" $"+format.format(AppUtil.listaSubcategorias.get(0).getDomicilio()).replace(",",".")+")");
             }
         }
         db.close();
@@ -386,7 +387,7 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
         String substring = valorTotalpedido.substring(1);
         substring =substring.replace(".","");
         int contador= Integer.parseInt(substring)-precio;
-        if(contador==2000)
+        if(contador==AppUtil.listaSubcategorias.get(0).getDomicilio())
         {
             contador=0;
             Menu m = navView.getMenu();

@@ -6,6 +6,7 @@ import android.util.Log;
 import com.backendless.Backendless;
 import com.backendless.async.callback.AsyncCallback;
 import com.backendless.exceptions.BackendlessFault;
+import com.facebook.FacebookSdk;
 
 import java.util.ArrayList;
 import java.util.Calendar;
