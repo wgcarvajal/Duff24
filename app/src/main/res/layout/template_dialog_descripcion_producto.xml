@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/txt_nombre_producto_dialog_descripcion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/size_producto_nombre_dialog_descripcion"
+        android:gravity="center"
+        android:textColor="@color/blanco"/>
+
+    <Button
+        android:id="@+id/btn_agregar_producto_dialog_descripcion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/txt_btn_agregar_dialog_descripcion"
+        android:layout_alignParentBottom="true"
+        android:textColor="@color/blanco"
+        android:background="@drawable/bordes_superiores_redondos_fondo_rojo_transparente"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        />
+
+    <TextView
+        android:id="@+id/txt_precio_dialog_descripcion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/blanco"
+        android:layout_above="@+id/btn_agregar_producto_dialog_descripcion"
+        android:gravity="right"
+        android:textSize="@dimen/size_precio_dialog_descripcion"
+        android:layout_marginRight="5dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/txt_nombre_producto_dialog_descripcion"
+        android:layout_above="@+id/txt_precio_dialog_descripcion"
+        android:orientation="horizontal"
+        android:layout_marginTop="5dp"
+        >
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            >
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                >
+
+                <pl.droidsonroids.gif.GifImageView
+                    android:id="@+id/placeholder_dialog_descripcion"
+                    android:layout_width="@dimen/tam_place_holder"
+                    android:layout_height="@dimen/tam_place_holder"
+                    android:layout_centerInParent="true"
+                    />
+
+                <ImageView
+                    android:id="@+id/img_producto_dialog_descripcion"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitXY"/>
+            </RelativeLayout>
+
+
+            <RelativeLayout
+                android:id="@+id/rl_personalizable"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                >
+
+                <TextView
+                    android:id="@+id/txt_sin_dialog_descripcion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/txt_siningrediente_dialog_descripcion"
+                    android:textSize="@dimen/size_textosiningrediente_dialog_descripcion"
+                    android:textColor="@color/blanco"
+                    android:gravity="center"
+                    android:layout_marginTop="10dp"
+                    />
+
+                <ScrollView
+                    android:id="@+id/scroll_personalizable"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_below="@id/txt_sin_dialog_descripcion"
+                    android:layout_marginTop="5dp"
+                    >
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:background="@drawable/bordes_redondos_rojotransparente_sin">
+
+                        <CheckBox
+                            android:id="@+id/check_cebolla"
+                            android:textStyle="bold"
+                            android:buttonTint="@color/blanco"
+                            android:textColor="@color/blanco"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/txt_cebolla"
+                            android:textSize="@dimen/size_descripcion_dialog_descripcion"
+                            android:layout_marginTop="5dp"
+                            android:theme="@style/MyCheckBox"/>
+                        <CheckBox
+                            android:id="@+id/check_tomate"
+                            android:textStyle="bold"
+                            android:buttonTint="@color/blanco"
+                            android:textColor="@color/blanco"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/txt_tomate"
+                            android:textSize="@dimen/size_descripcion_dialog_descripcion"
+                            android:layout_marginTop="5dp"
+                            android:theme="@style/MyCheckBox"
+                            />
+
+                        <CheckBox
+                            android:id="@+id/check_salsas"
+                            android:textStyle="bold"
+                            android:buttonTint="@color/blanco"
+                            android:textColor="@color/blanco"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/txt_salsas"
+                            android:textSize="@dimen/size_descripcion_dialog_descripcion"
+                            android:layout_marginTop="5dp"
+                            android:layout_marginBottom="5dp"
+                            android:theme="@style/MyCheckBox"
+                            />
+
+
+                    </LinearLayout>
+
+
+                </ScrollView>
+
+            </RelativeLayout>
+
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginLeft="5dp"
+            >
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <TextView
+                    android:id="@+id/txt_descripcion_producto_dialog_descripcion"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textSize="@dimen/size_descripcion_dialog_descripcion"
+                    android:textColor="@color/blanco"
+                    />
+                ,
+
+            </ScrollView>
+
+
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+
+
+</RelativeLayout>

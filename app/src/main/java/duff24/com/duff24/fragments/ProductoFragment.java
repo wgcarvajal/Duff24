@@ -11,6 +11,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +26,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import duff24.com.duff24.R;
+import duff24.com.duff24.SpacesItemDecoration;
 import duff24.com.duff24.adaptadores.AdaptadorProducto;
 import duff24.com.duff24.basededatos.AdminSQliteOpenHelper;
 import duff24.com.duff24.modelo.Producto;
@@ -34,31 +37,25 @@ import pl.droidsonroids.gif.GifImageView;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ProductoFragment extends FragmentGeneric implements AdapterView.OnItemClickListener, View.OnClickListener {
+public class ProductoFragment extends FragmentGeneric implements  View.OnClickListener ,AdaptadorProducto.OnItemClickListener{
     private static final String LIST_STATE = "listState";
 
     private Parcelable mListState = null;
-    private String subcategoriaing;
-    private String subcategoriaesp;
+    private String subcategoria;
+    private String subcategoriaNombre;
     private TextView titulo;
-    private ImageView btnMenuPrincipal;
-    private GifImageView btnMipedido;
-    private ListView listaProductos;
+    private RecyclerView gridProductos;
     private List<Producto> data= new ArrayList<>();
     private AdaptadorProducto adapter;
-    private String font_path = "font/2-4ef58.ttf";
+    private ImageView carritoCompras;
+    private ImageView menuPrincipal;
+    private String rotulafont="font/VTKS_ANIMAL_2.ttf";
+    private GridLayoutManager layoutManager;
 
 
     public ProductoFragment() {
         // Required empty public constructor
     }
-
-    public interface OnComunicationFragment
-    {
-        void onIrAlPedidoFragment();
-        void onAbrirMenuPrincipalFragment();
-    }
-    OnComunicationFragment onComunicationFragment;
 
     @Override
     public void onAttach(Context context) {
@@ -67,13 +64,47 @@ public class ProductoFragment extends FragmentGeneric implements AdapterView.OnI
     }
 
     @Override
+    public void onClick(View v) {
+        switch (v.getId())
+        {
+            case R.id.btn_mi_pedido:
+                onComunicationFragment.onIrAlPedidoFragment();
+                break;
+
+            case R.id.btn_menu_principal:
+                onComunicationFragment.onAbrirMenuPrincipalFragment();
+                break;
+        }
+    }
+
+   @Override
+    public void itemClick(Producto producto,TextView btnDisminuir , TextView txtconteo)
+    {
+        onComunicationFragment.onAbrirDescripcionProducto(producto,btnDisminuir,txtconteo);
+    }
+
+    @Override
+    public void itemClickDisminuir(Producto producto, TextView btnDisminuir, TextView txtconteo) {
+
+        onComunicationFragment.onAbrirDisminuirProducto(producto,btnDisminuir,txtconteo);
+    }
+
+    public interface OnComunicationFragment
+    {
+        void onIrAlPedidoFragment();
+        void onAbrirMenuPrincipalFragment();
+        void onAbrirDescripcionProducto(Producto producto,TextView btnDisminuir , TextView txtconteo);
+        void onAbrirDisminuirProducto(Producto producto,TextView btnDisminuir , TextView txtconteo);
+    }
+    OnComunicationFragment onComunicationFragment;
+    @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         if(savedInstanceState!=null)
         {
-            subcategoriaing=savedInstanceState.getString("subcategoriaing");
-            subcategoriaesp=savedInstanceState.getString("subcategoriaesp");
+            subcategoria=savedInstanceState.getString("subcategoria");
+            subcategoriaNombre=savedInstanceState.getString("subcategoriaNombre");
             mListState=savedInstanceState.getParcelable(LIST_STATE);
         }
     }
@@ -83,24 +114,26 @@ public class ProductoFragment extends FragmentGeneric implements AdapterView.OnI
                              Bundle savedInstanceState)
     {
         View v= inflater.inflate(R.layout.fragment_producto, container, false);
-        listaProductos= (ListView) v.findViewById(R.id.lstproductos);
-        titulo = (TextView) v.findViewById(R.id.textsubcategoria);
+        gridProductos= (RecyclerView) v.findViewById(R.id.gridProductos);
+        titulo=(TextView)v.findViewById(R.id.textsubcategoria);
 
-        Typeface TF = FontCache.get(font_path,inflater.getContext());
-        titulo.setText(this.subcategoriaing);
-        titulo.setTypeface(TF);
-        if(getResources().getString(R.string.idioma).equals("es"))
-        {
-            titulo.setText(this.subcategoriaesp);
-        }
-        btnMenuPrincipal=(ImageView)v.findViewById(R.id.btn_menu_principal);
-        btnMipedido=(GifImageView)v.findViewById(R.id.btn_mi_pedido);
+        layoutManager = new GridLayoutManager(v.getContext(),3);
+        gridProductos.setLayoutManager(layoutManager);
+        adapter= new AdaptadorProducto(v.getContext(),data,this);
+        SpacesItemDecoration spacesItemDecoration = new SpacesItemDecoration(getResources().getDimensionPixelSize(R.dimen.margin_item_grid_left_right),getResources().getDimensionPixelSize(R.dimen.margin_item_grid_bottom));
+        gridProductos.setAdapter(adapter);
+        gridProductos.addItemDecoration(spacesItemDecoration);
 
-        btnMenuPrincipal.setOnClickListener(this);
-        btnMipedido.setOnClickListener(this);
-        adapter= new AdaptadorProducto(v.getContext(),data);
-        listaProductos.setAdapter(adapter);
-        listaProductos.setOnItemClickListener(this);
+        //gridProductos.setOnItemClickListener(this);
+
+        carritoCompras=(ImageView)v.findViewById(R.id.btn_mi_pedido);
+        menuPrincipal=(ImageView)v.findViewById(R.id.btn_menu_principal);
+        carritoCompras.setOnClickListener(this);
+        menuPrincipal.setOnClickListener(this);
+
+        titulo.setText(subcategoriaNombre);
+        Typeface TF= FontCache.get(rotulafont,v.getContext());
+        titulo.setTypeface(TF,Typeface.BOLD);
         return v;
     }
 
@@ -110,7 +143,6 @@ public class ProductoFragment extends FragmentGeneric implements AdapterView.OnI
         super.onActivityCreated(savedInstanceState);
         if(data.size()>0)
         {
-            Log.i("entro:","data size >0");
             adapter.notifyDataSetChanged();
         }
         else
@@ -119,106 +151,29 @@ public class ProductoFragment extends FragmentGeneric implements AdapterView.OnI
         }
     }
 
-    public void init(String subcategoriaing,String subcategoriaesp)
+    public void init(String subcategoria,String subcategoriaNombre)
     {
-        this.subcategoriaing=subcategoriaing;
-        this.subcategoriaesp=subcategoriaesp;
+
+        this.subcategoria=subcategoria;
+        this.subcategoriaNombre=subcategoriaNombre;
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState)
     {
-        mListState = listaProductos.onSaveInstanceState();
-        outState.putString("subcategoriaing", subcategoriaing);
-        outState.putString("subcategoriaesp", subcategoriaesp);
+        mListState = layoutManager.onSaveInstanceState();
+        outState.putString("subcategoria", subcategoria);
+        outState.putString("subcategoriaNombre", subcategoriaNombre);
         outState.putParcelable(LIST_STATE, mListState);
         super.onSaveInstanceState(outState);
     }
 
     private void loadData()
     {
-            for(Producto prod: AppUtil.data)
-            {
-                if(prod.getSubcategoriaing().equals(subcategoriaing))
-                {
-                    data.add(prod);
-
-                }
-            }
-
-
-            if (mListState != null)
-            {
-                listaProductos.onRestoreInstanceState(mListState);
-            }
-            adapter.notifyDataSetChanged();
-            mListState = null;
-
+        LoadDataTask loadDataTask= new LoadDataTask();
+        loadDataTask.execute();
     }
 
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-    {
-        TextView textconteo= (TextView) view.findViewById(R.id.txtconteo);
-        TextView btnDisminuir= (TextView) view.findViewById(R.id.btn_disminuir);
-        AgregarProductoPedidoTask agregarProductoPedidoTask= new AgregarProductoPedidoTask(textconteo,btnDisminuir);
-        agregarProductoPedidoTask.execute(data.get(position));
-    }
-
-    public class AgregarProductoPedidoTask extends AsyncTask<Producto,Void,Integer>
-    {
-        private WeakReference<TextView> txtcontedo;
-        private WeakReference<TextView> btndisminuir;
-
-        public AgregarProductoPedidoTask(TextView conteo,TextView disminuir)
-        {
-            txtcontedo= new WeakReference<TextView>(conteo);
-            btndisminuir= new WeakReference<TextView>(disminuir);
-        }
-        @Override
-        protected Integer doInBackground(Producto... params)
-        {
-            MediaPlayer m = MediaPlayer.create(getContext(),R.raw.sonido_click);
-            m.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                public void onCompletion(MediaPlayer mp) {
-                    mp.release();
-                }
-            });
-            m.start();
-            AdminSQliteOpenHelper admin = AdminSQliteOpenHelper.crearSQLite(getContext());
-            SQLiteDatabase db = admin.getWritableDatabase();
-            Cursor fila = db.rawQuery("select prodcantidad from pedido where prodid = '" + params[0].getObjectId() + "'", null);
-            ContentValues registroPedido= new ContentValues();
-            int conteo=1;
-            if(fila.moveToFirst())
-            {
-                conteo=fila.getInt(0)+1;
-                registroPedido.put("prodcantidad",conteo);
-                db.update("pedido",registroPedido,"prodid = '"+params[0].getObjectId()+"'",null);
-            }
-            else
-            {
-                registroPedido.put("prodid",params[0].getObjectId());
-                registroPedido.put("prodprecio",params[0].getPrecio());
-                registroPedido.put("prodnombreesp",params[0].getProdnombreesp());
-                registroPedido.put("prodnombreing",params[0].getProdnombre());
-                registroPedido.put("proddescripcioning",params[0].getProddescripcion());
-                registroPedido.put("proddescripcionesp",params[0].getProddescripcionesp());
-                registroPedido.put("prodcantidad",conteo);
-                db.insert("pedido",null,registroPedido);
-            }
-            db.close();
-            return conteo;
-        }
-
-        @Override
-        protected void onPostExecute(Integer resultado) {
-            super.onPostExecute(resultado);
-            txtcontedo.get().setText("" + resultado);
-            txtcontedo.get().setVisibility(View.VISIBLE);
-            btndisminuir.get().setVisibility(View.VISIBLE);
-        }
-    }
 
     @Override
     public void actualizarData()
@@ -230,21 +185,35 @@ public class ProductoFragment extends FragmentGeneric implements AdapterView.OnI
 
     }
 
-    @Override
-    public void onClick(View v)
+    public class LoadDataTask extends AsyncTask<Void,Void,Void>
     {
-        switch (v.getId())
+        @Override
+        protected Void doInBackground(Void... params)
         {
+            for(Producto prod: AppUtil.data)
+            {
+                if(prod.getSubcategoria().equals(subcategoria))
+                {
+                    data.add(prod);
 
-            case R.id.btn_menu_principal:
-                onComunicationFragment.onAbrirMenuPrincipalFragment();
-            break;
-            case R.id.btn_mi_pedido:
-                onComunicationFragment.onIrAlPedidoFragment();
-            break;
-
+                }
+            }
+            return null;
+        }
+        @Override
+        protected void onPostExecute(Void aVoid)
+        {
+            super.onPostExecute(aVoid);
+            if (mListState != null)
+            {
+                layoutManager.onRestoreInstanceState(mListState);
+            }
+            adapter.notifyDataSetChanged();
+            mListState = null;
         }
     }
+
+
 
 
 }

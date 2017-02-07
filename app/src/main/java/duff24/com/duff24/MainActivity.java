@@ -1,12 +1,16 @@
 package duff24.com.duff24;
 
+import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
 import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -14,6 +18,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.util.Log;
@@ -24,10 +30,15 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
+
 import com.backendless.Backendless;
 import com.backendless.BackendlessCollection;
 import com.backendless.BackendlessUser;
@@ -37,16 +48,22 @@ import com.backendless.persistence.BackendlessDataQuery;
 import com.backendless.persistence.QueryOptions;
 import com.backendless.persistence.local.UserIdStorageFactory;
 import com.facebook.login.LoginManager;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 import com.viewpagerindicator.PageIndicator;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+
+import duff24.com.duff24.adaptadores.AdaptadorProductoDisminuir;
 import duff24.com.duff24.adaptadores.PagerAdapter;
+import duff24.com.duff24.basededatos.AdminSQliteOpenHelper;
 import duff24.com.duff24.fragments.AnuncioFragment;
 import duff24.com.duff24.fragments.FragmentGeneric;
 import duff24.com.duff24.fragments.ProductoFragment;
-import duff24.com.duff24.fragments.ProductoGridFragment;
 import duff24.com.duff24.modelo.Producto;
+import duff24.com.duff24.modelo.ProductoPersonalizado;
 import duff24.com.duff24.modelo.Subcategoria;
 import duff24.com.duff24.typeface.CustomTypefaceSpan;
 import duff24.com.duff24.util.AppUtil;
@@ -54,7 +71,7 @@ import duff24.com.duff24.util.FontCache;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener,
-        ProductoFragment.OnComunicationFragment, ProductoGridFragment.OnComunicationFragmentGrid {
+        ProductoFragment.OnComunicationFragment, AdaptadorProductoDisminuir.OnItemClickListener {
 
     public final static int MI_REQUEST_CODE = 1;
 
@@ -67,9 +84,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView tituloMenuHeader;
     private TextView text_compruebe_conexion;
     private Button btnRecargarVista;
-    private String font_path = "font/2-4ef58.ttf";
-    private String font_path_ASimple="font/A_Simple_Life.ttf";
+    private String font_path = "font/KGTenThousandReasonsAlt.ttf";
+    private String font_path_ASimple="font/VTKS_ANIMAL_2.ttf";
     private ProgressDialog pd = null;
+    private VideoView videofondo;
+
+    private Producto productSelected;
+    private TextView btnDisminuirProductSelected;
+    private TextView txtConteoProductoSelected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -77,18 +99,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        /*VideoView videoView = (VideoView) findViewById(R.id.videofondo);
-        Uri path = Uri.parse("android.resource://"+getPackageName()+"/"+R.raw.video);
-        videoView.setVideoURI(path);
-
-        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mp) {
-                mp.setLooping(true);
-            }
-        });
-
-        videoView.start();*/
+        videofondo = (VideoView)findViewById(R.id.videofondo);
 
         text_compruebe_conexion=(TextView)findViewById(R.id.txt_sin_conexion);
         tituloMenuHeader=(TextView)findViewById(R.id.titulo_header_menu);
@@ -98,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         drawer=(DrawerLayout)findViewById(R.id.drawer);
         pager= (ViewPager)findViewById(R.id.pager);
-        pager.setPageTransformer(true, new com.ToxicBakery.viewpager.transforms.ZoomOutSlideTransformer());
+        pager.setPageTransformer(true, new com.ToxicBakery.viewpager.transforms.CubeOutTransformer());
         pagerIndicator=(PageIndicator)findViewById(R.id.pagerIndicator);
         navView = (NavigationView) findViewById(R.id.nav);
 
@@ -109,22 +120,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         text_compruebe_conexion.setVisibility(View.GONE);
         btnRecargarVista.setVisibility(View.GONE);
 
-        Typeface TF = FontCache.get(font_path,this);
-        tituloMenuHeader.setTypeface(TF);
 
-        TF = FontCache.get(font_path_ASimple,this);
+        Typeface TF = FontCache.get(font_path_ASimple,this);
+
+        tituloMenuHeader.setTypeface(TF);
         text_compruebe_conexion.setTypeface(TF);
         btnRecargarVista.setTypeface(TF);
         adapter = new PagerAdapter(getSupportFragmentManager(), data);
         pager.setAdapter(adapter);
         pagerIndicator.setViewPager(pager);
         Menu m = navView.getMenu();
-        aplicandoTipoLetraItemMenu(m, font_path_ASimple);
+        aplicandoTipoLetraItemMenu(m, font_path);
         ocultandoMenu(m);
         loadData();
-
-
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        this.videofondo.setVideoPath("android.resource://"+getPackageName()+"/"+R.raw.fondo_duff);
+        this.videofondo.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
+        {
+            public void onCompletion(MediaPlayer paramAnonymousMediaPlayer)
+            {
+                MainActivity.this.videofondo.start();
+            }
+        });
+        this.videofondo.start();
+    }
+
     private void ocultandoMenu(Menu m)
     {
         for (int i=0;i<m.size();i++) {
@@ -181,15 +205,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             {
                 switch (sub.getTipoFragment())
                 {
+                    case Subcategoria.SINDESCRIPCION:
                     case Subcategoria.CONDESCRIPCION:
                         ProductoFragment productoFragment = new ProductoFragment();
-                        productoFragment.init(sub.getSubcatnombre(), sub.getSubcatnombresp());
+                        productoFragment.init(sub.getObjectId(), sub.getSubcatnombresp());
                         data.add(productoFragment);
-                        break;
-                    case Subcategoria.SINDESCRIPCION:
-                        ProductoGridFragment productoGridFragment = new ProductoGridFragment();
-                        productoGridFragment.init(sub.getSubcatnombre(), sub.getSubcatnombresp());
-                        data.add(productoGridFragment);
                         break;
 
                     case Subcategoria.ANUNCIO:
@@ -250,6 +270,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 productoSelect.add("prodnombreesp");
                 productoSelect.add("subcategoria");
                 productoSelect.add("imgFile");
+                productoSelect.add("imgFileNew");
+                productoSelect.add("condescripcion");
+                productoSelect.add("personalizable");
                 dataQueryProductos.setProperties(productoSelect);
                 QueryOptions queryOptionsProductos= new QueryOptions();
                 queryOptionsProductos.setPageSize(100);
@@ -377,16 +400,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         {
             switch (sub.getTipoFragment())
             {
+                case Subcategoria.SINDESCRIPCION:
                 case Subcategoria.CONDESCRIPCION:
                     ProductoFragment productoFragment = new ProductoFragment();
-                    productoFragment.init(sub.getSubcatnombre(), sub.getSubcatnombresp());
+                    productoFragment.init(sub.getObjectId(), sub.getSubcatnombresp());
                     data.add(productoFragment);
                     break;
-                case Subcategoria.SINDESCRIPCION:
-                    ProductoGridFragment productoGridFragment = new ProductoGridFragment();
-                    productoGridFragment.init(sub.getSubcatnombre(), sub.getSubcatnombresp());
-                    data.add(productoGridFragment);
-                    break;
+
 
                 case Subcategoria.ANUNCIO:
                     AnuncioFragment anuncioFragment= new AnuncioFragment();
@@ -489,6 +509,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 men.getItem(0).setVisible(false);
             }
         }
+    }
+
+    @Override
+    public void itemClickDisminuirDialogDisminuir(String sinIngredientes)
+    {
+
+        disminuirProducto(productSelected,btnDisminuirProductSelected,txtConteoProductoSelected,sinIngredientes);
     }
 
 
@@ -601,17 +628,396 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         drawer.openDrawer(GravityCompat.START);
     }
 
+
     @Override
-    public void onIrAlPedidoFragmenGrid()
+    public void onAbrirDescripcionProducto(Producto producto,TextView btnDisminuir , TextView txtconteo)
     {
-        Intent intent = new Intent(this,PedidoActivity.class);
-        startActivityForResult(intent, MI_REQUEST_CODE);
+        if(producto.isCondescripcion())
+        {
+            productSelected = producto;
+            btnDisminuirProductSelected = btnDisminuir;
+            txtConteoProductoSelected = txtconteo;
+
+            abrirDialogDescripcionProducto();
+        }
+        else
+        {
+            aumentarProducto(producto,btnDisminuir,txtconteo,"","");
+        }
+
     }
 
     @Override
-    public void onAbrirMenuPrincipalFragmentGrid() {
-        drawer.openDrawer(GravityCompat.START);
+    public void onAbrirDisminuirProducto(Producto producto, TextView btnDisminuir, TextView txtconteo)
+    {
+        if(producto.isCondescripcion() && producto.isPersonalizable())
+        {
+            productSelected = producto;
+            btnDisminuirProductSelected = btnDisminuir;
+            txtConteoProductoSelected = txtconteo;
+            abrirDialogDisminuirProducto();
+        }
+        else
+        {
+            disminuirProducto(producto,btnDisminuir,txtconteo,"");
+        }
+
+    }
+
+    private void abrirDialogDisminuirProducto()
+    {
+        AdminSQliteOpenHelper admin = new AdminSQliteOpenHelper(this,"admin",null,AdminSQliteOpenHelper.v);
+        SQLiteDatabase db = admin.getWritableDatabase();
+        Cursor fila = db.rawQuery("select prodid,prodprecio, prodcantidad , prodsiningredientes, prodsiningredientesing from pedido where prodid = '" + productSelected.getObjectId() + "'", null);
+        if(fila.getCount()>1)
+        {
+            final Dialog dialog= new Dialog(this);
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dialog.setContentView(R.layout.template_dialog_disminuir_producto);
+            dialog.getWindow().setBackgroundDrawableResource(R.drawable.bordes_redondos_dialog_descripcion_producto);
+
+            Button btn_cerrar_dialog_disminuir = (Button)dialog.findViewById(R.id.btn_cerrar_dialog_disminuir);
+            TextView nombre_producto_dialog_disminuir = (TextView)dialog.findViewById(R.id.txt_nombre_producto_dialog_disminuir);
+            RecyclerView listProductos = (RecyclerView) dialog.findViewById(R.id.list_producto_personalizado);
+
+            List<ProductoPersonalizado> listaProductosPersonalizados = new ArrayList<>();
+
+            if(fila.moveToFirst())
+            {
+                ProductoPersonalizado productoPersonalizado = new ProductoPersonalizado();
+                productoPersonalizado.setProdid(fila.getString(0));
+                productoPersonalizado.setProdprecio(fila.getInt(1));
+                productoPersonalizado.setProdcantidad(fila.getInt(2));
+                productoPersonalizado.setProdsiningredientes(fila.getString(3));
+                productoPersonalizado.setProdsiningredientesIng(fila.getString(4));
+                listaProductosPersonalizados.add(productoPersonalizado);
+
+                while (fila.moveToNext())
+                {
+                    productoPersonalizado = new ProductoPersonalizado();
+                    productoPersonalizado.setProdid(fila.getString(0));
+                    productoPersonalizado.setProdprecio(fila.getInt(1));
+                    productoPersonalizado.setProdcantidad(fila.getInt(2));
+                    productoPersonalizado.setProdsiningredientes(fila.getString(3));
+                    productoPersonalizado.setProdsiningredientesIng(fila.getString(4));
+                    listaProductosPersonalizados.add(productoPersonalizado);
+                }
+            }
+
+            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+            listProductos.setLayoutManager(layoutManager);
+            AdaptadorProductoDisminuir adaptadorProductoDisminuir= new AdaptadorProductoDisminuir(this,listaProductosPersonalizados,this);
+            SpacesItemDecoration spacesItemDecoration = new SpacesItemDecoration(getResources().getDimensionPixelSize(R.dimen.margin_item_grid_left_right),getResources().getDimensionPixelSize(R.dimen.margin_item_grid_bottom));
+            listProductos.setAdapter(adaptadorProductoDisminuir);
+            listProductos.addItemDecoration(spacesItemDecoration);
+
+
+            String idioma = getResources().getString(R.string.idioma);
+
+            if(idioma.equals("es"))
+            {
+                nombre_producto_dialog_disminuir.setText(productSelected.getProdnombreesp());
+
+            }
+            else
+            {
+                nombre_producto_dialog_disminuir.setText(productSelected.getProdnombre());
+
+            }
+
+            Typeface TF = FontCache.get(font_path_ASimple,this);
+            nombre_producto_dialog_disminuir.setTypeface(TF);
+            btn_cerrar_dialog_disminuir.setTypeface(TF);
+
+            btn_cerrar_dialog_disminuir.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    dialog.hide();
+                }
+            });
+
+            dialog.show();
+        }
+        else
+        {
+            fila.moveToFirst();
+            disminuirProducto(productSelected,btnDisminuirProductSelected,txtConteoProductoSelected,fila.getString(3));
+        }
+        db.close();
+    }
+
+    private void abrirDialogDescripcionProducto()
+    {
+        final Dialog dialog= new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.template_dialog_descripcion_producto);
+        dialog.getWindow().setBackgroundDrawableResource(R.drawable.bordes_redondos_dialog_descripcion_producto);
+
+        TextView nombre_producto_dialog_descripcion = (TextView)dialog.findViewById(R.id.txt_nombre_producto_dialog_descripcion);
+        TextView nombre_descripcion_dialog_descripcion = (TextView)dialog.findViewById(R.id.txt_descripcion_producto_dialog_descripcion);
+        TextView precio_dialog_descripcion = (TextView)dialog.findViewById(R.id.txt_precio_dialog_descripcion);
+        TextView sin_dialog_descripcion = (TextView)dialog.findViewById(R.id.txt_sin_dialog_descripcion);
+        Button btnagregarProducto_dialog_descripcion = (Button)dialog.findViewById(R.id.btn_agregar_producto_dialog_descripcion);
+        ImageView imagen_producto_dialog_descripcion = (ImageView) dialog.findViewById(R.id.img_producto_dialog_descripcion);
+        ScrollView scrollpersonalizable = (ScrollView) dialog.findViewById(R.id.scroll_personalizable);
+
+
+        final CheckBox sincebolla = (CheckBox)dialog.findViewById(R.id.check_cebolla);
+        final CheckBox sintomate = (CheckBox)dialog.findViewById(R.id.check_tomate);
+        final CheckBox sinsalsas = (CheckBox)dialog.findViewById(R.id.check_salsas);
+
+
+        final ImageView placeholder = (ImageView) dialog.findViewById(R.id.placeholder_dialog_descripcion);
+
+        placeholder.setVisibility(View.VISIBLE);
+        placeholder.setImageResource(R.drawable.foodgif);
+
+        String idioma = getResources().getString(R.string.idioma);
+
+        if(idioma.equals("es"))
+        {
+            nombre_producto_dialog_descripcion.setText(productSelected.getProdnombreesp());
+            nombre_descripcion_dialog_descripcion.setText(productSelected.getProddescripcionesp());
+        }
+        else
+        {
+            nombre_producto_dialog_descripcion.setText(productSelected.getProdnombre());
+            nombre_descripcion_dialog_descripcion.setText(productSelected.getProddescripcion());
+        }
+
+
+
+        DecimalFormat format= new DecimalFormat("###,###.##");
+        String precio=format.format(productSelected.getPrecio());
+        precio = precio.replace(",",".");
+        precio_dialog_descripcion.setText("$"+precio);
+
+        Typeface TF = FontCache.get(font_path_ASimple,this);
+
+        nombre_producto_dialog_descripcion.setTypeface(TF);
+        precio_dialog_descripcion.setTypeface(TF);
+        btnagregarProducto_dialog_descripcion.setTypeface(TF);
+        sin_dialog_descripcion.setTypeface(TF);
+
+        TF = FontCache.get(font_path,this);
+        nombre_descripcion_dialog_descripcion.setTypeface(TF);
+        sincebolla.setTypeface(TF);
+        sintomate.setTypeface(TF);
+        sinsalsas.setTypeface(TF);
+
+        if(!productSelected.isPersonalizable())
+        {
+            scrollpersonalizable.setVisibility(View.GONE);
+            sin_dialog_descripcion.setVisibility(View.GONE);
+        }
+
+        Picasso.with(this)
+                .load(productSelected.getImgFile())
+                .into(imagen_producto_dialog_descripcion, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        placeholder.setImageDrawable(null);
+                        placeholder.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onError() {
+
+                    }
+                });
+
+        final Context context=this;
+
+
+        btnagregarProducto_dialog_descripcion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view)
+            {
+                String sinIngredientes ="";
+                String sinIngredientesIng ="";
+
+
+                if(sincebolla.isChecked())
+                {
+                    sinIngredientes = "cebolla";
+                    sinIngredientesIng = "onion";
+
+                }
+
+                if(sintomate.isChecked())
+                {
+                    if(sinIngredientes.equals(""))
+                    {
+                        sinIngredientes = "tomate";
+                        sinIngredientesIng = "tomato";
+                    }
+                    else
+                    {
+                        sinIngredientes = sinIngredientes +", tomate";
+                        sinIngredientesIng = sinIngredientesIng +", tomato";
+
+                    }
+
+                }
+
+                if(sinsalsas.isChecked())
+                {
+                    if(sinIngredientes.equals(""))
+                    {
+                        sinIngredientes = "salsas";
+                        sinIngredientesIng = "sauces";
+                    }
+                    else
+                    {
+                        sinIngredientes = sinIngredientes +", salsas";
+                        sinIngredientesIng = sinIngredientesIng +", sauces";
+                    }
+
+                }
+
+                aumentarProducto(productSelected,btnDisminuirProductSelected,txtConteoProductoSelected,sinIngredientes,sinIngredientesIng);
+                dialog.hide();
+            }
+        });
+
+
+        dialog.show();
+    }
+
+    private void aumentarProducto(Producto producto, TextView btndisminuir, TextView txtconteo, String sinIngredientes , String sinIngredientesIng)
+    {
+        MediaPlayer m = MediaPlayer.create(this,R.raw.sonido_click);
+        m.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            public void onCompletion(MediaPlayer mp) {
+                mp.release();
+            }
+        });
+        m.start();
+        AdminSQliteOpenHelper admin = new AdminSQliteOpenHelper(this,"admin",null,AdminSQliteOpenHelper.v);
+        SQLiteDatabase db = admin.getWritableDatabase();
+        Cursor fila = db.rawQuery("select prodcantidad , prodsiningredientes from pedido where prodid = '" + producto.getObjectId() + "'", null);
+        ContentValues registroPedido= new ContentValues();
+        int conteoTotal=1;
+        if(fila.moveToFirst())
+        {
+            int conteo = 0;
+            conteoTotal=fila.getInt(0)+1;
+
+            if(fila.getString(1).equals(sinIngredientes))
+            {
+                conteo = fila.getInt(0) +1;
+            }
+
+            while(fila.moveToNext())
+            {
+                if(fila.getString(1).equals(sinIngredientes))
+                {
+                    conteo = fila.getInt(0) +1;
+                }
+                conteoTotal = conteoTotal + fila.getInt(0);
+            }
+
+
+            if(conteo > 0)
+            {
+                registroPedido.put("prodcantidad",conteo);
+                db.update("pedido",registroPedido,"prodid = '"+producto.getObjectId()+"' AND prodsiningredientes = '"+sinIngredientes+"'",null);
+            }
+            else
+            {
+                conteo = 1;
+                registroPedido.put("prodid",producto.getObjectId());
+                registroPedido.put("prodprecio",producto.getPrecio());
+                registroPedido.put("prodnombreing",producto.getProdnombre());
+                registroPedido.put("prodnombreesp",producto.getProdnombreesp());
+                registroPedido.put("proddescripcioning",producto.getProddescripcion());
+                registroPedido.put("proddescripcionesp",producto.getProddescripcionesp());
+                registroPedido.put("prodcantidad",conteo);
+                registroPedido.put("prodsiningredientes",sinIngredientes);
+                registroPedido.put("prodsiningredientesing",sinIngredientesIng);
+                db.insert("pedido",null,registroPedido);
+            }
+
+
+        }
+        else
+        {
+            registroPedido.put("prodid",producto.getObjectId());
+            registroPedido.put("prodprecio",producto.getPrecio());
+            registroPedido.put("prodnombreing",producto.getProdnombre());
+            registroPedido.put("prodnombreesp",producto.getProdnombreesp());
+            registroPedido.put("proddescripcioning",producto.getProddescripcion());
+            registroPedido.put("proddescripcionesp",producto.getProddescripcionesp());
+            registroPedido.put("prodcantidad",conteoTotal);
+            registroPedido.put("prodsiningredientes",sinIngredientes);
+            registroPedido.put("prodsiningredientesing",sinIngredientesIng);
+            db.insert("pedido",null,registroPedido);
+        }
+        db.close();
+
+        txtconteo.setText("" + conteoTotal);
+        txtconteo.setVisibility(View.VISIBLE);
+        btndisminuir.setVisibility(View.VISIBLE);
     }
 
 
+    private void disminuirProducto(Producto producto,TextView txtdisminuir, TextView txtconteo, String sinIngredientes)
+    {
+        int cantidad=0;
+        int cantidadProductoPersonalizado =0;
+        MediaPlayer m = MediaPlayer.create(this, R.raw.sonido_click);
+        m.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            public void onCompletion(MediaPlayer mp) {
+                mp.release();
+            }
+        });
+        m.start();
+
+        AdminSQliteOpenHelper admin = new AdminSQliteOpenHelper(this,"admin",null,AdminSQliteOpenHelper.v);
+        SQLiteDatabase db = admin.getWritableDatabase();
+        Cursor fila = db.rawQuery("select prodcantidad , prodsiningredientes from pedido where prodid = '" + producto.getObjectId() + "'", null);
+        if(fila.moveToFirst())
+        {
+            cantidad=fila.getInt(0);
+            if(fila.getString(1).equals(sinIngredientes))
+            {
+                cantidadProductoPersonalizado = fila.getInt(0) -1;
+            }
+
+            while (fila.moveToNext())
+            {
+                cantidad = cantidad +fila.getInt(0);
+
+                if(fila.getString(1).equals(sinIngredientes))
+                {
+                    cantidadProductoPersonalizado = fila.getInt(0) -1;
+                }
+            }
+
+            cantidad = cantidad -1;
+
+            if(cantidadProductoPersonalizado==0)
+            {
+                db.delete("pedido", "prodid ='" + producto.getObjectId() + "' AND prodsiningredientes = '"+sinIngredientes+"'", null);
+            }
+            else
+            {
+                ContentValues registroPedido= new ContentValues();
+                registroPedido.put("prodcantidad",cantidadProductoPersonalizado);
+                db.update("pedido", registroPedido, "prodid = '" + producto.getObjectId() + "' AND prodsiningredientes = '"+sinIngredientes+"'", null);
+            }
+        }
+        db.close();
+
+        if(cantidad==0)
+        {
+            txtconteo.setVisibility(View.GONE);
+            txtconteo.setText(0 + "");
+            txtdisminuir.setVisibility(View.GONE);
+        }
+        else
+        {
+            txtconteo.setText(cantidad + "");
+        }
+    }
 }

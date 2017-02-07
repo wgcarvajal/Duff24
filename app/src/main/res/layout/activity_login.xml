@@ -3,8 +3,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="duff24.com.duff24.LoginActivity"
-    android:background="@drawable/fondo"
     >
+
+    <VideoView
+        android:id="@+id/videofondo"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@drawable/bordes_redondos_dialog_descripcion_producto"
+
+        />
+
     <ImageView
         android:id="@+id/flecha_atras"
         android:layout_width="@dimen/tam_ancho_flecha_atras"

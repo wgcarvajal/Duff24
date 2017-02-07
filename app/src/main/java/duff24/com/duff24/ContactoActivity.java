@@ -2,6 +2,7 @@ package duff24.com.duff24;
 
 import android.app.ProgressDialog;
 import android.graphics.Typeface;
+import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -13,6 +14,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.backendless.Backendless;
 import com.backendless.async.callback.AsyncCallback;
@@ -32,13 +34,16 @@ public class ContactoActivity extends AppCompatActivity implements View.OnClickL
     private EditText textMensaje;
     private TextView textOpinion;
     private Button btnEnviar;
-    private String font_path_ASimple="font/A_Simple_Life.ttf";
+    private String font_path = "font/KGTenThousandReasonsAlt.ttf";
     private ProgressDialog pd = null;
+    private VideoView videofondo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contacto);
+
+        videofondo = (VideoView)findViewById(R.id.videofondo);
 
         btnFlechaAtras=(ImageView)findViewById(R.id.flecha_atras);
         btnEnviar=(Button)findViewById(R.id.btn_enviar_pedido);
@@ -51,15 +56,27 @@ public class ContactoActivity extends AppCompatActivity implements View.OnClickL
         btnFlechaAtras.setOnClickListener(this);
         btnEnviar.setOnClickListener(this);
 
-        Typeface TF = FontCache.get(font_path_ASimple,this);
+        Typeface TF = FontCache.get(font_path,this);
         textOpinion.setTypeface(TF);
         textMensaje.setTypeface(TF);
         textNombre.setTypeface(TF);
         textEmail.setTypeface(TF);
-
         btnEnviar.setTypeface(TF);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        this.videofondo.setVideoPath("android.resource://"+getPackageName()+"/"+R.raw.fondo_duff);
+        this.videofondo.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
+        {
+            public void onCompletion(MediaPlayer paramAnonymousMediaPlayer)
+            {
+                ContactoActivity.this.videofondo.start();
+            }
+        });
+        this.videofondo.start();
+    }
 
     @Override
     public void onClick(View v)

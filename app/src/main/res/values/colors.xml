@@ -3,6 +3,7 @@
     <color name="blanco">#ffffff</color>
     <color name="rojoTransparente">#66ff0000</color>
     <color name="rojo_mas_Transparente">#88ff0000</color>
+    <color name="rojo_super_Transparente">#44ff0000</color>
     <color name="rojo">#ff0000</color>
     <color name="negro">#000000</color>
     <color name="transparente">#00000000</color>
@@ -12,5 +13,7 @@
     <color name="vinotinto">#7C0808</color>
 
     <color name="negroTransparente">#BB000000</color>
+
+    <color name="rojo_transparente_producto">#778A0808</color>
 
 </resources>

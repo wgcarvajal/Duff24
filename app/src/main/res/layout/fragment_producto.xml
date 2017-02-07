@@ -3,7 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="duff24.com.duff24.fragments.MascotaFragment"
     android:background="#44000000"
     >
 
@@ -11,7 +10,6 @@
         android:id="@+id/textsubcategoria"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_small"
         android:text="@string/la_carta"
         android:textSize="@dimen/tam_titulo_subcategoria"
 
@@ -34,7 +32,22 @@
         android:layout_alignRight="@id/textsubcategoria"
         android:scaleType="fitXY"
         />
-    <ListView
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/gridProductos"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/btn_mi_pedido"
+        android:cacheColorHint="@color/transparente"
+        android:scrollbars="none"
+        android:layout_marginLeft="@dimen/super_margin_small"
+        android:layout_marginRight="@dimen/super_margin_small"
+        android:layout_marginTop="@dimen/super_margin_small"
+
+        >
+    </android.support.v7.widget.RecyclerView>
+
+    <!--<ListView
         android:id="@+id/lstproductos"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -49,6 +62,6 @@
         android:layout_marginBottom="30dp"
         android:layout_below="@id/btn_mi_pedido"
         >
-    </ListView>
+    </ListView>-->
 
 </RelativeLayout>

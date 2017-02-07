@@ -2,7 +2,11 @@
 <resources>
 
 
+    <string name="app_name">Duff24</string>
     <string name="la_carta">La Carta</string>
+
+    <string name="hello_world">Hola desde Duff 24!</string>
+
 
     <string name="comida">Comidas</string>
     <string name="bebida">Bebidas</string>
@@ -28,7 +32,7 @@
     <string name="txt_barrio">Barrio</string>
     <string name="txt_telefono">Teléfono</string>
     <string name="text_enviar_pedido">Enviar pedido</string>
-    <string name="text_hint_observaciones">Observaciones (Opcional).\n ejemplo: Hamburguesa sin cebolla.</string>
+    <string name="text_hint_observaciones">Observaciones (Opcional).\n ejemplo: Traer cambio de billete de 50mil.</string>
     <string name="campos_obligatorios">Todos los campos son obligatorios menos el de observaciones</string>
     <string name="seleccione_forma_pago">Seleccione una forma de pago</string>
     <string name="compruebe_conexion">Compruebe su conexión a internet...</string>
@@ -75,6 +79,12 @@
     <string name="txt_mensaje_usuario_no_puede_ser_logueado">El correo electrónico se registro bajo la autenticación por facebook.</string>
 
 
+    <string name="txt_btn_agregar_dialog_descripcion">Agregar</string>
+    <string name="txt_siningrediente_dialog_descripcion">Quitale:</string>
+    <string name="txt_cebolla">Cebolla</string>
+    <string name="txt_tomate">Tomate</string>
+    <string name="txt_salsas">Salsas</string>
+    <string name="cerrar_dialog_disminuir">Cerrar</string>
 
     <string-array name="forma_pago">
         <item>Seleccione forma de pago</item>

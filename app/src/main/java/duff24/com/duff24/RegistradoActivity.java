@@ -7,6 +7,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
+import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -26,6 +27,7 @@ import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.backendless.Backendless;
 import com.backendless.BackendlessCollection;
@@ -57,7 +59,7 @@ import duff24.com.duff24.util.FontCache;
 
 public class RegistradoActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
 
-    private String font_path="font/A_Simple_Life.ttf";
+    private String font_path="font/KGTenThousandReasonsAlt.ttf";
 
     private ImageView btnFlechaAtras;
     private Spinner spDireccion;
@@ -80,6 +82,7 @@ public class RegistradoActivity extends AppCompatActivity implements View.OnClic
     private AdaptadorSpinnerCiudad adapterciudad;
     private ProgressDialog pd = null;
     private Dialog dialog;
+    private VideoView videofondo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -87,6 +90,7 @@ public class RegistradoActivity extends AppCompatActivity implements View.OnClic
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registrado);
 
+        videofondo = (VideoView)findViewById(R.id.videofondo);
         btnFlechaAtras=(ImageView)findViewById(R.id.flecha_atras);
         spDireccion=(Spinner)findViewById(R.id.sp_direccion);
         scrollformulario=(ScrollView)findViewById(R.id.scrollformularioregistrado);
@@ -120,6 +124,20 @@ public class RegistradoActivity extends AppCompatActivity implements View.OnClic
         loadView();
     }
 
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        this.videofondo.setVideoPath("android.resource://"+getPackageName()+"/"+R.raw.fondo_duff);
+        this.videofondo.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
+        {
+            public void onCompletion(MediaPlayer paramAnonymousMediaPlayer)
+            {
+                RegistradoActivity.this.videofondo.start();
+            }
+        });
+        this.videofondo.start();
+    }
 
     private void loadView()
     {
@@ -273,6 +291,7 @@ public class RegistradoActivity extends AppCompatActivity implements View.OnClic
                         "<tr>" +
                         "<th>Producto</th>" +
                         "<th>cantidad</th>"+
+                        "<th>detalles</th>"+
                         "<th>Precio</th>"+
                         "<th>Total</th>"+
                         "</tr>";
@@ -280,7 +299,7 @@ public class RegistradoActivity extends AppCompatActivity implements View.OnClic
                 int totalPedido=0;
                 AdminSQliteOpenHelper admin = AdminSQliteOpenHelper.crearSQLite(getApplicationContext());
                 SQLiteDatabase db = admin.getReadableDatabase();
-                Cursor fila = db.rawQuery("select prodid,prodcantidad from pedido", null);
+                Cursor fila = db.rawQuery("select prodid,prodcantidad,prodsiningredientes from pedido", null);
                 if (fila != null) {
 
                     if (fila.moveToFirst()) {
@@ -289,7 +308,7 @@ public class RegistradoActivity extends AppCompatActivity implements View.OnClic
                             itempedido.setPedido(response.getObjectId());
                             itempedido.setProducto(fila.getString(fila.getColumnIndex("prodid")));
                             itempedido.setItemcantidad(fila.getInt(fila.getColumnIndex("prodcantidad")));
-
+                            itempedido.setSiningredientes(fila.getString(fila.getColumnIndex("prodsiningredientes")));
                             Producto producto= new Producto();
 
                             for(Producto p: AppUtil.data)
@@ -322,6 +341,7 @@ public class RegistradoActivity extends AppCompatActivity implements View.OnClic
                                     "<tr>"+
                                     "<td>"+producto.getProdnombreesp()+"</td>"+
                                     "<td>"+fila.getInt(fila.getColumnIndex("prodcantidad"))+"</td>"+
+                                    "<td> sin: " + fila.getString(fila.getColumnIndex("prodsiningredientes")) + "</td>" +
                                     "<td>"+producto.getPrecio()+"</td>"+
                                     "<td>"+total+"</td>"+
                                     "</tr>";
@@ -346,9 +366,10 @@ public class RegistradoActivity extends AppCompatActivity implements View.OnClic
                         });
 
 
-
+                        ArrayList pedidos = new ArrayList<String>();
+                        pedidos.add("default");
                         Messaging.DEVICE_ID=response.getObjectId();
-                        Backendless.Messaging.registerDevice("464411838818", new AsyncCallback<Void>() {
+                        Backendless.Messaging.registerDevice("464411838818",pedidos,null, new AsyncCallback<Void>() {
                             @Override
                             public void handleResponse(Void response) {
                                 Log.i("device:", "registrado");

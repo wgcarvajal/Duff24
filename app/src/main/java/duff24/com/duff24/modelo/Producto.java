@@ -40,6 +40,9 @@ public class Producto
     private String subcategoriaesp;
     private String imgFile;
     private String subcategoria;
+    private String imgFileNew;
+    private boolean condescripcion;
+    private boolean personalizable;
 
 
     public String getObjectId() {
@@ -114,11 +117,37 @@ public class Producto
         this.imgFile = imgFile;
     }
 
+    public String getImgFileNew() {
+        return imgFileNew;
+    }
+
+    public void setImgFileNew(String imgFileNew) {
+        this.imgFileNew = imgFileNew;
+    }
+
     public String getSubcategoria() {
         return subcategoria;
     }
 
     public void setSubcategoria(String subcategoria) {
         this.subcategoria = subcategoria;
+    }
+
+
+    public boolean isCondescripcion() {
+        return condescripcion;
+    }
+
+    public void setCondescripcion(boolean condescripcion) {
+        this.condescripcion = condescripcion;
+    }
+
+
+    public boolean isPersonalizable() {
+        return personalizable;
+    }
+
+    public void setPersonalizable(boolean personalizable) {
+        this.personalizable = personalizable;
     }
 }

@@ -16,12 +16,12 @@
         android:scaleType="fitXY"
         />
 
-    <pl.droidsonroids.gif.GifImageView
+    <include
         android:id="@+id/placeholder"
         android:layout_width="@dimen/tam_place_holder"
         android:layout_height="@dimen/tam_place_holder"
-        android:scaleType="fitXY"
         android:layout_centerInParent="true"
+        layout="@layout/progress_layout"
         />
 
 </RelativeLayout>

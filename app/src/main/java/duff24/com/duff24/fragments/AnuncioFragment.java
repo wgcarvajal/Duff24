@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.backendless.Backendless;
@@ -33,7 +34,7 @@ public class AnuncioFragment extends FragmentGeneric {
     private String subcategoriaesp;
     private String anuncioId;
     private ImageView anuncio;
-    private ImageView placeholder;
+    private RelativeLayout placeholder;
     private String font_path = "font/2-4ef58.ttf";
 
 
@@ -81,7 +82,7 @@ public class AnuncioFragment extends FragmentGeneric {
 
 
         anuncio=(ImageView)v.findViewById(R.id.anuncio);
-        placeholder = (ImageView)v.findViewById(R.id.placeholder);
+        placeholder = (RelativeLayout)v.findViewById(R.id.placeholder);
         return v;
     }
 
@@ -107,7 +108,6 @@ public class AnuncioFragment extends FragmentGeneric {
                 if(getResources().getString(R.string.idioma).equals("es"))
                 {
                     placeholder.setVisibility(View.VISIBLE);
-                    placeholder.setImageResource(R.drawable.carga);
 
                     Picasso.with(getContext())
                             .load(an.getImgFileEsp())
@@ -116,7 +116,6 @@ public class AnuncioFragment extends FragmentGeneric {
                                 public void onSuccess()
                                 {
                                     placeholder.setVisibility(View.GONE);
-                                    placeholder.setImageDrawable(null);
 
                                 }
 
@@ -129,14 +128,12 @@ public class AnuncioFragment extends FragmentGeneric {
                 else
                 {
                     placeholder.setVisibility(View.VISIBLE);
-                    placeholder.setImageResource(R.drawable.carga);
                     Picasso.with(getContext())
                             .load(an.getImgFile())
                             .into(anuncio, new Callback() {
                                 @Override
                                 public void onSuccess() {
                                     placeholder.setVisibility(View.GONE);
-                                    placeholder.setImageDrawable(null);
                                 }
 
                                 @Override
@@ -177,7 +174,6 @@ public class AnuncioFragment extends FragmentGeneric {
                 AppUtil.listaAnuncios.add(response);
 
                 placeholder.setVisibility(View.VISIBLE);
-                placeholder.setImageResource(R.drawable.carga);
                 if(context.getResources().getString(R.string.idioma).equals("es"))
                 {
                     Picasso.with(getContext())
@@ -186,7 +182,6 @@ public class AnuncioFragment extends FragmentGeneric {
                                 @Override
                                 public void onSuccess() {
                                     placeholder.setVisibility(View.GONE);
-                                    placeholder.setImageDrawable(null);
                                 }
 
                                 @Override
@@ -203,7 +198,6 @@ public class AnuncioFragment extends FragmentGeneric {
                                 @Override
                                 public void onSuccess() {
                                     placeholder.setVisibility(View.GONE);
-                                    placeholder.setImageDrawable(null);
                                 }
 
                                 @Override

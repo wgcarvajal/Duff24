@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -21,6 +22,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.backendless.Backendless;
 import com.backendless.BackendlessUser;
@@ -44,7 +46,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public final static int MI_REQUEST_CODE_CONT_NO_REGISTRADO = 2;
     public final static int MI_REQUEST_SE_LOGUIO_USUARIO=101;
 
-    private String font_path="font/A_Simple_Life.ttf";
+    private String font_path="font/KGTenThousandReasonsAlt.ttf";
     private ImageView btnAtras;
     private Button btnIniciarSesion;
     private Button btnRegistrarse;
@@ -56,6 +58,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private ProgressDialog pd = null;
     private Button btnFacebook;
     private Dialog dialog;
+    private VideoView videofondo;
 
     private CallbackManager callbackManager;
 
@@ -66,6 +69,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        videofondo = (VideoView)findViewById(R.id.videofondo);
         txtrecuperarClave=(TextView)findViewById(R.id.recuperarClave);
         txtemail=(TextView)findViewById(R.id.txt_email);
         txtpassword=(TextView)findViewById(R.id.txt_password);
@@ -92,6 +96,20 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         btnFacebook.setTypeface(TF);
 
         callbackManager = CallbackManager.Factory.create();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        this.videofondo.setVideoPath("android.resource://"+getPackageName()+"/"+R.raw.fondo_duff);
+        this.videofondo.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
+        {
+            public void onCompletion(MediaPlayer paramAnonymousMediaPlayer)
+            {
+                LoginActivity.this.videofondo.start();
+            }
+        });
+        this.videofondo.start();
     }
 
 

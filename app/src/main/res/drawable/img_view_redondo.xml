@@ -8,5 +8,6 @@
     <!-- Just to add a border -->
     <stroke
         android:color="#ffffff"
+        android:width="1dp"
         />
 </shape>

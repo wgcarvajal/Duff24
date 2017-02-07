@@ -3,6 +3,7 @@ package duff24.com.duff24;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.graphics.Typeface;
+import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -16,6 +17,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.backendless.Backendless;
 import com.backendless.BackendlessUser;
@@ -28,7 +30,7 @@ import duff24.com.duff24.modelo.Telefono;
 import duff24.com.duff24.util.FontCache;
 
 public class RegistrarseActivity extends AppCompatActivity implements View.OnClickListener {
-    private String font_path_ASimple="font/A_Simple_Life.ttf";
+    private String font_path_ASimple="font/KGTenThousandReasonsAlt.ttf";
     private TextView txtnombre;
     private TextView txtemail;
     private TextView txtpassword;
@@ -36,6 +38,7 @@ public class RegistrarseActivity extends AppCompatActivity implements View.OnCli
     private Button btnRegistrarse;
     private ImageView btnAtras;
     private ProgressDialog pd = null;
+    private VideoView videofondo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -43,6 +46,7 @@ public class RegistrarseActivity extends AppCompatActivity implements View.OnCli
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registrarse);
 
+        videofondo = (VideoView)findViewById(R.id.videofondo);
         txtnombre=(TextView)findViewById(R.id.txt_nombre);
         txtemail=(TextView)findViewById(R.id.txt_email);
         txtpassword=(TextView)findViewById(R.id.txt_password);
@@ -62,6 +66,19 @@ public class RegistrarseActivity extends AppCompatActivity implements View.OnCli
         btnRegistrarse.setOnClickListener(this);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        this.videofondo.setVideoPath("android.resource://"+getPackageName()+"/"+R.raw.fondo_duff);
+        this.videofondo.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
+        {
+            public void onCompletion(MediaPlayer paramAnonymousMediaPlayer)
+            {
+                RegistrarseActivity.this.videofondo.start();
+            }
+        });
+        this.videofondo.start();
+    }
 
     @Override
     public void onClick(View v)

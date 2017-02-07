@@ -3,8 +3,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="duff24.com.duff24.ContactoActivity"
-    android:background="@drawable/fondo">
+    >
 
+    <VideoView
+        android:id="@+id/videofondo"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@drawable/bordes_redondos_dialog_descripcion_producto"
+
+        />
 
     <ImageView
         android:id="@+id/flecha_atras"
@@ -43,7 +54,7 @@
             <TextView
                 android:id="@+id/txtOpinion"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/tam_alto_caja_texto"
+                android:layout_height="wrap_content"
                 android:layout_below="@id/imagen_login"
                 android:textColor="@color/blanco"
                 android:textSize="@dimen/size_text_caja_texto"

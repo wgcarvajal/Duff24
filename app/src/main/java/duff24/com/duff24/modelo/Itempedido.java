@@ -10,6 +10,7 @@ public class Itempedido
     private int itemcantidad;
     private String producto;
     private int precioProducto;
+    private String siningredientes;
 
     public String getObjectId() {
         return objectId;
@@ -49,5 +50,14 @@ public class Itempedido
 
     public void setPrecioProducto(int precioProducto) {
         this.precioProducto = precioProducto;
+    }
+
+
+    public String getSiningredientes() {
+        return siningredientes;
+    }
+
+    public void setSiningredientes(String siningredientes) {
+        this.siningredientes = siningredientes;
     }
 }

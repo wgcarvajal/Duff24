@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/txt_nombre_producto_dialog_disminuir"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/size_precio_dialog_descripcion"
+        android:gravity="center"
+        android:textColor="@color/blanco"/>
+
+    <Button
+        android:id="@+id/btn_cerrar_dialog_disminuir"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/cerrar_dialog_disminuir"
+        android:layout_alignParentBottom="true"
+        android:textColor="@color/blanco"
+        android:background="@drawable/bordes_superiores_redondos_fondo_rojo_transparente"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        />
+
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/list_producto_personalizado"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/txt_nombre_producto_dialog_disminuir"
+        android:layout_above="@id/btn_cerrar_dialog_disminuir"
+        android:cacheColorHint="@color/transparente"
+        android:scrollbars="none"
+        android:layout_marginLeft="@dimen/super_margin_small"
+        android:layout_marginRight="@dimen/super_margin_small"
+        android:layout_marginTop="@dimen/margin_small"
+        >
+
+    </android.support.v7.widget.RecyclerView>
+
+
+
+
+</RelativeLayout>

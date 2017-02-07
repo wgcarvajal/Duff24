@@ -7,5 +7,8 @@
     <solid android:color="@color/rojo_mas_Transparente" />
     <!-- Just to add a border -->
 
-    <corners android:radius="10dp"></corners>
+    <corners android:radius="10dp">
+
+
+    </corners>
 </shape>

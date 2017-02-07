@@ -10,9 +10,11 @@ import android.util.Log;
  */
 public class AdminSQliteOpenHelper extends SQLiteOpenHelper
 {
+    public static int v = 3;
+
     public static AdminSQliteOpenHelper crearSQLite(Context context)
     {
-        return  new AdminSQliteOpenHelper(context,"admin", null, 2);
+        return  new AdminSQliteOpenHelper(context,"admin", null, v);
     }
 
     public AdminSQliteOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version)
@@ -23,7 +25,7 @@ public class AdminSQliteOpenHelper extends SQLiteOpenHelper
     @Override
     public void onCreate(SQLiteDatabase db)
     {
-        db.execSQL("create table pedido(prodid text primary key, prodcantidad integer, prodprecio integer, prodnombreesp text, prodnombreing text, proddescripcioning text, proddescripcionesp text )");
+        db.execSQL("create table pedido(prodid text, prodcantidad integer, prodprecio integer, prodnombreesp text, prodnombreing text, proddescripcioning text, proddescripcionesp text , prodsiningredientes text, prodsiningredientesing text, PRIMARY KEY ( prodid, prodsiningredientes))");
     }
 
     @Override
@@ -32,6 +34,6 @@ public class AdminSQliteOpenHelper extends SQLiteOpenHelper
         Log.e("se borro BD:", "nueva:"+newVersion);
         Log.e("vieja version", ":"+oldVersion);
         db.execSQL("drop table if exists pedido");
-        db.execSQL("create table pedido(prodid text primary key, prodcantidad integer, prodprecio integer, prodnombreesp text, prodnombreing text, proddescripcioning text, proddescripcionesp text )");
+        db.execSQL("create table pedido(prodid text, prodcantidad integer, prodprecio integer, prodnombreesp text, prodnombreing text, proddescripcioning text, proddescripcionesp text , prodsiningredientes text, prodsiningredientesing text, PRIMARY KEY ( prodid, prodsiningredientes))");
     }
 }

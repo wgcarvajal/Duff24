@@ -8,11 +8,14 @@ import android.graphics.Typeface;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Callback;
@@ -29,114 +32,72 @@ import duff24.com.duff24.util.FontCache;
 /**
  * Created by geovanny on 8/01/16.
  */
-public class AdaptadorProducto extends BaseAdapter implements View.OnClickListener
-{
+
+
+public class AdaptadorProducto extends RecyclerView.Adapter<AdaptadorProducto.ProductoViewHolder> implements View.OnClickListener {
     private Context context;
     private List<Producto> data;
-    private LayoutInflater mInflater;
-
-    private String font_path = "font/2-4ef58.ttf";
-    private String font_pathOds="font/odstemplik.otf";
-    private String font_path_ASimple="font/A_Simple_Life.ttf";
+    //private LayoutInflater mInflater;
+    private String sunshine="font/sunshine.ttf";
+    private OnItemClickListener onItemClickListener;
 
 
-    public class ViewHolder
+
+    public interface OnItemClickListener
     {
-        public TextView txtnombreProducto;
-        public ImageView imagenProducto;
-        public ImageView placeholder;
-        public TextView txtconteo;
-        public TextView btnDisminuir;
-        public TextView txtPrecioProducto;
-        public TextView txtDescripcionProducto;
+
+        void itemClick(Producto producto,TextView btnDisminuir , TextView txtconteo);
+        void itemClickDisminuir(Producto producto,TextView btnDisminuir , TextView txtconteo);
+
     }
 
-    public AdaptadorProducto(Context context, List<Producto> data)
+    public AdaptadorProducto(Context context, List<Producto> data , OnItemClickListener onItemClickListener)
     {
-        mInflater=(LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.context = context;
         this.data = data;
+        this.onItemClickListener = onItemClickListener;
     }
+
     @Override
-    public int getCount()
+    public ProductoViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.template_producto,parent,false);
+        ProductoViewHolder productoViewHolder = new ProductoViewHolder(v);
+        productoViewHolder.fijarTiposLetras(sunshine,context);
+        v.setTag(productoViewHolder);
+        return productoViewHolder;
+    }
+
+    @Override
+    public void onBindViewHolder(ProductoViewHolder holder, int position)
     {
-        if(data!=null)
+        Producto p = data.get(position);
+        holder.txtconteo.setText("0");
+        fijarDatos(p,holder,position);
+
+        holder.placeholder.setVisibility(View.VISIBLE);
+        holder.placeholder.setImageResource(R.drawable.foodgif);
+        final ProductoViewHolder viewHolder = holder;
+
+        String imgFile;
+
+        if(p.getImgFileNew() == null)
         {
-            return data.size();
-        }
-        return 0;
-    }
-
-    @Override
-    public Object getItem(int position)
-    {
-        if(data != null && position >= 0 && position < getCount() )
-        {
-            return data.get(position);
-        }
-        return null;
-    }
-
-    @Override
-    public long getItemId(int position)
-    {
-        return position;
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent)
-    {
-        View v = convertView;
-        final ViewHolder viewHolder;
-
-        if(convertView == null)
-        {
-            v = mInflater.inflate(R.layout.template_producto,parent,false);
-            viewHolder=new ViewHolder();
-            viewHolder.txtnombreProducto=(TextView) v.findViewById(R.id.txtnombreproducto);
-            viewHolder.imagenProducto=(ImageView) v.findViewById(R.id.img_producto);
-            viewHolder.placeholder=(ImageView)v.findViewById(R.id.placeholder);
-            viewHolder.txtconteo=(TextView) v.findViewById(R.id.txtconteo);
-            viewHolder.btnDisminuir=(TextView) v.findViewById(R.id.btn_disminuir);
-            viewHolder.txtPrecioProducto=(TextView) v.findViewById(R.id.txtprecioproducto);
-            viewHolder.txtDescripcionProducto=(TextView) v.findViewById(R.id.txtdescripcionproducto);
-            Typeface TF = FontCache.get(font_path,context);
-            viewHolder.txtnombreProducto.setTypeface(TF);
-            TF = FontCache.get(font_pathOds,context);
-            viewHolder.txtconteo.setTypeface(TF);
-            viewHolder.txtconteo.setText("0");
-            TF = FontCache.get(font_path_ASimple,context);
-            viewHolder.txtDescripcionProducto.setTypeface(TF);
-            viewHolder.txtPrecioProducto.setTypeface(TF);
-            viewHolder.btnDisminuir.setTag(R.id.txtconteo,viewHolder.txtconteo);
-            v.setTag(viewHolder);
+            imgFile = p.getImgFile();
         }
         else
         {
-            viewHolder=(ViewHolder)v.getTag();
-            viewHolder.txtconteo.setText("0");
+            imgFile = p.getImgFileNew();
         }
 
-        final Producto p = (Producto) getItem(position);
-        fijarDatos(p, viewHolder, context.getResources().getString(R.string.idioma), position);
-
-        viewHolder.placeholder.setVisibility(View.VISIBLE);
-        viewHolder.placeholder.setImageResource(R.drawable.carga);
-        viewHolder.txtPrecioProducto.setVisibility(View.INVISIBLE);
-        viewHolder.txtDescripcionProducto.setVisibility(View.INVISIBLE);
-        viewHolder.txtnombreProducto.setVisibility(View.INVISIBLE);
-
         Picasso.with(context)
-                .load(p.getImgFile())
+                .load(imgFile)
                 .into(viewHolder.imagenProducto, new Callback() {
 
                     @Override
                     public void onSuccess() {
+
                         viewHolder.placeholder.setImageDrawable(null);
                         viewHolder.placeholder.setVisibility(View.GONE);
-                        viewHolder.txtPrecioProducto.setVisibility(View.VISIBLE);
-                        viewHolder.txtDescripcionProducto.setVisibility(View.VISIBLE);
-                        viewHolder.txtnombreProducto.setVisibility(View.VISIBLE);
                     }
 
                     @Override
@@ -145,29 +106,56 @@ public class AdaptadorProducto extends BaseAdapter implements View.OnClickListen
                     }
                 });
 
-        return v;
     }
 
-    private void fijarDatos(Producto producto,ViewHolder viewHolder,String idioma,int position)
+    @Override
+    public int getItemCount() {
+        if(data!=null)
+        {
+            return data.size();
+        }
+        return 0;
+    }
+
+    public static class ProductoViewHolder extends RecyclerView.ViewHolder
     {
-        DecimalFormat format =new DecimalFormat("###,###.##");
-        String valorProducto=format.format(producto.getPrecio());
-        valorProducto=valorProducto.replace(",",".");
-        viewHolder.txtPrecioProducto.setText("$" + valorProducto);
-        if(idioma.equals("es"))
-        {
-            viewHolder.txtnombreProducto.setText(producto.getProdnombreesp());
-            viewHolder.txtDescripcionProducto.setText(producto.getProddescripcionesp());
+
+
+        ImageView imagenProducto;
+        ImageView placeholder;
+        TextView txtconteo;
+        TextView btnDisminuir;
+
+        public ProductoViewHolder(View itemView) {
+            super(itemView);
+            imagenProducto=(ImageView) itemView.findViewById(R.id.img_producto);
+            placeholder=(ImageView) itemView.findViewById(R.id.placeholder);
+            txtconteo=(TextView) itemView.findViewById(R.id.txtconteo);
+            btnDisminuir=(TextView) itemView.findViewById(R.id.btn_disminuir);
+
         }
-        else
+        public void  fijarTiposLetras(String tipo, Context context)
         {
-            viewHolder.txtnombreProducto.setText(producto.getProdnombre());
-            viewHolder.txtDescripcionProducto.setText(producto.getProddescripcion());
+            Typeface TF = FontCache.get(tipo,context);
+            txtconteo.setTypeface(TF);
+            txtconteo.setText("0");
+            btnDisminuir.setTag(R.id.txtconteo, txtconteo);
+            imagenProducto.setTag(R.id.txtconteo,txtconteo);
+            imagenProducto.setTag(R.id.btn_disminuir,btnDisminuir);
         }
+
+    }
+
+
+    private void fijarDatos(Producto producto,ProductoViewHolder viewHolder,int position)
+    {
+
         viewHolder.txtconteo.setVisibility(View.GONE);
         viewHolder.btnDisminuir.setVisibility(View.GONE);
         viewHolder.btnDisminuir.setTag(position);
+        viewHolder.imagenProducto.setTag(position);
         viewHolder.btnDisminuir.setOnClickListener(this);
+        viewHolder.imagenProducto.setOnClickListener(this);
         FijarCantidadTask fijarCantidadTask=new FijarCantidadTask(context,viewHolder);
         fijarCantidadTask.execute(producto.getObjectId());
 
@@ -175,11 +163,11 @@ public class AdaptadorProducto extends BaseAdapter implements View.OnClickListen
 
     public class FijarCantidadTask extends AsyncTask<String,Void,Void>
     {
-        ViewHolder viewHolder;
+        ProductoViewHolder viewHolder;
         Context context;
         int cantidad=0;
 
-        public FijarCantidadTask(Context context,ViewHolder viewHolder)
+        public FijarCantidadTask(Context context, ProductoViewHolder viewHolder)
         {
             this.viewHolder=viewHolder;
             this.context=context;
@@ -188,13 +176,18 @@ public class AdaptadorProducto extends BaseAdapter implements View.OnClickListen
         @Override
         protected Void doInBackground(String... params)
         {
-            AdminSQliteOpenHelper admin = AdminSQliteOpenHelper.crearSQLite(context);
+            AdminSQliteOpenHelper admin = new AdminSQliteOpenHelper(context,"admin",null,AdminSQliteOpenHelper.v);
 
             SQLiteDatabase db = admin.getReadableDatabase();
             Cursor fila = db.rawQuery("select prodcantidad from pedido where prodid = '"+params[0]+"'",null);
             if(fila.moveToFirst())
             {
                 cantidad=fila.getInt(0);
+
+                while (fila.moveToNext())
+                {
+                    cantidad = cantidad + fila.getInt(0);
+                }
             }
             db.close();
             return  null;
@@ -207,7 +200,7 @@ public class AdaptadorProducto extends BaseAdapter implements View.OnClickListen
             {
                 viewHolder.txtconteo.setVisibility(View.VISIBLE);
                 viewHolder.btnDisminuir.setVisibility(View.VISIBLE);
-                viewHolder.txtconteo.setText(cantidad+"");
+                viewHolder.txtconteo.setText(cantidad + "");
             }
         }
     }
@@ -215,77 +208,30 @@ public class AdaptadorProducto extends BaseAdapter implements View.OnClickListen
     @Override
     public void onClick(View v)
     {
-        TextView txtconteo=(TextView)v.getTag(R.id.txtconteo);
-        String prodid = data.get(Integer.parseInt(v.getTag().toString())).getObjectId();
-        DisminuirCantidadTask disminuirCantidadTask= new DisminuirCantidadTask(txtconteo,(TextView)v,context);
-        disminuirCantidadTask.execute(data.get(Integer.parseInt(v.getTag().toString())).getObjectId());
-    }
-
-    public class DisminuirCantidadTask extends AsyncTask<String,Void,Void>
-    {
-        private WeakReference<TextView> textViewWeakReference;
-        private WeakReference<TextView> imageViewWeakReference;
-        private Context context;
-        private int cantidad=0;
-
-        public DisminuirCantidadTask(TextView textView,TextView btn,Context context)
+        switch (v.getId())
         {
-            this.textViewWeakReference= new WeakReference<TextView>(textView);
-            this.imageViewWeakReference= new WeakReference<TextView>(btn);
-            this.context=context;
-        }
-        @Override
-        protected Void doInBackground(String... params)
-        {
-            MediaPlayer m = MediaPlayer.create(context, R.raw.sonido_click);
-            m.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                public void onCompletion(MediaPlayer mp) {
-                    mp.release();
-                }
-            });
-            m.start();
 
-            AdminSQliteOpenHelper admin = AdminSQliteOpenHelper.crearSQLite(context);
-            SQLiteDatabase db = admin.getWritableDatabase();
-            Cursor fila = db.rawQuery("select prodcantidad from pedido where prodid = '" + params[0] + "'", null);
-            if(fila.moveToFirst())
-            {
-                this.cantidad=fila.getInt(0)-1;
-                if(cantidad==0)
-                {
-                    db.delete("pedido", "prodid ='" + params[0] + "'", null);
-                }
-                else
-                {
-                    ContentValues registroPedido= new ContentValues();
-                    registroPedido.put("prodcantidad",cantidad);
-                    db.update("pedido", registroPedido, "prodid = '" + params[0] + "'", null);
-                }
-            }
-            db.close();
-            return null;
+            case R.id.btn_disminuir:
+
+
+                TextView txtconteo=(TextView)v.getTag(R.id.txtconteo);
+                Producto p = data.get(Integer.parseInt(v.getTag().toString()));
+                onItemClickListener.itemClickDisminuir(p,(TextView)v,txtconteo);
+                break;
+
+            case R.id.img_producto:
+                Log.i("entro ", "entroooooooooooooooooo");
+                int posicion = Integer.parseInt(v.getTag().toString());
+                TextView disminuir = (TextView) v.getTag(R.id.btn_disminuir);
+                TextView conteo = (TextView) v.getTag(R.id.txtconteo);
+                onItemClickListener.itemClick(data.get(posicion),disminuir, conteo);
+                break;
         }
 
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            if(cantidad==0)
-            {
-                imageViewWeakReference.get().setVisibility(View.GONE);
-                textViewWeakReference.get().setText(0+"");
-                textViewWeakReference.get().setVisibility(View.GONE);
-            }
-            else
-            {
-                textViewWeakReference.get().setText(cantidad + "");
-            }
-        }
     }
-
-
-
-
-    //--------------------------------------------------------------------
 
 
 }
+
+
+

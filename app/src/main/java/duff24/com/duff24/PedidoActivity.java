@@ -14,6 +14,8 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.util.Log;
@@ -31,6 +33,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.backendless.Backendless;
 import com.backendless.BackendlessUser;
@@ -45,19 +48,20 @@ import java.util.List;
 import duff24.com.duff24.adaptadores.AdaptadorProductoPedido;
 import duff24.com.duff24.basededatos.AdminSQliteOpenHelper;
 import duff24.com.duff24.modelo.Producto;
+import duff24.com.duff24.modelo.ProductoPersonalizado;
 import duff24.com.duff24.typeface.CustomTypefaceSpan;
 import duff24.com.duff24.util.AppUtil;
 import duff24.com.duff24.util.FontCache;
 
-public class PedidoActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener, AdapterView.OnItemClickListener, AdaptadorProductoPedido.OnDisminuirTotal {
+public class PedidoActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener, AdapterView.OnItemClickListener, AdaptadorProductoPedido.OnItemClickListener {
 
     public final static int MI_REQUEST_CODE = 1;
     public final static int MI_REQUEST_CODE_REGISTRADO = 2;
     public final static int MI_REQUEST_SE_LOGUIO_USUARIO=101;
 
+    private String font_path = "font/KGTenThousandReasonsAlt.ttf";
+    private String font_path_ASimple="font/VTKS_ANIMAL_2.ttf";
 
-    private String font_path = "font/2-4ef58.ttf";
-    private String font_path_ASimple="font/A_Simple_Life.ttf";
     private TextView titulo;
     private TextView tituloMenuHeader;
     private TextView textTotalPedido;
@@ -67,11 +71,14 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
     private DrawerLayout drawer;
     private NavigationView navView;
     private Button btnFinalizarPedido;
-    private GridView gridProductosPedido;
+    private RecyclerView gridProductosPedido;
+
+    private RecyclerView.LayoutManager layoutManager;
     private ImageView flechaAtras;
     private AdaptadorProductoPedido adapter;
-    private List<Producto> data= new ArrayList<>();
+    private List<ProductoPersonalizado> data= new ArrayList<>();
     private ProgressDialog pd = null;
+    private VideoView videofondo;
 
 
     @Override
@@ -80,6 +87,7 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pedido);
 
+        videofondo = (VideoView)findViewById(R.id.videofondo);
         titulo = (TextView)findViewById(R.id.txttitulo);
         tituloMenuHeader=(TextView)findViewById(R.id.titulo_header_menu);
         textTotalPedido=(TextView)findViewById(R.id.txt_total_pedido);
@@ -90,7 +98,7 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
         btnFinalizarPedido=(Button)findViewById(R.id.btn_finalizar_pedido);
         flechaAtras=(ImageView)findViewById(R.id.flecha_atras);
 
-        gridProductosPedido=(GridView)findViewById(R.id.grid_productos_pedido);
+        gridProductosPedido=(RecyclerView) findViewById(R.id.grid_productos_pedido);
 
         drawer=(DrawerLayout)findViewById(R.id.drawer);
         navView = (NavigationView) findViewById(R.id.nav);
@@ -133,21 +141,40 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
             }
         }
 
-        aplicandoTipoLetraItemMenu(m, font_path_ASimple);
+        aplicandoTipoLetraItemMenu(m, font_path);
 
-        Typeface TF = FontCache.get(font_path,this);
+        Typeface TF = FontCache.get(font_path_ASimple,this);
         titulo.setTypeface(TF);
         tituloMenuHeader.setTypeface(TF);
-        TF = FontCache.get(font_path_ASimple,this);
         btnFinalizarPedido.setTypeface(TF);
+        TF = FontCache.get(font_path,this);
         textDomicilio.setTypeface(TF);
 
-        adapter= new AdaptadorProductoPedido(this,data);
+        layoutManager = new LinearLayoutManager(this);
+        gridProductosPedido.setLayoutManager(layoutManager);
+        adapter= new AdaptadorProductoPedido(this,data, this);
+        SpacesItemDecoration spacesItemDecoration = new SpacesItemDecoration(getResources().getDimensionPixelSize(R.dimen.margin_item_grid_left_right),getResources().getDimensionPixelSize(R.dimen.margin_item_grid_bottom));
         gridProductosPedido.setAdapter(adapter);
-        gridProductosPedido.setOnItemClickListener(this);
+        gridProductosPedido.addItemDecoration(spacesItemDecoration);
 
+
+        DecimalFormat format= new DecimalFormat("###,###.##");
+        textDomicilio.setText(getResources().getString(R.string.domicilio_incluido) + " $" + format.format(AppUtil.listaSubcategorias.get(0).getDomicilio()).replace(",", ".") + ")");
         loadData();
 
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        this.videofondo.setVideoPath("android.resource://"+getPackageName()+"/"+R.raw.fondo_duff);
+        this.videofondo.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
+        {
+            public void onCompletion(MediaPlayer paramAnonymousMediaPlayer)
+            {
+                PedidoActivity.this.videofondo.start();
+            }
+        });
+        this.videofondo.start();
     }
 
     private void loadData()
@@ -155,7 +182,7 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
         AdminSQliteOpenHelper admin = AdminSQliteOpenHelper.crearSQLite(this);
         SQLiteDatabase db = admin.getReadableDatabase();
 
-        Cursor fila = db.rawQuery("select prodid, prodcantidad from pedido", null);
+        Cursor fila = db.rawQuery("select prodid,prodprecio, prodcantidad , prodsiningredientes ,prodsiningredientesing from pedido", null);
         if (fila != null) {
 
             if (fila.moveToFirst())
@@ -168,19 +195,31 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
                     {
                         if(p.getObjectId().equals(fila.getString(fila.getColumnIndex("prodid"))))
                         {
-                            data.add(p);
+                            ProductoPersonalizado productoPersonalizado = new ProductoPersonalizado();
+                            productoPersonalizado.setProdid(fila.getString(0));
+                            productoPersonalizado.setProdprecio(p.getPrecio());
+                            productoPersonalizado.setNombreEsp(p.getProdnombreesp());
+                            productoPersonalizado.setNombreIng(p.getProdnombre());
+                            productoPersonalizado.setDescripcionEsp(p.getProddescripcionesp());
+                            productoPersonalizado.setDescripcionIng(p.getProddescripcion());
+                            productoPersonalizado.setProdcantidad(fila.getInt(2));
+                            productoPersonalizado.setProdsiningredientes(fila.getString(3));
+                            productoPersonalizado.setProdsiningredientesIng(fila.getString(4));
+                            productoPersonalizado.setImgFile(p.getImgFile());
+                            data.add(productoPersonalizado);
                             contador=contador+(fila.getInt(fila.getColumnIndex("prodcantidad"))*p.getPrecio());
-                            adapter.notifyDataSetChanged();
+
                             break;
                         }
                     }
 
                 } while (fila.moveToNext());
                 DecimalFormat format= new DecimalFormat("###,###.##");
+                adapter.notifyDataSetChanged();
                 String valorTotal=format.format(contador);
                 valorTotal=valorTotal.replace(",",".");
                 textValorTotalPedido.setText("$"+valorTotal);
-                textDomicilio.setText(getResources().getString(R.string.domicilio_incluido)+" $"+format.format(AppUtil.listaSubcategorias.get(0).getDomicilio()).replace(",",".")+")");
+
             }
         }
         db.close();
@@ -356,7 +395,7 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
         String substring = valorTotalpedido.substring(1);
         substring =substring.replace(".","");
         int contador= Integer.parseInt(substring);
-        contador= contador+ data.get(position).getPrecio();
+        contador= contador+ data.get(position).getProdprecio();
 
         DecimalFormat format= new DecimalFormat("###,###.##");
         String valorTotal=format.format(contador);
@@ -374,14 +413,14 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
         ContentValues registroPedido= new ContentValues();
         registroPedido.put("prodcantidad",conteo);
 
-        int cant= db.update("pedido",registroPedido,"prodid = '"+data.get(position).getObjectId()+"'",null);
+        int cant= db.update("pedido",registroPedido,"prodid = '"+data.get(position).getProdid()+"'",null);
 
         db.close();
 
     }
 
-    @Override
-    public void onDisminuirTotal(int precio)
+
+    public void disminuirTotal(int precio)
     {
         String valorTotalpedido=textValorTotalPedido.getText().toString();
         String substring = valorTotalpedido.substring(1);
@@ -397,6 +436,18 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
             flechaAtras.setVisibility(View.VISIBLE);
 
         }
+        DecimalFormat format= new DecimalFormat("###,###.##");
+        String valorTotal=format.format(contador);
+        valorTotal=valorTotal.replace(",",".");
+        textValorTotalPedido.setText("$" + valorTotal);
+    }
+
+    public void aumentarTotal(int precio)
+    {
+        String valorTotalpedido=textValorTotalPedido.getText().toString();
+        String substring = valorTotalpedido.substring(1);
+        substring =substring.replace(".","");
+        int contador= Integer.parseInt(substring)+precio;
         DecimalFormat format= new DecimalFormat("###,###.##");
         String valorTotal=format.format(contador);
         valorTotal=valorTotal.replace(",",".");
@@ -588,5 +639,65 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
             }
         });
         dialog.show();
+    }
+
+    @Override
+    public void aumentarProducto(ProductoPersonalizado productoPersonalizado, TextView btnDisminuir, TextView txtConteo)
+    {
+        MediaPlayer m = MediaPlayer.create(this, R.raw.sonido_click);
+        m.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            public void onCompletion(MediaPlayer mp) {
+                mp.release();
+            }
+        });
+        m.start();
+        int cantidad = productoPersonalizado.getProdcantidad();
+        cantidad = cantidad +1;
+        productoPersonalizado.setProdcantidad(cantidad);
+        txtConteo.setText(cantidad+"");
+        aumentarTotal(productoPersonalizado.getProdprecio());
+
+        AdminSQliteOpenHelper admin = new AdminSQliteOpenHelper(this,"admin",null,AdminSQliteOpenHelper.v);
+        SQLiteDatabase db = admin.getWritableDatabase();
+        ContentValues registroPedido= new ContentValues();
+        registroPedido.put("prodcantidad",cantidad);
+        db.update("pedido", registroPedido, "prodid = '" + productoPersonalizado.getProdid() + "' AND prodsiningredientes = '"+productoPersonalizado.getProdsiningredientes()+"'", null);
+        db.close();
+    }
+
+    @Override
+    public void disminurProducto(ProductoPersonalizado productoPersonalizado, TextView btnDisminuir, TextView txtConteo)
+    {
+        MediaPlayer m = MediaPlayer.create(this, R.raw.sonido_click);
+        m.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            public void onCompletion(MediaPlayer mp) {
+                mp.release();
+            }
+        });
+        m.start();
+        int cantidad = productoPersonalizado.getProdcantidad();
+        cantidad = cantidad -1;
+
+        AdminSQliteOpenHelper admin = new AdminSQliteOpenHelper(this,"admin",null,AdminSQliteOpenHelper.v);
+        SQLiteDatabase db = admin.getWritableDatabase();
+
+        if(cantidad>0)
+        {
+            productoPersonalizado.setProdcantidad(cantidad);
+            txtConteo.setText(cantidad+"");
+
+            ContentValues registroPedido= new ContentValues();
+            registroPedido.put("prodcantidad",cantidad);
+            db.update("pedido", registroPedido, "prodid = '" + productoPersonalizado.getProdid() + "' AND prodsiningredientes = '"+productoPersonalizado.getProdsiningredientes()+"'", null);
+        }
+        else
+        {
+            data.remove(productoPersonalizado);
+            db.delete("pedido", "prodid ='" + productoPersonalizado.getProdid() + "' AND prodsiningredientes = '"+productoPersonalizado.getProdsiningredientes()+"'", null);
+            adapter.notifyDataSetChanged();
+        }
+        disminuirTotal(productoPersonalizado.getProdprecio());
+        db.close();
+
     }
 }

@@ -1,10 +1,10 @@
 <resources>
     <string name="app_name">Duff24</string>
 
-    <string name="facebook_app_id">559518764223765</string>
+    <string name="facebook_app_id" translatable="false">559518764223765</string>
 
     <string name="hello_world">Hola desde Duff 24!</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_settings" translatable="false">Settings</string>
 
     <string name="la_carta">The Menu</string>
 
@@ -18,34 +18,34 @@
     <string name="text_btn_finalizar_pedido">Checkout</string>
 
 <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
 
     <string name="idioma">eng</string>
-    <string name="title_activity_bebidas">BebidasActivity</string>
-    <string name="title_activity_market">MarketActivity</string>
-    <string name="title_activity_bitmap">Bitmap</string>
-    <string name="title_activity_bitmap_decodificacion">BitmapDecodificacion</string>
-    <string name="title_activity_pedido">PedidoActivity</string>
-    <string name="title_activity_prueba">PruebaActivity</string>
+    <string name="title_activity_bebidas" translatable="false">BebidasActivity</string>
+    <string name="title_activity_market" translatable="false">MarketActivity</string>
+    <string name="title_activity_bitmap" translatable="false">Bitmap</string>
+    <string name="title_activity_bitmap_decodificacion" translatable="false">BitmapDecodificacion</string>
+    <string name="title_activity_pedido" translatable="false">PedidoActivity</string>
+    <string name="title_activity_prueba" translatable="false">PruebaActivity</string>
     <string name="domicilio_incluido">(Delivery included </string>
     <string name="menaje_desea_vaciar_pedido">You want to empty the order?</string>
     <string name="mensaje_pedido_vacio">It has emptied the order.</string>
     <string name="mensaje_pedido_minimo">Minimum order value $10.000</string>
-    <string name="title_activity_login">LoginActivity</string>
+    <string name="title_activity_login" translatable="false">LoginActivity</string>
     <string name="txt_hint_correo_electronico">Email</string>
     <string name="text_autenticarse">Login</string>
     <string name="text_recuperar_clave">Forgot your password?</string>
     <string name="text_registrarse">Sign up</string>
     <string name="text_clave">Password</string>
     <string name="text_continuar_no_registrado">Continue as not registered</string>
-    <string name="title_activity_registrarse">RegistrarseActivity</string>
-    <string name="title_activity_noregistrado">NoregistradoActivity</string>
+    <string name="title_activity_registrarse" translatable="false">RegistrarseActivity</string>
+    <string name="title_activity_noregistrado" translatable="false">NoregistradoActivity</string>
     <string name="txt_nombre">Name</string>
     <string name="txt_direccion">Address</string>
     <string name="txt_barrio">Neighborhood</string>
     <string name="txt_telefono">Phone</string>
     <string name="text_enviar_pedido">Send order</string>
-    <string name="text_hint_observaciones">Observations (Optional) \ n example. Hamburger no onions.</string>
+    <string name="text_hint_observaciones">Observations (Optional) \ n example. bring change for a fifty.</string>
     <string name="campos_obligatorios">All fields are required unless the observations</string>
     <string name="todos_campos_obligatorios">All fields are required.</string>
     <string name="seleccione_forma_pago">Select a payment method</string>
@@ -66,7 +66,7 @@
     <string name="confirmar_registro">Thanks for signing .... can now login with your account.</string>
     <string name="campos_obligatorios_inicio_session">Enter email and password</string>
     <string name="campo_obligatorio_correo_inicio_session">Enter email.</string>
-    <string name="campo_obligatorio_password_inicio_session">Enter password.</string>
+    <string name="campo_obligatorio_password_inicio_session" translatable="false">Enter password.</string>
     <string name="txt_cuenta">Account</string>
     <string name="txt_cerrar_sesion">Logout</string>
     <string name="txt_iniciando">Starting</string>
@@ -97,18 +97,23 @@
         <item>Card</item>
         <item>Cash</item>
     </string-array>
-    <string name="title_activity_pruebaconeccion">PruebaconeccionActivity</string>
-    <string name="title_activity_introduccion">IntroduccionActivity</string>
-    <string name="title_activity_registrado">RegistradoActivity</string>
-    <string name="title_activity_probandofacebook">ProbandofacebookActivity</string>
-    <string name="title_activity_contacto">ContactoActivity</string>
+    <string name="title_activity_pruebaconeccion" translatable="false">PruebaconeccionActivity</string>
+    <string name="title_activity_introduccion" translatable="false">IntroduccionActivity</string>
+    <string name="title_activity_registrado" translatable="false">RegistradoActivity</string>
+    <string name="title_activity_probandofacebook" translatable="false">ProbandofacebookActivity</string>
+    <string name="title_activity_contacto" translatable="false">ContactoActivity</string>
     <string name="txt_tu_opinion_importante">Your opinion is very important to us.</string>
     <string name="txt_mensaje_contacto">Message</string>
     <string name="txt_mensaje_enviado">Message sent</string>
     <string name="txt_mensaje_usuario_no_puede_ser_logueado">The registration email on facebook authentication.</string>
-    <string name="title_activity_notificacion">NotificacionActivity</string>
-    <string name="title_activity_pedidoencamino">PedidoencaminoActivity</string>
-
+    <string name="title_activity_notificacion" translatable="false">NotificacionActivity</string>
+    <string name="title_activity_pedidoencamino" translatable="false">PedidoencaminoActivity</string>
+    <string name="txt_btn_agregar_dialog_descripcion">Add</string>
+    <string name="txt_siningrediente_dialog_descripcion">Quit it:</string>
+    <string name="txt_cebolla">Onion</string>
+    <string name="txt_tomate">Tomato</string>
+    <string name="txt_salsas">Sauces</string>
+    <string name="cerrar_dialog_disminuir">Close</string>
 
 
 </resources>

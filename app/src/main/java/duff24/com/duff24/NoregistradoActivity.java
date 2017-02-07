@@ -3,9 +3,11 @@ package duff24.com.duff24;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
+import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -23,6 +25,7 @@ import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.backendless.Backendless;
 import com.backendless.BackendlessCollection;
@@ -49,7 +52,7 @@ import duff24.com.duff24.util.AppUtil;
 import duff24.com.duff24.util.FontCache;
 
 public class NoregistradoActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
-    private String font_path="font/A_Simple_Life.ttf";
+    private String font_path="font/KGTenThousandReasonsAlt.ttf";
 
     private Spinner spFormapago;
     private Spinner spCiudad;
@@ -67,6 +70,7 @@ public class NoregistradoActivity extends AppCompatActivity implements View.OnCl
     private AdaptadorSpinnerFormaPago adapter;
     private AdaptadorSpinnerCiudad adapterciudad;
     private ProgressDialog pd = null;
+    private VideoView videofondo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -74,6 +78,7 @@ public class NoregistradoActivity extends AppCompatActivity implements View.OnCl
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_noregistrado);
 
+        videofondo = (VideoView)findViewById(R.id.videofondo);
         spFormapago=(Spinner)findViewById(R.id.sp_forma_pago);
         spCiudad=(Spinner)findViewById(R.id.sp_ciudad);
         iconospinnerciudad=(ImageView)findViewById(R.id.iconospinerciudad);
@@ -105,6 +110,8 @@ public class NoregistradoActivity extends AppCompatActivity implements View.OnCl
 
         cargarDatosRemotos();
     }
+
+
 
     private void cargarDatosRemotos()
     {
@@ -229,6 +236,15 @@ public class NoregistradoActivity extends AppCompatActivity implements View.OnCl
     @Override
     protected void onResume() {
         super.onResume();
+        this.videofondo.setVideoPath("android.resource://"+getPackageName()+"/"+R.raw.fondo_duff);
+        this.videofondo.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
+        {
+            public void onCompletion(MediaPlayer paramAnonymousMediaPlayer)
+            {
+                NoregistradoActivity.this.videofondo.start();
+            }
+        });
+        this.videofondo.start();
 
         textNombre.setFocusableInTouchMode(true);
         textNombre.requestFocus();
@@ -254,7 +270,7 @@ public class NoregistradoActivity extends AppCompatActivity implements View.OnCl
     private void enviarParse(String nombre,String direccion,String barrio,String telefono,String observaciones,String formaPago,String ciudadid, final String ciudadnombre, final String ciudadcorreo)
     {
 
-        Pedido pedido= new Pedido();
+       Pedido pedido= new Pedido();
         pedido.setPeddireccion(direccion+" "+barrio);
         pedido.setPedformapago(formaPago);
         pedido.setPedtelefono(telefono);
@@ -289,6 +305,7 @@ public class NoregistradoActivity extends AppCompatActivity implements View.OnCl
                         "<tr>" +
                         "<th>Producto</th>" +
                         "<th>cantidad</th>" +
+                        "<th>detalles</th>"+
                         "<th>Precio</th>" +
                         "<th>Total</th>" +
                         "</tr>";
@@ -296,7 +313,7 @@ public class NoregistradoActivity extends AppCompatActivity implements View.OnCl
                 int totalPedido = 0;
                 AdminSQliteOpenHelper admin = AdminSQliteOpenHelper.crearSQLite(getApplicationContext());
                 SQLiteDatabase db = admin.getReadableDatabase();
-                Cursor fila = db.rawQuery("select prodid,prodcantidad from pedido", null);
+                Cursor fila = db.rawQuery("select prodid,prodcantidad,prodsiningredientes from pedido", null);
                 if (fila != null) {
 
                     if (fila.moveToFirst()) {
@@ -305,6 +322,7 @@ public class NoregistradoActivity extends AppCompatActivity implements View.OnCl
                             itempedido.setPedido(response.getObjectId());
                             itempedido.setProducto(fila.getString(fila.getColumnIndex("prodid")));
                             itempedido.setItemcantidad(fila.getInt(fila.getColumnIndex("prodcantidad")));
+                            itempedido.setSiningredientes(fila.getString(fila.getColumnIndex("prodsiningredientes")));
 
                             Producto producto = new Producto();
 
@@ -335,6 +353,7 @@ public class NoregistradoActivity extends AppCompatActivity implements View.OnCl
                                     "<tr>" +
                                     "<td>" + producto.getProdnombreesp() + "</td>" +
                                     "<td>" + fila.getInt(fila.getColumnIndex("prodcantidad")) + "</td>" +
+                                    "<td> sin: " + fila.getString(fila.getColumnIndex("prodsiningredientes")) + "</td>" +
                                     "<td>" + producto.getPrecio() + "</td>" +
                                     "<td>" + total + "</td>" +
                                     "</tr>";
@@ -357,8 +376,11 @@ public class NoregistradoActivity extends AppCompatActivity implements View.OnCl
                             }
                         });
 
+
+                        ArrayList pedidos = new ArrayList<String>();
+                        pedidos.add("default");
                         Messaging.DEVICE_ID=response.getObjectId();
-                        Backendless.Messaging.registerDevice("464411838818", new AsyncCallback<Void>() {
+                        Backendless.Messaging.registerDevice("464411838818",pedidos,null, new AsyncCallback<Void>() {
                             @Override
                             public void handleResponse(Void response) {
                                 Log.i("device:", "registrado");
