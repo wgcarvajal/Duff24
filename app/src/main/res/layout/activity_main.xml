@@ -5,8 +5,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".MainActivity"
     >
-
-
     <android.support.v4.widget.DrawerLayout
         android:id="@+id/drawer"
         android:layout_height="match_parent"
@@ -51,21 +49,13 @@
                     android:layout_alignParentBottom="true"
                     android:layout_margin="@dimen/margin_small"
                     />
-
-
-
-
-
-
-
-
                 <com.viewpagerindicator.CirclePageIndicator
                     android:id="@+id/pagerIndicator"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="3dp"
-                    android:layout_marginBottom="5dp"
                     android:layout_alignParentBottom="true"
+                    android:background="#000000"
 
                     />
                 <android.support.v4.view.ViewPager

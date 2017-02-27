@@ -3,7 +3,6 @@ package duff24.com.duff24;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -296,22 +295,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     {
                                         AppUtil.data.add(p);
                                     }
-
-
-                                    for(Producto pr : AppUtil.data)
-                                    {
-                                        for(Subcategoria sb: AppUtil.listaSubcategorias)
-                                        {
-                                            if(sb.getObjectId().equals(pr.getSubcategoria()))
-                                            {
-                                                pr.setSubcategoriaing(sb.getSubcatnombre());
-                                                pr.setSubcategoriaesp(sb.getSubcatnombresp());
-                                                break;
-                                            }
-                                        }
-
-                                    }
-
                                     crearFragments();
 
                                 }
@@ -750,23 +733,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     {
         final Dialog dialog= new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.template_dialog_descripcion_producto);
+        if(productSelected.isPersonalizable())
+        {
+            dialog.setContentView(R.layout.template_dialog_descripcion_producto);
+        }
+        else
+        {
+            dialog.setContentView(R.layout.template_dialog_descripcion_producto_2);
+        }
+
         dialog.getWindow().setBackgroundDrawableResource(R.drawable.bordes_redondos_dialog_descripcion_producto);
 
         TextView nombre_producto_dialog_descripcion = (TextView)dialog.findViewById(R.id.txt_nombre_producto_dialog_descripcion);
         TextView nombre_descripcion_dialog_descripcion = (TextView)dialog.findViewById(R.id.txt_descripcion_producto_dialog_descripcion);
         TextView precio_dialog_descripcion = (TextView)dialog.findViewById(R.id.txt_precio_dialog_descripcion);
-        TextView sin_dialog_descripcion = (TextView)dialog.findViewById(R.id.txt_sin_dialog_descripcion);
         Button btnagregarProducto_dialog_descripcion = (Button)dialog.findViewById(R.id.btn_agregar_producto_dialog_descripcion);
         ImageView imagen_producto_dialog_descripcion = (ImageView) dialog.findViewById(R.id.img_producto_dialog_descripcion);
-        ScrollView scrollpersonalizable = (ScrollView) dialog.findViewById(R.id.scroll_personalizable);
-
-
-        final CheckBox sincebolla = (CheckBox)dialog.findViewById(R.id.check_cebolla);
-        final CheckBox sintomate = (CheckBox)dialog.findViewById(R.id.check_tomate);
-        final CheckBox sinsalsas = (CheckBox)dialog.findViewById(R.id.check_salsas);
-
-
+        final CheckBox sincebolla;
+        final CheckBox sintomate;
+        final CheckBox sinsalsas;
         final ImageView placeholder = (ImageView) dialog.findViewById(R.id.placeholder_dialog_descripcion);
 
         placeholder.setVisibility(View.VISIBLE);
@@ -784,31 +769,83 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             nombre_producto_dialog_descripcion.setText(productSelected.getProdnombre());
             nombre_descripcion_dialog_descripcion.setText(productSelected.getProddescripcion());
         }
-
-
-
         DecimalFormat format= new DecimalFormat("###,###.##");
         String precio=format.format(productSelected.getPrecio());
         precio = precio.replace(",",".");
         precio_dialog_descripcion.setText("$"+precio);
-
         Typeface TF = FontCache.get(font_path_ASimple,this);
-
         nombre_producto_dialog_descripcion.setTypeface(TF);
         precio_dialog_descripcion.setTypeface(TF);
         btnagregarProducto_dialog_descripcion.setTypeface(TF);
-        sin_dialog_descripcion.setTypeface(TF);
-
         TF = FontCache.get(font_path,this);
         nombre_descripcion_dialog_descripcion.setTypeface(TF);
-        sincebolla.setTypeface(TF);
-        sintomate.setTypeface(TF);
-        sinsalsas.setTypeface(TF);
-
-        if(!productSelected.isPersonalizable())
+        if(productSelected.isPersonalizable())
         {
-            scrollpersonalizable.setVisibility(View.GONE);
-            sin_dialog_descripcion.setVisibility(View.GONE);
+            TF = FontCache.get(font_path_ASimple,this);
+            TextView sin_dialog_descripcion = (TextView)dialog.findViewById(R.id.txt_sin_dialog_descripcion);
+            ScrollView scrollpersonalizable = (ScrollView) dialog.findViewById(R.id.scroll_personalizable);
+            sin_dialog_descripcion.setTypeface(TF);
+            sincebolla = (CheckBox)dialog.findViewById(R.id.check_cebolla);
+            sintomate = (CheckBox)dialog.findViewById(R.id.check_tomate);
+            sinsalsas = (CheckBox)dialog.findViewById(R.id.check_salsas);
+            sincebolla.setTypeface(TF);
+            sintomate.setTypeface(TF);
+            sinsalsas.setTypeface(TF);
+            btnagregarProducto_dialog_descripcion.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view)
+                {
+                    String sinIngredientes ="";
+                    String sinIngredientesIng ="";
+                    if(sincebolla.isChecked())
+                    {
+                        sinIngredientes = "cebolla";
+                        sinIngredientesIng = "onion";
+                    }
+                    if(sintomate.isChecked())
+                    {
+                        if(sinIngredientes.equals(""))
+                        {
+                            sinIngredientes = "tomate";
+                            sinIngredientesIng = "tomato";
+                        }
+                        else
+                        {
+                            sinIngredientes = sinIngredientes +", tomate";
+                            sinIngredientesIng = sinIngredientesIng +", tomato";
+                        }
+                    }
+
+                    if(sinsalsas.isChecked())
+                    {
+                        if(sinIngredientes.equals(""))
+                        {
+                            sinIngredientes = "salsas";
+                            sinIngredientesIng = "sauces";
+                        }
+                        else
+                        {
+                            sinIngredientes = sinIngredientes +", salsas";
+                            sinIngredientesIng = sinIngredientesIng +", sauces";
+                        }
+                    }
+                    aumentarProducto(productSelected,btnDisminuirProductSelected,txtConteoProductoSelected,sinIngredientes,sinIngredientesIng);
+                    dialog.hide();
+                }
+            });
+        }
+        else
+        {
+            btnagregarProducto_dialog_descripcion.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view)
+                {
+                    String sinIngredientes ="";
+                    String sinIngredientesIng ="";
+                    aumentarProducto(productSelected,btnDisminuirProductSelected,txtConteoProductoSelected,sinIngredientes,sinIngredientesIng);
+                    dialog.hide();
+                }
+            });
         }
 
         Picasso.with(this)
@@ -826,64 +863,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 });
 
-        final Context context=this;
-
-
-        btnagregarProducto_dialog_descripcion.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view)
-            {
-                String sinIngredientes ="";
-                String sinIngredientesIng ="";
-
-
-                if(sincebolla.isChecked())
-                {
-                    sinIngredientes = "cebolla";
-                    sinIngredientesIng = "onion";
-
-                }
-
-                if(sintomate.isChecked())
-                {
-                    if(sinIngredientes.equals(""))
-                    {
-                        sinIngredientes = "tomate";
-                        sinIngredientesIng = "tomato";
-                    }
-                    else
-                    {
-                        sinIngredientes = sinIngredientes +", tomate";
-                        sinIngredientesIng = sinIngredientesIng +", tomato";
-
-                    }
-
-                }
-
-                if(sinsalsas.isChecked())
-                {
-                    if(sinIngredientes.equals(""))
-                    {
-                        sinIngredientes = "salsas";
-                        sinIngredientesIng = "sauces";
-                    }
-                    else
-                    {
-                        sinIngredientes = sinIngredientes +", salsas";
-                        sinIngredientesIng = sinIngredientesIng +", sauces";
-                    }
-
-                }
-
-                aumentarProducto(productSelected,btnDisminuirProductSelected,txtConteoProductoSelected,sinIngredientes,sinIngredientesIng);
-                dialog.hide();
-            }
-        });
-
-
         dialog.show();
     }
-
     private void aumentarProducto(Producto producto, TextView btndisminuir, TextView txtconteo, String sinIngredientes , String sinIngredientesIng)
     {
         MediaPlayer m = MediaPlayer.create(this,R.raw.sonido_click);
@@ -937,8 +918,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 registroPedido.put("prodsiningredientesing",sinIngredientesIng);
                 db.insert("pedido",null,registroPedido);
             }
-
-
         }
         else
         {
@@ -954,13 +933,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             db.insert("pedido",null,registroPedido);
         }
         db.close();
-
         txtconteo.setText("" + conteoTotal);
         txtconteo.setVisibility(View.VISIBLE);
         btndisminuir.setVisibility(View.VISIBLE);
     }
-
-
     private void disminuirProducto(Producto producto,TextView txtdisminuir, TextView txtconteo, String sinIngredientes)
     {
         int cantidad=0;

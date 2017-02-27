@@ -459,7 +459,7 @@ public class PedidoActivity extends AppCompatActivity implements View.OnClickLis
         final Dialog dialog= new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.template_dialog_vaciar_pedido);
-        dialog.getWindow().setBackgroundDrawableResource(R.drawable.bordes_redondos);
+        dialog.getWindow().setBackgroundDrawableResource(R.drawable.bordes_redondos_fondo_negro);
 
 
         Button btnAceptar=(Button)dialog.findViewById(R.id.btn_aceptar);

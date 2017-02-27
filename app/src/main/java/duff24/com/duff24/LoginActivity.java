@@ -284,7 +284,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     {
         Map<String, String> facebookFieldMappings = new HashMap<String, String>();
         facebookFieldMappings.put("email", "emailFacebook");
-        facebookFieldMappings.put("name", "nombre");
 
         List<String> permissions = new ArrayList<String>();
         permissions.add("public_profile");

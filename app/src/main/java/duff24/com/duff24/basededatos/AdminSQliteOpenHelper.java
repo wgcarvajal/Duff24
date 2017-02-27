@@ -10,7 +10,7 @@ import android.util.Log;
  */
 public class AdminSQliteOpenHelper extends SQLiteOpenHelper
 {
-    public static int v = 3;
+    public static int v = 4;
 
     public static AdminSQliteOpenHelper crearSQLite(Context context)
     {

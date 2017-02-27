@@ -35,7 +35,7 @@ public class IntroduccionActivity extends AppCompatActivity {
         protected Void doInBackground(Void... params)
         {
             try {
-                Thread.sleep(2000);
+                Thread.sleep(5000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

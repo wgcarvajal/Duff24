@@ -34,8 +34,7 @@ public class AnuncioFragment extends FragmentGeneric {
     private String subcategoriaesp;
     private String anuncioId;
     private ImageView anuncio;
-    private RelativeLayout placeholder;
-    private String font_path = "font/2-4ef58.ttf";
+    private ImageView placeholder;
 
 
     public AnuncioFragment()
@@ -82,7 +81,7 @@ public class AnuncioFragment extends FragmentGeneric {
 
 
         anuncio=(ImageView)v.findViewById(R.id.anuncio);
-        placeholder = (RelativeLayout)v.findViewById(R.id.placeholder);
+        placeholder = (ImageView) v.findViewById(R.id.placeholder);
         return v;
     }
 
@@ -105,16 +104,17 @@ public class AnuncioFragment extends FragmentGeneric {
                 Log.i("ya habia","un anuncio guardado");
                 an=a;
                 bandera=1;
+                placeholder.setVisibility(View.VISIBLE);
+                placeholder.setImageResource(R.drawable.foodgif);
                 if(getResources().getString(R.string.idioma).equals("es"))
                 {
-                    placeholder.setVisibility(View.VISIBLE);
-
                     Picasso.with(getContext())
                             .load(an.getImgFileEsp())
                             .into(anuncio, new Callback() {
                                 @Override
                                 public void onSuccess()
                                 {
+                                    placeholder.setImageDrawable(null);
                                     placeholder.setVisibility(View.GONE);
 
                                 }
@@ -127,12 +127,13 @@ public class AnuncioFragment extends FragmentGeneric {
                 }
                 else
                 {
-                    placeholder.setVisibility(View.VISIBLE);
                     Picasso.with(getContext())
                             .load(an.getImgFile())
                             .into(anuncio, new Callback() {
                                 @Override
-                                public void onSuccess() {
+                                public void onSuccess()
+                                {
+                                    placeholder.setImageDrawable(null);
                                     placeholder.setVisibility(View.GONE);
                                 }
 
@@ -174,6 +175,7 @@ public class AnuncioFragment extends FragmentGeneric {
                 AppUtil.listaAnuncios.add(response);
 
                 placeholder.setVisibility(View.VISIBLE);
+                placeholder.setImageResource(R.drawable.foodgif);
                 if(context.getResources().getString(R.string.idioma).equals("es"))
                 {
                     Picasso.with(getContext())
@@ -181,6 +183,7 @@ public class AnuncioFragment extends FragmentGeneric {
                             .into(anuncio, new Callback() {
                                 @Override
                                 public void onSuccess() {
+                                    placeholder.setImageDrawable(null);
                                     placeholder.setVisibility(View.GONE);
                                 }
 
@@ -197,6 +200,7 @@ public class AnuncioFragment extends FragmentGeneric {
                             .into(anuncio, new Callback() {
                                 @Override
                                 public void onSuccess() {
+                                    placeholder.setImageDrawable(null);
                                     placeholder.setVisibility(View.GONE);
                                 }
 

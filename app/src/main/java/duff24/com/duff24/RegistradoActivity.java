@@ -177,7 +177,18 @@ public class RegistradoActivity extends AppCompatActivity implements View.OnClic
 
     private void enviarPedido()
     {
+
         String nombre=(String)Backendless.UserService.CurrentUser().getProperty("nombre");
+
+        if(nombre == null)
+        {
+            nombre=(String)Backendless.UserService.CurrentUser().getProperty("name");
+            if(nombre == null)
+            {
+                nombre ="No registra nombre";
+            }
+        }
+
         int indiceDireccion=spDireccion.getSelectedItemPosition();
         int indiceTelefono=spTelefono.getSelectedItemPosition();
         int indiceFormaPago=spFormaPago.getSelectedItemPosition();

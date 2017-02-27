@@ -12,16 +12,16 @@
         android:id="@+id/anuncio"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="30dp"
         android:scaleType="fitXY"
         />
 
-    <include
+    <pl.droidsonroids.gif.GifImageView
         android:id="@+id/placeholder"
         android:layout_width="@dimen/tam_place_holder"
         android:layout_height="@dimen/tam_place_holder"
         android:layout_centerInParent="true"
-        layout="@layout/progress_layout"
         />
+
+
 
 </RelativeLayout>
