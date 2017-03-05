@@ -12,6 +12,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.backendless.Backendless;
+import com.backendless.BackendlessCollection;
 import com.backendless.async.callback.AsyncCallback;
 import com.backendless.exceptions.BackendlessFault;
 import com.backendless.persistence.BackendlessDataQuery;
@@ -164,61 +165,27 @@ public class AnuncioFragment extends FragmentGeneric {
         anuncioSelect.add("idSubcategoria");
 
         dataQueryanuncio.setProperties(anuncioSelect);
-        dataQueryanuncio.setWhereClause("subcategoria='"+anuncioId+"'");
+        dataQueryanuncio.setWhereClause("idSubcategoria='"+anuncioId+"'");
         QueryOptions queryOptionsAnuncio= new QueryOptions();
         queryOptionsAnuncio.setPageSize(100);
         dataQueryanuncio.setQueryOptions(queryOptionsAnuncio);
-        Backendless.Persistence.of(Anuncio.class).findFirst(new AsyncCallback<Anuncio>() {
+        Backendless.Persistence.of(Anuncio.class).find(dataQueryanuncio, new AsyncCallback<BackendlessCollection<Anuncio>>() {
             @Override
-            public void handleResponse(Anuncio response)
+            public void handleResponse(BackendlessCollection<Anuncio> response)
             {
-                AppUtil.listaAnuncios.add(response);
-
-                placeholder.setVisibility(View.VISIBLE);
-                placeholder.setImageResource(R.drawable.foodgif);
-                if(context.getResources().getString(R.string.idioma).equals("es"))
-                {
-                    Picasso.with(getContext())
-                            .load(response.getImgFileEsp())
-                            .into(anuncio, new Callback() {
-                                @Override
-                                public void onSuccess() {
-                                    placeholder.setImageDrawable(null);
-                                    placeholder.setVisibility(View.GONE);
-                                }
-
-                                @Override
-                                public void onError() {
-
-                                }
-                            });
-                }
-                else
-                {
-                    Picasso.with(getContext())
-                            .load(response.getImgFile())
-                            .into(anuncio, new Callback() {
-                                @Override
-                                public void onSuccess() {
-                                    placeholder.setImageDrawable(null);
-                                    placeholder.setVisibility(View.GONE);
-                                }
-
-                                @Override
-                                public void onError() {
-
-                                }
-                            });
-                }
+                Anuncio anuncioResponse = response.getData().get(0);
+                AppUtil.listaAnuncios.add(anuncioResponse);
+                loadAnuncio();
             }
 
             @Override
             public void handleFault(BackendlessFault fault)
             {
-
+                Log.i("imformacion:", fault.getMessage());
             }
         });
     }
+
     @Override
     public void actualizarData()
     {

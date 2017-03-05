@@ -89,8 +89,15 @@ public class AdaptadorProducto extends RecyclerView.Adapter<AdaptadorProducto.Pr
             imgFile = p.getImgFileNew();
         }
 
+        final float tam = context.getResources().getDimension(R.dimen.alto_template_producto);
+
+        int height = (int)tam;
+
+        int width = (int)(tam * 2 / 3);
+
         Picasso.with(context)
                 .load(imgFile)
+                .resize(width,height)
                 .into(viewHolder.imagenProducto, new Callback() {
 
                     @Override
